@@ -69,6 +69,12 @@ pip install mpremote
 Or in Thonny: `View → Files`, select `config.py`, `drivers` and `flight`,
 right-click → **Upload to /**. Re-upload after any change under `src/`.
 
+`main.py` is deliberately excluded. MicroPython auto-runs it on every boot *and
+every soft-reboot* — which is what Thonny's Run button always does first — so a
+`main.py` on the board hijacks every test run before your script executes. If
+you see the shell print `MPY: soft reboot` repeatedly with none of your test's
+own output, this is why: run `./tools/upload.sh` again, which removes it.
+
 ### 3. Work through the bench tests
 
 Do these **in order** — each assumes the previous one passes.
@@ -87,9 +93,17 @@ Index and safety notes: [`testing/README.md`](testing/README.md).
 
 ### 4. Run it
 
-Copy the contents of `src/` to the board's filesystem **root** and reset. You get
-live attitude, heading and GPS status streamed to the REPL, with the motors held
-hardware-disarmed throughout.
+**Do this separately from the bench tests above, and remove it again afterwards.**
+`main.py` auto-runs on every boot and soft-reboot, so leaving it on the board
+hijacks every test run in step 3 - if you go back to bench testing after this,
+delete it first (`./tools/upload.sh` does this for you automatically).
+
+```bash
+mpremote fs cp src/main.py :
+```
+
+Then reset the board. You get live attitude, heading and GPS status streamed to
+the REPL, with the motors held hardware-disarmed throughout.
 
 ## Safety model
 

@@ -43,6 +43,20 @@ ImportError: no module named 'config'
 Re-upload after any change under `src/`. The board keeps its own copy; editing
 the file on your computer does not update it.
 
+**`main.py` is deliberately never uploaded by this script.** MicroPython
+auto-runs a file named `main.py` on every boot *and every soft-reboot* — and
+Thonny's Run button always soft-reboots the board first. If `main.py` were on
+the board, every test run would re-enter it instead of your script before your
+script ever got a chance to execute. Its sensor bring-up blocks forever in two
+places, so the symptom is total silence: the shell just prints
+
+```
+MPY: soft reboot
+```
+
+repeatedly, with none of your test's output ever appearing. `upload.sh` actively
+removes `main.py` from the board if it finds one there, for exactly this reason.
+
 ### Step 1 — run it
 
 Open the script in Thonny with the interpreter set to **MicroPython (Raspberry Pi

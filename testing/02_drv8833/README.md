@@ -105,6 +105,7 @@ that band is a pass. What matters is that it moves when the duty changes.
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | `AOUT1` stays at 0 V always | `SLP` not reaching 3.3 V. Measure it directly — this is the most common failure and produces no error message |
 | `AOUT1` sits at full 5 V | `AIN2` not tied to GND |
 | `nFAULT: TRIPPED` | Over-current or thermal. With no motor attached this means an output is shorted to GND |

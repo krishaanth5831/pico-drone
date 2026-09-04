@@ -111,6 +111,7 @@ diagnose later.
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | Buzzes but does not turn | Duty below the motor's start threshold. Raise `MIN_START` in `src/config.py` to 0.30 |
 | Wrong motor spins | Output leads swapped between channels. Check `AOUT` vs `BOUT` |
 | Nothing spins at all | Go back to `02_drv8833` — this is a driver fault, not a motor fault |

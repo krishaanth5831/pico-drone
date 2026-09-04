@@ -105,6 +105,7 @@ streaming - tilt the board, ctrl-C to stop
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | `I2C devices: []` | SDA/SCL swapped, or no power. Check 3V3 at the module |
 | `0x68` present, WHO_AM_I error | Clone chip. MPU6500/9250 report 0x70/0x71/0x73 and are accepted |
 | Readings all zero | Chip still asleep — a failed `PWR_MGMT_1` write, usually a flaky SDA connection |
