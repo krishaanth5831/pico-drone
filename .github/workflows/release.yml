@@ -27,7 +27,12 @@ jobs:
           python-version: "3.12"
 
       - name: Verify it compiles before shipping it
-        run: python -m compileall -q src
+        run: |
+          python -m compileall -q src
+          # compileall leaves __pycache__ behind, and those are CPython
+          # bytecode - the wrong format for MicroPython and pure waste on the
+          # Pico's flash. Clear them before anything gets copied.
+          find src -name __pycache__ -type d -exec rm -rf {} + 2>/dev/null || true
 
       - name: Assemble firmware bundle
         run: |
@@ -44,6 +49,8 @@ jobs:
           # meaning at the board root, so it is left out.
           cp src/main.py src/config.py dist/pico-drone/
           cp -r src/drivers src/flight dist/pico-drone/
+          find dist -name __pycache__ -type d -exec rm -rf {} + 2>/dev/null || true
+          find dist -name '*.pyc' -delete
           cp README.md LICENSE dist/pico-drone/
           echo "$VERSION" > dist/pico-drone/VERSION
 
