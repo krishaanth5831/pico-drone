@@ -45,6 +45,27 @@ stronger than that at close range.
   distortion you are cancelling comes from the airframe itself, so a calibration
   done on a bare bench is worthless once the module is bolted down.
 
+## Upload the library first
+
+This script imports `config`, `drivers` and `flight`. **Those imports resolve
+against the Pico's filesystem, not your computer's** — opening the file in an
+editor is not enough. Without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+Upload once, and it stays there until you overwrite it:
+
+- **Thonny** — `View → Files` so both panes show. In the top (computer) pane
+  select `config.py`, `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh` (needs `pip install mpremote`).
+
+Verify with `./tools/upload.sh --list`, or just look at the bottom pane in
+Thonny — you should see `config.py`, `drivers/` and `flight/` at the root.
+
+Re-upload whenever you change anything under `src/`.
+
 ## Running the test
 
 Run `test_hmc5883l_compass.py`. It detects the chip, runs a 30-second

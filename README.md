@@ -56,7 +56,20 @@ Grab the Pico 2 W UF2 from
 **BOOTSEL** while plugging in, and copy the file to the `RP2350` drive that
 appears. Full walkthrough in [`testing/01_pico_2w/`](testing/01_pico_2w/README.md).
 
-### 2. Work through the bench tests
+### 2. Put the library on the board
+
+The bench scripts import `config`, `drivers` and `flight`, and those imports
+resolve against the **Pico's** filesystem — not your computer's:
+
+```bash
+pip install mpremote
+./tools/upload.sh          # --list to check, --clean to wipe first
+```
+
+Or in Thonny: `View → Files`, select `config.py`, `drivers` and `flight`,
+right-click → **Upload to /**. Re-upload after any change under `src/`.
+
+### 3. Work through the bench tests
 
 Do these **in order** — each assumes the previous one passes.
 
@@ -72,7 +85,7 @@ Do these **in order** — each assumes the previous one passes.
 
 Index and safety notes: [`testing/README.md`](testing/README.md).
 
-### 3. Run it
+### 4. Run it
 
 Copy the contents of `src/` to the board's filesystem **root** and reset. You get
 live attitude, heading and GPS status streamed to the REPL, with the motors held

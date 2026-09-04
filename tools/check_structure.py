@@ -64,6 +64,24 @@ for folder in component_dirs:
             fail(f"{script.relative_to(ROOT)} has no module docstring")
 
 
+# --- scripts importing from src/ must explain how to get it there ------------
+# These imports resolve against the BOARD's filesystem. Without a guard the
+# failure is a bare "ImportError: no module named 'config'", which says nothing
+# about needing to upload anything.
+
+for script in sorted(TESTING.rglob("test_*.py")):
+    body = script.read_text()
+    imports_library = "import config" in body or "from drivers" in body or "from flight" in body
+    if not imports_library:
+        continue
+    checked += 1
+    rel = script.relative_to(ROOT)
+    if "except ImportError" not in body:
+        fail(f"{rel} imports from src/ but does not catch ImportError")
+    elif "upload.sh" not in body:
+        fail(f"{rel} catches ImportError but does not point at tools/upload.sh")
+
+
 # --- every bench script must show a liveness heartbeat -----------------------
 # The onboard LED pulsing is the user's failsafe: it says the board is powered
 # and its scheduler is running. A script that starts one and never stops it is

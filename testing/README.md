@@ -24,10 +24,32 @@ a wiring table in physical pin numbers and a runnable script.
 
 ## Running a script
 
-Open it in Thonny with the interpreter set to **MicroPython (Raspberry Pi Pico)**
-and press Run. Scripts import from `src/`, so copy `config.py`, `drivers/` and
-`flight/` to the board's filesystem root first — or upload the release bundle,
-which has the right layout.
+### Step 0 — put the library on the board
+
+Every script except [01](01_pico_2w/README.md) imports `config`, `drivers` and
+`flight`. **Those imports resolve against the Pico's filesystem, not your
+computer's.** Opening a file in an editor and pressing Run does not upload
+anything, so without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+- **Thonny** — `View → Files`. In the top (computer) pane select `config.py`,
+  `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh`, which needs `pip install mpremote`.
+  `--list` shows what is currently on the board, `--clean` wipes it first.
+
+Re-upload after any change under `src/`. The board keeps its own copy; editing
+the file on your computer does not update it.
+
+### Step 1 — run it
+
+Open the script in Thonny with the interpreter set to **MicroPython (Raspberry Pi
+Pico)** and press Run.
+
+[01](01_pico_2w/README.md) needs no upload at all — it is deliberately
+self-contained so you can check the board before anything else exists on it.
 
 ## The LED heartbeat
 

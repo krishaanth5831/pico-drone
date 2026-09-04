@@ -42,6 +42,27 @@ Keep the wires away from motor leads. Coreless motors are brush-commutated and
 throw a lot of electrical noise; corrupted I2C reads mid-flight drop your
 attitude estimate.
 
+## Upload the library first
+
+This script imports `config`, `drivers` and `flight`. **Those imports resolve
+against the Pico's filesystem, not your computer's** — opening the file in an
+editor is not enough. Without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+Upload once, and it stays there until you overwrite it:
+
+- **Thonny** — `View → Files` so both panes show. In the top (computer) pane
+  select `config.py`, `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh` (needs `pip install mpremote`).
+
+Verify with `./tools/upload.sh --list`, or just look at the bottom pane in
+Thonny — you should see `config.py`, `drivers/` and `flight/` at the root.
+
+Re-upload whenever you change anything under `src/`.
+
 ## Running the test
 
 Put the board flat and still, then run `test_gy521_imu.py`. It scans the bus,

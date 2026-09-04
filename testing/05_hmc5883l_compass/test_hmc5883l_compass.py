@@ -15,9 +15,21 @@ sys.path.append("/")
 
 from machine import I2C, Pin  # noqa: E402
 
-import config  # noqa: E402
-from drivers import hmc5883l  # noqa: E402
-from drivers.heartbeat import Heartbeat  # noqa: E402
+try:
+    import config  # noqa: E402
+    from drivers import hmc5883l  # noqa: E402
+    from drivers.heartbeat import Heartbeat  # noqa: E402
+except ImportError as exc:
+    raise SystemExit(
+        "\n%s\n\n"
+        "The library modules are not on the Pico yet. These imports resolve\n"
+        "against the BOARD's filesystem, not your computer's, so opening this\n"
+        "file in an editor is not enough.\n\n"
+        "Upload them once, then run this again:\n"
+        "  Thonny   : View -> Files. In the top pane select config.py, drivers\n"
+        "             and flight, right-click -> 'Upload to /'\n"
+        "  Terminal : ./tools/upload.sh\n" % exc
+    )
 
 CALIBRATION_S = 30
 

@@ -15,10 +15,22 @@ sys.path.append("/")
 
 from machine import I2C, Pin  # noqa: E402
 
-import config  # noqa: E402
-from drivers.heartbeat import Heartbeat  # noqa: E402
-from drivers.mpu6050 import MPU6050  # noqa: E402
-from flight.fusion import ComplementaryFilter  # noqa: E402
+try:
+    import config  # noqa: E402
+    from drivers.heartbeat import Heartbeat  # noqa: E402
+    from drivers.mpu6050 import MPU6050  # noqa: E402
+    from flight.fusion import ComplementaryFilter  # noqa: E402
+except ImportError as exc:
+    raise SystemExit(
+        "\n%s\n\n"
+        "The library modules are not on the Pico yet. These imports resolve\n"
+        "against the BOARD's filesystem, not your computer's, so opening this\n"
+        "file in an editor is not enough.\n\n"
+        "Upload them once, then run this again:\n"
+        "  Thonny   : View -> Files. In the top pane select config.py, drivers\n"
+        "             and flight, right-click -> 'Upload to /'\n"
+        "  Terminal : ./tools/upload.sh\n" % exc
+    )
 
 print("\n=== GY-521 / MPU6050 test ===")
 print("LED pulses for as long as this runs\n")

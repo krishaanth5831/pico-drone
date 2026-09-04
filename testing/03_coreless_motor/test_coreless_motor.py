@@ -12,10 +12,22 @@ import time
 
 sys.path.append("/")
 
-import config  # noqa: E402
-from drivers.heartbeat import Heartbeat  # noqa: E402
-from drivers.motors import MotorBank, ramp  # noqa: E402
-from flight.mixer import MOTOR_DIRECTIONS, MOTOR_POSITIONS  # noqa: E402
+try:
+    import config  # noqa: E402
+    from drivers.heartbeat import Heartbeat  # noqa: E402
+    from drivers.motors import MotorBank, ramp  # noqa: E402
+    from flight.mixer import MOTOR_DIRECTIONS, MOTOR_POSITIONS  # noqa: E402
+except ImportError as exc:
+    raise SystemExit(
+        "\n%s\n\n"
+        "The library modules are not on the Pico yet. These imports resolve\n"
+        "against the BOARD's filesystem, not your computer's, so opening this\n"
+        "file in an editor is not enough.\n\n"
+        "Upload them once, then run this again:\n"
+        "  Thonny   : View -> Files. In the top pane select config.py, drivers\n"
+        "             and flight, right-click -> 'Upload to /'\n"
+        "  Terminal : ./tools/upload.sh\n" % exc
+    )
 
 HOLD_S = 1.5
 RAMP_S = 1.0
