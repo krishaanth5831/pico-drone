@@ -55,6 +55,8 @@ seconds.
 
 ```
 === GY-521 / MPU6050 test ===
+LED pulses for as long as this runs
+
 I2C devices : ['0x68']
 WHO_AM_I    : 0x68 (MPU6050)
 temperature : 24.8 C
@@ -75,6 +77,8 @@ streaming - tilt the board, ctrl-C to stop
 - Lying flat → both read within a degree or two of zero
 - `accel` magnitude stays near **9.81** in any orientation — that is gravity, and
   it is the check that your scaling is right
+
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
 
 ## If it fails
 

@@ -13,6 +13,7 @@ import time
 sys.path.append("/")
 
 import config  # noqa: E402
+from drivers.heartbeat import Heartbeat  # noqa: E402
 from drivers.motors import MotorBank, ramp  # noqa: E402
 from flight.mixer import MOTOR_DIRECTIONS, MOTOR_POSITIONS  # noqa: E402
 
@@ -21,9 +22,10 @@ RAMP_S = 1.0
 PEAK = 0.55  # enough to see direction clearly, gentle on the drivers
 
 print("\n=== coreless motor test ===")
-print("MAX_DUTY %.2f, props must be OFF\n" % config.MAX_DUTY)
+print("MAX_DUTY %.2f, props must be OFF" % config.MAX_DUTY)
+print("LED pulses for as long as this runs\n")
 
-with MotorBank() as bank:
+with Heartbeat(), MotorBank() as bank:
     try:
         for number in sorted(config.MOTOR_PINS):
             print(
@@ -51,4 +53,4 @@ with MotorBank() as bank:
     except KeyboardInterrupt:
         print("\ninterrupted")
 
-print("=== disarmed ===")
+print("=== disarmed, LED off ===")

@@ -95,6 +95,9 @@ motors together while watching for resets.
 === 1S LiPo power test ===
 boot #1  (reset cause 1)
 
+LED pulses for as long as this runs.
+If the pulse stops and restarts, that IS the brownout - watch the board.
+
 battery: measure across the pack now
   idle, motors off   -> expect 3.7-4.2 V
 ramping all four motors to 0.70 over 3s
@@ -111,6 +114,17 @@ boot count stayed at 1
 **The pass condition is that `boot #1` never becomes `boot #2`.** A reset shows
 up as the script restarting from the top with an incremented counter.
 
+### Watch the LED, not the shell
+
+This is where the heartbeat earns its keep. During the load test your eyes are on
+the multimeter, not the terminal — and **a brownout is visible as the LED pulse
+stopping and restarting**. That is the reset happening, in real time, without
+having to catch it scroll past.
+
+The boot counter is the durable record; the LED is the live one. If they
+disagree, trust the counter — it is written to flash and survives the reset that
+a glance might miss.
+
 Watch the multimeter across the battery as the ramp runs. A drop from 3.9 V to
 3.5 V under load is normal. A drop below 3.0 V means the pack is too small, too
 discharged, or its internal resistance is too high.
@@ -120,6 +134,7 @@ discharged, or its internal resistance is too high.
 | Symptom | Cause |
 |---|---|
 | `boot #2` appears mid-test | Brownout confirmed. Add or move the capacitors closer to the drivers |
+| LED pulse stops and restarts | Same thing, seen live — the board reset under load |
 | Thonny disconnects when motors spool | Same thing, seen from the host side |
 | Voltage under load drops below 3.0 V | Pack too small or too discharged. Charge it, or use a pack with a higher C rating |
 | Resets only at high throttle | Reduce `MAX_DUTY`, then fix the capacitors |

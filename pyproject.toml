@@ -32,6 +32,9 @@ ignore = [
 "testing/**/*.py" = ["E402", "T201"]
 "src/main.py" = ["E402"]
 "tests/**/*.py" = ["SLF001"]  # tests reach into private attrs on purpose
+# SIM105 wants contextlib.suppress(), which MicroPython does not ship - the
+# firmware has no contextlib at all, so try/except/pass is the only option.
+"src/drivers/heartbeat.py" = ["SIM105"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["config", "drivers", "flight"]

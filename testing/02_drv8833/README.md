@@ -60,6 +60,9 @@ pull several times that. Pin 36 is only for `SLP`.
 
 ```
 === DRV8833 driver check ===
+no motors should be connected
+LED pulses for as long as this runs
+
 SLP low  -> drivers asleep
   measure AOUT1 now: expect ~0 V (high impedance)
 SLP high -> drivers awake
@@ -74,6 +77,8 @@ nFAULT  : OK (high)
 A PWM output measured with a cheap multimeter reads the **average**, so 50% duty
 on a 5 V rail shows somewhere around 2.0–2.7 V, not a clean 2.5 V. Anything in
 that band is a pass. What matters is that it moves when the duty changes.
+
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
 
 ## If it fails
 

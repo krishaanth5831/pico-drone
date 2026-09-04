@@ -61,6 +61,7 @@ motor output.
 ```
 === coreless motor test ===
 MAX_DUTY 0.70, props must be OFF
+LED pulses for as long as this runs
 
 motor 1 (front-right, expect CCW)
   ramping up... holding... ramping down
@@ -82,6 +83,8 @@ Mark the direction on each motor with a pen as you confirm it.
 `src/flight/mixer.py` assumes the directions in the diagram above, and changing
 signs there to compensate will break yaw control in a way that is very hard to
 diagnose later.
+
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
 
 ## If it fails
 

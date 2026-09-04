@@ -16,6 +16,7 @@ from machine import PWM, Pin
 
 sys.path.append("/")
 import config  # noqa: E402
+from drivers.heartbeat import Heartbeat  # noqa: E402
 
 SETTLE_S = 6  # long enough to get a probe onto a pad
 
@@ -36,7 +37,12 @@ for number in (1, 2):
 OUTPUT_NAMES = {1: "AOUT1", 2: "BOUT1"}
 
 print("\n=== DRV8833 driver check ===")
-print("no motors should be connected\n")
+print("no motors should be connected")
+print("LED pulses for as long as this runs\n")
+
+# Soft-timer based, so it keeps beating through the six-second measurement
+# pauses below.
+heartbeat = Heartbeat().start()
 
 try:
     print("SLP low  -> drivers asleep")
@@ -71,4 +77,5 @@ finally:
     for pwm in channels.values():
         pwm.duty_u16(0)
     slp.low()
-    print("=== disarmed ===")
+    heartbeat.stop()
+    print("=== disarmed, LED off ===")

@@ -57,6 +57,8 @@ lazy figure-of-eight in all three axes — for the whole 30 seconds.
 
 ```
 === HMC5883L / QMC5883L test ===
+LED pulses for as long as this runs
+
 I2C devices : ['0x1e', '0x68']
 detected    : HMC5883L
 
@@ -80,6 +82,8 @@ matter:
 - `field` magnitude stays roughly **25–65 µT** and barely changes as you rotate.
   A magnitude that swings wildly means calibration failed or something magnetic
   is too close.
+
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
 
 ## If it fails
 

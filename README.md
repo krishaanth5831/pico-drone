@@ -32,6 +32,7 @@ src/
   main.py              entry point - sensor bring-up, motors stay disarmed
   drivers/
     motors.py          DRV8833 bank with hardware arm/disarm
+    heartbeat.py       onboard-LED liveness pulse, soft-timer driven
     mpu6050.py         GY-521 gyro + accelerometer
     hmc5883l.py        magnetometer, auto-detects the QMC5883L clone
     gps.py             NEO-6M NMEA parser
@@ -95,6 +96,18 @@ Enforced throughout:
 - Nothing in this repo arms motors at power-on.
 
 **Every bench procedure assumes props are off.**
+
+### LED heartbeat
+
+Every script pulses the onboard LED for as long as it runs — a long on, short off
+that reads as a glow. Pulsing means the board is powered and its scheduler is
+running; **stopping and restarting means it reset**, which on this airframe means
+a brownout. It runs on a soft timer, so it survives blocking calls, and
+`tools/check_structure.py` fails CI if a script starts one without stopping it.
+
+It does not prove the main loop is progressing — a soft timer keeps firing even
+if the code above it hangs. It catches reset and power loss, which is the failure
+this hardware actually has.
 
 ## Development
 

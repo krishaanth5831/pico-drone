@@ -74,6 +74,8 @@ moment a fix is acquired — that is hardware confirmation, independent of any
 code. Cold start outdoors takes 30 s to several minutes; the onboard backup
 battery then makes later warm starts a few seconds.
 
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
+
 ## If it fails
 
 | Symptom | Cause |
