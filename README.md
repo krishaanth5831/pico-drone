@@ -116,8 +116,8 @@ Enforced throughout:
 - `MotorBank` drives `SLP` low **before** any PWM channel is constructed, so no
   stale duty can reach a motor during startup.
 - Using it as a context manager disarms on every exit path, exceptions included.
-- `tools/check_structure.py` fails CI if any motor-driving file lacks a
-  `finally` block or `with MotorBank()`.
+- Keep that pattern in any new motor-driving code: a `finally` block or
+  `with MotorBank()`, no exceptions.
 - `MAX_DUTY` is capped at 0.70 — two DRV8833s thermally shut down at sustained
   full throttle — and `tests/test_config.py` fails if it is raised.
 - Nothing in this repo arms motors at power-on.
@@ -130,7 +130,7 @@ Every script pulses the onboard LED for as long as it runs — a long on, short 
 that reads as a glow. Pulsing means the board is powered and its scheduler is
 running; **stopping and restarting means it reset**, which on this airframe means
 a brownout. It runs on a soft timer, so it survives blocking calls, and
-`tools/check_structure.py` fails CI if a script starts one without stopping it.
+Keep that pattern in anything new: start it, stop it, no orphaned timers.
 
 It does not prove the main loop is progressing — a soft timer keeps firing even
 if the code above it hangs. It catches reset and power loss, which is the failure
@@ -142,33 +142,17 @@ this hardware actually has.
 python3 -m venv .venv
 ./.venv/bin/pip install pytest ruff
 
-./.venv/bin/python -m pytest        # 67 tests, no hardware needed
+./.venv/bin/python -m pytest        # 80 tests, no hardware needed
 ./.venv/bin/ruff check .
-python3 tools/check_structure.py
 ```
 
 `tests/mocks/machine.py` fakes MicroPython's hardware layer — `Pin` records its
 levels, `PWM` its duty, `I2C` serves bytes from a register dict — so the same
-code the board runs is exercised in CI on the same import paths.
+code the board runs can be exercised on a computer with no board attached.
 
 > On a machine with ROS installed, prefix pytest with
 > `env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` — ROS's `launch_testing`
 > plugin auto-loads and crashes.
-
-## Branching
-
-```
-feature branch ──PR──> dev ──PR──> main
-                                    ^
-                            human merges only
-```
-
-`main` is protected: no direct pushes, PR required, force-push and deletion
-disabled, and the rules apply to admins too. Day-to-day work goes to `dev`.
-
-CI runs on every PR: ruff, pytest across Python 3.10–3.12, a compile check of all
-board code, repo convention checks, and markdown link validation. Tagging `v*`
-bundles `src/` into a flashable zip and attaches it to a GitHub Release.
 
 ## License
 

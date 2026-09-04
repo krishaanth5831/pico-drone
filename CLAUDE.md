@@ -1,25 +1,13 @@
 # Working agreements for this repo
 
-## Branching and merging — hard rules
+## Branching
 
-- `main` is protected. All work happens on `dev` or on feature branches cut from `dev`.
-- Nothing is ever pushed directly to `main`. It is rejected by branch protection.
-- **Claude never merges a pull request.** Not to `main`, not to `dev`, not ever.
-  Claude may *create* a PR, and only when explicitly asked to. A human (the repo
-  owner) performs every merge.
-- Do not use `gh pr merge`, `gh api --method PUT .../merge`, or any equivalent.
-- When a PR is ready, say so and hand over the URL. Stop there.
+Plain version control. One branch, `main`. No branch protection, no required
+PRs, no CI. Commit and push directly.
 
-## Flow
-
-```
-feature branch ──PR──> dev ──PR──> main
-                                    ^
-                            human merges only
-```
-
-- Day-to-day work in progress goes to `dev`.
-- `dev` -> `main` PRs are opened only when a milestone is genuinely ready.
+Claude does not create or merge pull requests here unless explicitly asked to -
+not because of any repo-level gate, just as a matter of not taking actions the
+user has not asked for.
 
 ## Hardware safety rules that affect code
 
@@ -44,4 +32,4 @@ feature branch ──PR──> dev ──PR──> main
 - Comment generously, especially anything touching hardware registers or timing.
 - Hardware code goes in `src/drivers/`, control maths in `src/flight/`.
 - Anything in `src/` must import cleanly under CPython with `tests/mocks/` on the
-  path, so CI can exercise it without a board attached.
+  path, so it can be tested without a board attached.

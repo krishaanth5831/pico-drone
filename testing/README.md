@@ -90,8 +90,7 @@ from — not a hang.
 [01](01_pico_2w/README.md) is the one exception to the shared implementation: it
 runs before anything has been uploaded to the board, so it carries its own copy
 rather than importing `drivers/heartbeat.py`. Every other script imports the real
-one, and `tools/check_structure.py` fails CI if any script starts a heartbeat
-without stopping it.
+one.
 
 ## Safety model
 
@@ -100,4 +99,4 @@ outputs go high-impedance and the motors are dead regardless of what the PWM
 registers contain — a hardware disarm that a software bug cannot override.
 
 Every script here pulls it low at start and in a `finally` block.
-`tools/check_structure.py` fails CI if one does not.
+Every script here follows that pattern - keep it that way in anything new.

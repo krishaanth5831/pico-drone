@@ -9,7 +9,7 @@ What exists, and what is still needed before this flies.
 - [x] MPU6050, HMC5883L/QMC5883L and NEO-6M drivers
 - [x] Complementary filter, PID, and X-quad mixer
 - [x] Per-component bench procedures under [`testing/`](../testing/README.md)
-- [x] CI: lint, tests against a mocked hardware layer, structure checks
+- [x] LED heartbeat failsafe on every bench script
 
 ## Next — in order
 

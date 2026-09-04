@@ -2,8 +2,8 @@
 
 Every GPIO on the airframe, in one place. The authoritative source is
 [`src/config.py`](../src/config.py) — this document mirrors it, and
-`tools/check_structure.py` fails CI if a `testing/` script hardcodes a pin
-instead of importing it.
+Keep it that way when editing `testing/` scripts - import pins from `config.py`
+rather than hardcoding a GPIO number.
 
 ## Board orientation
 
