@@ -18,7 +18,7 @@ try:
     from drivers.motors import MotorBank, ramp  # noqa: E402
     from flight.mixer import MOTOR_DIRECTIONS, MOTOR_POSITIONS  # noqa: E402
 except ImportError as exc:
-    raise SystemExit(
+    print(
         "\n%s\n\n"
         "The library modules are not on the Pico yet. These imports resolve\n"
         "against the BOARD's filesystem, not your computer's, so opening this\n"
@@ -28,6 +28,7 @@ except ImportError as exc:
         "             and flight, right-click -> 'Upload to /'\n"
         "  Terminal : ./tools/upload.sh\n" % exc
     )
+    raise SystemExit()
 
 HOLD_S = 1.5
 RAMP_S = 1.0

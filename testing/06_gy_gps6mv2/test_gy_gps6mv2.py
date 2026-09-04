@@ -23,7 +23,7 @@ try:
     from drivers.gps import GPS  # noqa: E402
     from drivers.heartbeat import Heartbeat  # noqa: E402
 except ImportError as exc:
-    raise SystemExit(
+    print(
         "\n%s\n\n"
         "The library modules are not on the Pico yet. These imports resolve\n"
         "against the BOARD's filesystem, not your computer's, so opening this\n"
@@ -33,6 +33,7 @@ except ImportError as exc:
         "             and flight, right-click -> 'Upload to /'\n"
         "  Terminal : ./tools/upload.sh\n" % exc
     )
+    raise SystemExit()
 
 RAW_SECONDS = 10
 FIX_TIMEOUT = 300
@@ -73,7 +74,7 @@ with Heartbeat():
         time.sleep_ms(20)
 
     if seen == 0:
-        raise SystemExit(
+        print(
             "\nNO DATA.\n"
             "  1. TX/RX are almost certainly swapped - GPS TX must go to Pico RX "
             "(GP%d, pin 2)\n"
@@ -81,6 +82,7 @@ with Heartbeat():
             "  3. If your board's header order differs, trust the silkscreen"
             % config.GPS_RX_PIN
         )
+        raise SystemExit()
 
     print("\n%d sentences in %ds - wiring is good" % (seen, RAW_SECONDS))
 

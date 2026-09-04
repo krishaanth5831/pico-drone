@@ -22,7 +22,7 @@ try:
     from drivers.heartbeat import Heartbeat  # noqa: E402
     from drivers.motors import MotorBank  # noqa: E402
 except ImportError as exc:
-    raise SystemExit(
+    print(
         "\n%s\n\n"
         "The library modules are not on the Pico yet. These imports resolve\n"
         "against the BOARD's filesystem, not your computer's, so opening this\n"
@@ -32,6 +32,7 @@ except ImportError as exc:
         "             and flight, right-click -> 'Upload to /'\n"
         "  Terminal : ./tools/upload.sh\n" % exc
     )
+    raise SystemExit()
 
 COUNTER_FILE = "boot_count.txt"
 LOAD_THROTTLE = config.MAX_DUTY

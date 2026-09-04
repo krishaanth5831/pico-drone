@@ -21,7 +21,7 @@ try:
     from drivers.mpu6050 import MPU6050  # noqa: E402
     from flight.fusion import ComplementaryFilter  # noqa: E402
 except ImportError as exc:
-    raise SystemExit(
+    print(
         "\n%s\n\n"
         "The library modules are not on the Pico yet. These imports resolve\n"
         "against the BOARD's filesystem, not your computer's, so opening this\n"
@@ -31,6 +31,7 @@ except ImportError as exc:
         "             and flight, right-click -> 'Upload to /'\n"
         "  Terminal : ./tools/upload.sh\n" % exc
     )
+    raise SystemExit()
 
 print("\n=== GY-521 / MPU6050 test ===")
 print("LED pulses for as long as this runs\n")
@@ -46,10 +47,11 @@ with Heartbeat():
     found = i2c.scan()
     print("I2C devices :", [hex(a) for a in found])
     if config.IMU_ADDR not in found:
-        raise SystemExit(
+        print(
             "no MPU6050 at 0x%02X - check SDA on GP%d (pin 6) and SCL on GP%d (pin 7)"
             % (config.IMU_ADDR, config.IMU_SDA_PIN, config.IMU_SCL_PIN)
         )
+        raise SystemExit()
 
     imu = MPU6050(i2c=i2c)
     names = {0x68: "MPU6050", 0x70: "MPU6500", 0x71: "MPU9250", 0x73: "MPU9255"}
