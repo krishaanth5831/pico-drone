@@ -24,10 +24,60 @@ a wiring table in physical pin numbers and a runnable script.
 
 ## Running a script
 
-Open it in Thonny with the interpreter set to **MicroPython (Raspberry Pi Pico)**
-and press Run. Scripts import from `src/`, so copy `config.py`, `drivers/` and
-`flight/` to the board's filesystem root first — or upload the release bundle,
-which has the right layout.
+### Step 0 — put the library on the board
+
+Every script except [01](01_pico_2w/README.md) imports `config`, `drivers` and
+`flight`. **Those imports resolve against the Pico's filesystem, not your
+computer's.** Opening a file in an editor and pressing Run does not upload
+anything, so without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+- **Thonny** — `View → Files`. In the top (computer) pane select `config.py`,
+  `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh`, which needs `pip install mpremote`.
+  `--list` shows what is currently on the board, `--clean` wipes it first.
+
+Re-upload after any change under `src/`. The board keeps its own copy; editing
+the file on your computer does not update it.
+
+### Step 1 — run it
+
+Open the script in Thonny with the interpreter set to **MicroPython (Raspberry Pi
+Pico)** and press Run.
+
+[01](01_pico_2w/README.md) needs no upload at all — it is deliberately
+self-contained so you can check the board before anything else exists on it.
+
+## The LED heartbeat
+
+**Every script here pulses the onboard LED for as long as it runs** — a long on,
+short off that reads as a steady glow but visibly beats. It is a failsafe you can
+watch without looking at the shell.
+
+| LED | Meaning |
+|---|---|
+| Pulsing | The board is powered and its scheduler is running |
+| Went dark | The script ended normally, or the board lost power |
+| **Stopped and restarted** | The board **reset** — on this airframe that means a brownout ([07](07_lipo_power/README.md)) |
+| Fast even blink | `main.py` only: a sensor failed to initialise |
+
+It runs on a soft timer, so it keeps beating through blocking calls — the
+six-second measurement pauses in [02](02_drv8833/README.md), the minutes of
+waiting for a GPS fix in [06](06_gy_gps6mv2/README.md).
+
+**What it does not prove:** that your main loop is progressing. A soft timer
+fires from the scheduler and carries on even if the code above it is stuck. This
+detects reset and power loss — which is what a coreless quad actually suffers
+from — not a hang.
+
+[01](01_pico_2w/README.md) is the one exception to the shared implementation: it
+runs before anything has been uploaded to the board, so it carries its own copy
+rather than importing `drivers/heartbeat.py`. Every other script imports the real
+one, and `tools/check_structure.py` fails CI if any script starts a heartbeat
+without stopping it.
 
 ## Safety model
 

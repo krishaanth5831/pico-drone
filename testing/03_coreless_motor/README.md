@@ -44,6 +44,27 @@ share a rotation direction so their yaw torques cancel in the hover.
       M2 (CCW)          M4 (CW)
 ```
 
+## Upload the library first
+
+This script imports `config`, `drivers` and `flight`. **Those imports resolve
+against the Pico's filesystem, not your computer's** — opening the file in an
+editor is not enough. Without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+Upload once, and it stays there until you overwrite it:
+
+- **Thonny** — `View → Files` so both panes show. In the top (computer) pane
+  select `config.py`, `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh` (needs `pip install mpremote`).
+
+Verify with `./tools/upload.sh --list`, or just look at the bottom pane in
+Thonny — you should see `config.py`, `drivers/` and `flight/` at the root.
+
+Re-upload whenever you change anything under `src/`.
+
 ## Running the test
 
 Run `test_coreless_motor.py`. It spins each motor alone, in order, with a ramp
@@ -61,6 +82,7 @@ motor output.
 ```
 === coreless motor test ===
 MAX_DUTY 0.70, props must be OFF
+LED pulses for as long as this runs
 
 motor 1 (front-right, expect CCW)
   ramping up... holding... ramping down
@@ -82,6 +104,8 @@ Mark the direction on each motor with a pen as you confirm it.
 `src/flight/mixer.py` assumes the directions in the diagram above, and changing
 signs there to compensate will break yaw control in a way that is very hard to
 diagnose later.
+
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
 
 ## If it fails
 

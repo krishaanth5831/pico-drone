@@ -11,9 +11,10 @@ Right now it:
   - brings up the IMU, magnetometer and GPS
   - streams attitude to the REPL so you can watch the fusion filter work
 
-Blink codes on the onboard LED:
-  slow steady   all sensors up
-  double blink  a sensor failed to initialise (see REPL for which)
+The onboard LED pulses for as long as this runs - a long on, short off that
+reads as a glow. It is a liveness indicator: if it stops and restarts, the board
+reset, which on this airframe means a brownout. A fast even blink instead means
+a sensor failed to initialise; see the REPL for which.
 """
 
 import sys
@@ -21,21 +22,10 @@ import time
 
 sys.path.append("/")
 
-from machine import Pin  # noqa: E402
-
 import config  # noqa: E402
+from drivers.heartbeat import Heartbeat  # noqa: E402
 from drivers.motors import MotorBank  # noqa: E402
 from flight.fusion import ComplementaryFilter  # noqa: E402
-
-led = Pin(config.LED_PIN, Pin.OUT)
-
-
-def blink(times, on_ms=80, off_ms=120):
-    for _ in range(times):
-        led.on()
-        time.sleep_ms(on_ms)
-        led.off()
-        time.sleep_ms(off_ms)
 
 
 def bring_up():
@@ -75,6 +65,10 @@ def bring_up():
 def main():
     print("\n=== pico-drone bring-up ===")
 
+    # Lit before anything else, so a failure during bring-up still leaves you a
+    # board that is visibly alive.
+    heartbeat = Heartbeat().start()
+
     # Motors are constructed disarmed and stay that way. Constructing MotorBank
     # is what drives SLP low, so do it first and before anything can fail.
     motors = MotorBank()
@@ -84,9 +78,12 @@ def main():
 
     if sensors["imu"] is None:
         print("\nno IMU - nothing useful to report. fix wiring and re-run.")
+        # Switch to an even fast blink so the fault is distinguishable from the
+        # normal glow across the room.
+        heartbeat.stop()
+        Heartbeat(mode="blink").start()
         while True:
-            blink(2)
-            time.sleep_ms(800)
+            time.sleep_ms(500)
 
     fusion = ComplementaryFilter()
     imu = sensors["imu"]
@@ -110,7 +107,6 @@ def main():
 
             if time.ticks_diff(time.ticks_ms(), last_print) > 200:
                 last_print = time.ticks_ms()
-                led.toggle()
                 line = "roll %+6.1f  pitch %+6.1f" % (
                     fusion.roll_deg,
                     fusion.pitch_deg,
@@ -131,7 +127,7 @@ def main():
         # Belt and braces: the bank is already disarmed, but never leave this
         # function by any path without cutting the drivers.
         motors.disarm()
-        led.off()
+        heartbeat.stop()
 
 
 if __name__ == "__main__":

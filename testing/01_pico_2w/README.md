@@ -60,7 +60,8 @@ Open `test_pico_2w.py` in Thonny, set the interpreter to
 ## What you should see
 
 The onboard LED blinks **three times slowly**, then **five times quickly**, and
-the shell prints something like:
+then settles into a **steady pulse that stays lit for the rest of the run**. The
+shell prints something like:
 
 ```
 === Pico 2 W bring-up ===
@@ -69,14 +70,23 @@ board       : RPi Pico 2 W with RP2350
 CPU freq    : 150 MHz
 free RAM    : 456384 bytes
 reset cause : 1
-LED         : blinking - watch the board
+LED         : 3 slow + 5 fast blinks - watch the board
+LED         : now pulsing - stays lit while this script runs
 WiFi chip   : present (CYW43 responded)
+
+holding 8s so you can see the pulse...
 === all good ===
+LED off - script ended
 ```
 
-**Watch the board itself, not just the shell.** The blinking LED is the proof
-that code is genuinely executing on the hardware rather than the editor merely
-connecting.
+**Watch the board itself, not just the shell.** The blink pattern is proof that
+code is genuinely executing on the hardware rather than the editor merely
+connecting. The pulse that follows is the liveness heartbeat every other test in
+this directory uses — this is your reference for what it should look like.
+
+This script deliberately imports nothing from `src/`, because it runs before you
+have uploaded any files to the board. Its heartbeat is therefore a hand-rolled
+copy of `drivers/heartbeat.py`.
 
 ## If it fails
 

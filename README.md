@@ -32,6 +32,7 @@ src/
   main.py              entry point - sensor bring-up, motors stay disarmed
   drivers/
     motors.py          DRV8833 bank with hardware arm/disarm
+    heartbeat.py       onboard-LED liveness pulse, soft-timer driven
     mpu6050.py         GY-521 gyro + accelerometer
     hmc5883l.py        magnetometer, auto-detects the QMC5883L clone
     gps.py             NEO-6M NMEA parser
@@ -55,7 +56,20 @@ Grab the Pico 2 W UF2 from
 **BOOTSEL** while plugging in, and copy the file to the `RP2350` drive that
 appears. Full walkthrough in [`testing/01_pico_2w/`](testing/01_pico_2w/README.md).
 
-### 2. Work through the bench tests
+### 2. Put the library on the board
+
+The bench scripts import `config`, `drivers` and `flight`, and those imports
+resolve against the **Pico's** filesystem — not your computer's:
+
+```bash
+pip install mpremote
+./tools/upload.sh          # --list to check, --clean to wipe first
+```
+
+Or in Thonny: `View → Files`, select `config.py`, `drivers` and `flight`,
+right-click → **Upload to /**. Re-upload after any change under `src/`.
+
+### 3. Work through the bench tests
 
 Do these **in order** — each assumes the previous one passes.
 
@@ -71,7 +85,7 @@ Do these **in order** — each assumes the previous one passes.
 
 Index and safety notes: [`testing/README.md`](testing/README.md).
 
-### 3. Run it
+### 4. Run it
 
 Copy the contents of `src/` to the board's filesystem **root** and reset. You get
 live attitude, heading and GPS status streamed to the REPL, with the motors held
@@ -95,6 +109,18 @@ Enforced throughout:
 - Nothing in this repo arms motors at power-on.
 
 **Every bench procedure assumes props are off.**
+
+### LED heartbeat
+
+Every script pulses the onboard LED for as long as it runs — a long on, short off
+that reads as a glow. Pulsing means the board is powered and its scheduler is
+running; **stopping and restarting means it reset**, which on this airframe means
+a brownout. It runs on a soft timer, so it survives blocking calls, and
+`tools/check_structure.py` fails CI if a script starts one without stopping it.
+
+It does not prove the main loop is progressing — a soft timer keeps firing even
+if the code above it hangs. It catches reset and power loss, which is the failure
+this hardware actually has.
 
 ## Development
 

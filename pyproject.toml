@@ -29,9 +29,17 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Board scripts import `machine` at module scope after a sys.path tweak, and
 # print rather than log. Both are correct there.
-"testing/**/*.py" = ["E402", "T201"]
+#
+# B904 wants `raise ... from None` inside an except block. MicroPython's support
+# for exception-chaining syntax varies between builds, and a SyntaxError on the
+# board would be a much worse failure than a chained traceback - especially in
+# the ImportError guards, whose whole job is to produce a readable message.
+"testing/**/*.py" = ["E402", "T201", "B904"]
 "src/main.py" = ["E402"]
 "tests/**/*.py" = ["SLF001"]  # tests reach into private attrs on purpose
+# SIM105 wants contextlib.suppress(), which MicroPython does not ship - the
+# firmware has no contextlib at all, so try/except/pass is the only option.
+"src/drivers/heartbeat.py" = ["SIM105"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["config", "drivers", "flight"]

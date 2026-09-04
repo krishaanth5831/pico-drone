@@ -49,6 +49,27 @@ motor and the chip's internal logic. There is no separate logic rail.
 **Never connect it to 3V3 (pin 36).** That regulator supplies ~300 mA; motors
 pull several times that. Pin 36 is only for `SLP`.
 
+## Upload the library first
+
+This script imports `config`, `drivers` and `flight`. **Those imports resolve
+against the Pico's filesystem, not your computer's** — opening the file in an
+editor is not enough. Without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+Upload once, and it stays there until you overwrite it:
+
+- **Thonny** — `View → Files` so both panes show. In the top (computer) pane
+  select `config.py`, `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh` (needs `pip install mpremote`).
+
+Verify with `./tools/upload.sh --list`, or just look at the bottom pane in
+Thonny — you should see `config.py`, `drivers/` and `flight/` at the root.
+
+Re-upload whenever you change anything under `src/`.
+
 ## Running the test
 
 1. Wire as above, **no motors**.
@@ -60,6 +81,9 @@ pull several times that. Pin 36 is only for `SLP`.
 
 ```
 === DRV8833 driver check ===
+no motors should be connected
+LED pulses for as long as this runs
+
 SLP low  -> drivers asleep
   measure AOUT1 now: expect ~0 V (high impedance)
 SLP high -> drivers awake
@@ -74,6 +98,8 @@ nFAULT  : OK (high)
 A PWM output measured with a cheap multimeter reads the **average**, so 50% duty
 on a 5 V rail shows somewhere around 2.0–2.7 V, not a clean 2.5 V. Anything in
 that band is a pass. What matters is that it moves when the duty changes.
+
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
 
 ## If it fails
 

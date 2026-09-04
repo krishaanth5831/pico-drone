@@ -15,7 +15,20 @@ import time
 from machine import PWM, Pin
 
 sys.path.append("/")
-import config  # noqa: E402
+try:
+    import config  # noqa: E402
+    from drivers.heartbeat import Heartbeat  # noqa: E402
+except ImportError as exc:
+    raise SystemExit(
+        "\n%s\n\n"
+        "The library modules are not on the Pico yet. These imports resolve\n"
+        "against the BOARD's filesystem, not your computer's, so opening this\n"
+        "file in an editor is not enough.\n\n"
+        "Upload them once, then run this again:\n"
+        "  Thonny   : View -> Files. In the top pane select config.py, drivers\n"
+        "             and flight, right-click -> 'Upload to /'\n"
+        "  Terminal : ./tools/upload.sh\n" % exc
+    )
 
 SETTLE_S = 6  # long enough to get a probe onto a pad
 
@@ -36,7 +49,12 @@ for number in (1, 2):
 OUTPUT_NAMES = {1: "AOUT1", 2: "BOUT1"}
 
 print("\n=== DRV8833 driver check ===")
-print("no motors should be connected\n")
+print("no motors should be connected")
+print("LED pulses for as long as this runs\n")
+
+# Soft-timer based, so it keeps beating through the six-second measurement
+# pauses below.
+heartbeat = Heartbeat().start()
 
 try:
     print("SLP low  -> drivers asleep")
@@ -71,4 +89,5 @@ finally:
     for pwm in channels.values():
         pwm.duty_u16(0)
     slp.low()
-    print("=== disarmed ===")
+    heartbeat.stop()
+    print("=== disarmed, LED off ===")

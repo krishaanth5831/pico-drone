@@ -64,6 +64,48 @@ for folder in component_dirs:
             fail(f"{script.relative_to(ROOT)} has no module docstring")
 
 
+# --- scripts importing from src/ must explain how to get it there ------------
+# These imports resolve against the BOARD's filesystem. Without a guard the
+# failure is a bare "ImportError: no module named 'config'", which says nothing
+# about needing to upload anything.
+
+for script in sorted(TESTING.rglob("test_*.py")):
+    body = script.read_text()
+    imports_library = "import config" in body or "from drivers" in body or "from flight" in body
+    if not imports_library:
+        continue
+    checked += 1
+    rel = script.relative_to(ROOT)
+    if "except ImportError" not in body:
+        fail(f"{rel} imports from src/ but does not catch ImportError")
+    elif "upload.sh" not in body:
+        fail(f"{rel} catches ImportError but does not point at tools/upload.sh")
+
+
+# --- every bench script must show a liveness heartbeat -----------------------
+# The onboard LED pulsing is the user's failsafe: it says the board is powered
+# and its scheduler is running. A script that starts one and never stops it is
+# worse than none at all, because it leaves the board blinking at an idle REPL.
+
+for script in sorted(TESTING.rglob("test_*.py")):
+    checked += 1
+    rel = script.relative_to(ROOT)
+    body = script.read_text()
+
+    starts = "Heartbeat(" in body or "Timer(" in body
+    if not starts:
+        fail(f"{rel} does not start an LED heartbeat")
+        continue
+
+    stops = (
+        "with Heartbeat(" in body
+        or "heartbeat.stop()" in body
+        or "heartbeat.deinit()" in body
+    )
+    if not stops:
+        fail(f"{rel} starts a heartbeat but never stops it")
+
+
 # --- anything that can drive motors must disarm ------------------------------
 MOTOR_MARKERS = ("MotorBank", "MOTOR_SLEEP_PIN", "duty_u16")
 
@@ -78,9 +120,12 @@ for script in sorted(TESTING.rglob("*.py")) + sorted((ROOT / "src").rglob("*.py"
         continue
     checked += 1
     rel = script.relative_to(ROOT)
+    # "with MotorBank() as bank" also appears inside a combined with-statement
+    # such as `with Heartbeat(), MotorBank() as bank:`, so match the construct
+    # rather than the line start.
     has_guard = (
         "finally:" in body
-        or "with MotorBank" in body
+        or "MotorBank() as" in body
         or "def __exit__" in body
     )
     if not has_guard:
