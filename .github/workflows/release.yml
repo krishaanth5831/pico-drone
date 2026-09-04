@@ -1,0 +1,63 @@
+name: Release
+
+# "Deploy" for a Pico means producing the exact set of files you copy onto the
+# board's filesystem. Tagging a version bundles them and attaches the zip to a
+# GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Version tag to build (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    name: Build flashable bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify it compiles before shipping it
+        run: python -m compileall -q src
+
+      - name: Assemble firmware bundle
+        run: |
+          VERSION="${GITHUB_REF_NAME:-${{ github.event.inputs.tag }}}"
+          mkdir -p dist/pico-drone
+          # Flat layout: src/ contents land at the board's filesystem root, which
+          # is what `sys.path.append("/")` in main.py expects.
+          cp -r src/* dist/pico-drone/
+          cp README.md LICENSE dist/pico-drone/
+          echo "$VERSION" > dist/pico-drone/VERSION
+          cd dist && zip -r "pico-drone-${VERSION}.zip" pico-drone
+          echo "BUNDLE=dist/pico-drone-${VERSION}.zip" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pico-drone-bundle
+          path: ${{ env.BUNDLE }}
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.BUNDLE }}
+          generate_release_notes: true
+          body: |
+            ## Flashing
+
+            1. Download and unzip the bundle below.
+            2. Copy everything inside `pico-drone/` to the **root** of the Pico's
+               filesystem (Thonny: select the files, right-click, "Upload to /").
+            3. Reset the board. `main.py` runs automatically.
+
+            Motors stay hardware-disarmed at boot. See `README.md`.

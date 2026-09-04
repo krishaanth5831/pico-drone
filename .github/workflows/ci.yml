@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+# A new push to a PR cancels the previous run rather than queueing behind it.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - name: ruff check
+        run: ruff check --output-format=github .
+      - name: ruff format --check
+        run: ruff format --check . || echo "::warning::formatting drift, not blocking"
+
+  test:
+    name: Tests (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install pytest
+      # tests/mocks/machine.py fakes the MicroPython hardware layer, so src/
+      # is exercised on the same import paths the board uses, with no board.
+      - name: pytest
+        run: pytest -v
+
+  compile:
+    name: Board code compiles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Syntax-only. These modules import `machine`, which does not exist off
+      # the board, so compiling is as far as CI can take them.
+      - name: compileall src/ and testing/
+        run: |
+          python -m compileall -q src testing
+          echo "all board modules parse"
+
+  structure:
+    name: Repo conventions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Every testing/ component keeps a wiring doc and a runnable script, and
+      # anything that can drive motors disarms on every exit path.
+      - run: python tools/check_structure.py
+
+  docs:
+    name: Docs links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check relative links resolve
+        run: |
+          fail=0
+          while IFS= read -r file; do
+            # Pull out markdown links that point at repo paths, not URLs.
+            grep -oE '\]\(([^)#][^)]*)\)' "$file" 2>/dev/null \
+              | sed -E 's/^\]\(//; s/\)$//' \
+              | grep -vE '^(https?|mailto):' \
+              | while read -r target; do
+                  target="${target%%#*}"
+                  [ -z "$target" ] && continue
+                  resolved="$(dirname "$file")/$target"
+                  if [ ! -e "$resolved" ]; then
+                    echo "::error file=$file::broken link -> $target"
+                    fail=1
+                  fi
+                done
+          done < <(find . -name '*.md' -not -path './.git/*')
+          exit $fail
+
+  summary:
+    name: CI passed
+    runs-on: ubuntu-latest
+    needs: [lint, test, compile, structure, docs]
+    if: always()
+    steps:
+      - name: Fail if any job failed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo "all checks green"

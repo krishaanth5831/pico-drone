@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# MicroPython cross-compiled
+*.mpy
+
+# Build / release artifacts
+dist/
+build/
+*.uf2
+
+# Editors
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Thonny
+.thonny/
+
+# Logs from bench runs (append-only, never commit)
+runs/
+*.log
+*.nmea

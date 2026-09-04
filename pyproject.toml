@@ -1,0 +1,37 @@
+[project]
+name = "pico-drone"
+version = "0.1.0"
+description = "Coreless quadcopter flight controller on a Raspberry Pi Pico 2 W"
+requires-python = ">=3.10"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests/mocks"]
+addopts = "-ra --strict-markers"
+
+[tool.ruff]
+line-length = 100
+# testing/ scripts are pasted into Thonny and run standalone on the board, so
+# they deliberately use MicroPython-only builtins and star-ish import patterns.
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = [
+    "E501",    # line length is handled by the formatter
+    "UP032",   # .format() vs f-string: MicroPython prefers % anyway
+    "UP031",   # % formatting is idiomatic and cheap on MicroPython
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Board scripts import `machine` at module scope after a sys.path tweak, and
+# print rather than log. Both are correct there.
+"testing/**/*.py" = ["E402", "T201"]
+"src/main.py" = ["E402"]
+"tests/**/*.py" = ["SLF001"]  # tests reach into private attrs on purpose
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "drivers", "flight"]
