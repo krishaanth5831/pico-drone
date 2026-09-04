@@ -149,6 +149,51 @@ class UART:
         return len(data)
 
 
+class Timer:
+    """
+    Fake soft timer. Stores the callback so a test can drive it with `fire()`
+    and assert on what it actually did - a mock that only recorded construction
+    would prove nothing about the heartbeat.
+    """
+
+    PERIODIC = "PERIODIC"
+    ONE_SHOT = "ONE_SHOT"
+
+    instances = []
+
+    def __init__(self, timer_id=-1):
+        self.id = timer_id
+        self.mode = None
+        self.period = None
+        self.callback = None
+        self.active = False
+        self.deinit_count = 0
+        Timer.instances.append(self)
+
+    def init(self, mode=None, period=None, callback=None):
+        self.mode = mode
+        self.period = period
+        self.callback = callback
+        self.active = True
+
+    def deinit(self):
+        self.active = False
+        self.callback = None
+        self.deinit_count += 1
+
+    def fire(self, times=1):
+        """Advance the timer by `times` ticks, as the scheduler would."""
+        for _ in range(times):
+            if not self.active or self.callback is None:
+                raise RuntimeError("timer fired while inactive")
+            self.callback(self)
+
+    @classmethod
+    def reset(cls):
+        cls.instances = []
+
+
 def reset_all():
     Pin.reset()
     PWM.reset()
+    Timer.reset()

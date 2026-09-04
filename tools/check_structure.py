@@ -64,6 +64,66 @@ for folder in component_dirs:
             fail(f"{script.relative_to(ROOT)} has no module docstring")
 
 
+# --- upload.sh must never put main.py where it can hijack bench testing ------
+# MicroPython auto-runs main.py on every boot AND every soft-reboot, and
+# Thonny's Run button always soft-reboots first. A main.py on the board during
+# bench testing silently swallows every test run - see tools/upload.sh's header
+# comment for the full story. This regressed once already; keep it from doing
+# so again.
+upload_script = ROOT / "tools" / "upload.sh"
+if upload_script.exists():
+    checked += 1
+    body = upload_script.read_text()
+    # Match only an actual invocation of the upload command, not the advisory
+    # prose later in the file that tells a user how to do this manually.
+    if re.search(r'\$\{MPR\[@\]\}"\s+fs cp\s+src/main\.py\s+:', body):
+        fail("tools/upload.sh copies main.py to the board root - it will hijack every test run")
+    if "remove_main_py" not in body and "main.py" not in body:
+        fail("tools/upload.sh no longer guards against a stale main.py on the board")
+
+
+# --- scripts importing from src/ must explain how to get it there ------------
+# These imports resolve against the BOARD's filesystem. Without a guard the
+# failure is a bare "ImportError: no module named 'config'", which says nothing
+# about needing to upload anything.
+
+for script in sorted(TESTING.rglob("test_*.py")):
+    body = script.read_text()
+    imports_library = "import config" in body or "from drivers" in body or "from flight" in body
+    if not imports_library:
+        continue
+    checked += 1
+    rel = script.relative_to(ROOT)
+    if "except ImportError" not in body:
+        fail(f"{rel} imports from src/ but does not catch ImportError")
+    elif "upload.sh" not in body:
+        fail(f"{rel} catches ImportError but does not point at tools/upload.sh")
+
+
+# --- every bench script must show a liveness heartbeat -----------------------
+# The onboard LED pulsing is the user's failsafe: it says the board is powered
+# and its scheduler is running. A script that starts one and never stops it is
+# worse than none at all, because it leaves the board blinking at an idle REPL.
+
+for script in sorted(TESTING.rglob("test_*.py")):
+    checked += 1
+    rel = script.relative_to(ROOT)
+    body = script.read_text()
+
+    starts = "Heartbeat(" in body or "Timer(" in body
+    if not starts:
+        fail(f"{rel} does not start an LED heartbeat")
+        continue
+
+    stops = (
+        "with Heartbeat(" in body
+        or "heartbeat.stop()" in body
+        or "heartbeat.deinit()" in body
+    )
+    if not stops:
+        fail(f"{rel} starts a heartbeat but never stops it")
+
+
 # --- anything that can drive motors must disarm ------------------------------
 MOTOR_MARKERS = ("MotorBank", "MOTOR_SLEEP_PIN", "duty_u16")
 
@@ -78,9 +138,12 @@ for script in sorted(TESTING.rglob("*.py")) + sorted((ROOT / "src").rglob("*.py"
         continue
     checked += 1
     rel = script.relative_to(ROOT)
+    # "with MotorBank() as bank" also appears inside a combined with-statement
+    # such as `with Heartbeat(), MotorBank() as bank:`, so match the construct
+    # rather than the line start.
     has_guard = (
         "finally:" in body
-        or "with MotorBank" in body
+        or "MotorBank() as" in body
         or "def __exit__" in body
     )
     if not has_guard:

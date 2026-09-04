@@ -45,6 +45,27 @@ stronger than that at close range.
   distortion you are cancelling comes from the airframe itself, so a calibration
   done on a bare bench is worthless once the module is bolted down.
 
+## Upload the library first
+
+This script imports `config`, `drivers` and `flight`. **Those imports resolve
+against the Pico's filesystem, not your computer's** — opening the file in an
+editor is not enough. Without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+Upload once, and it stays there until you overwrite it:
+
+- **Thonny** — `View → Files` so both panes show. In the top (computer) pane
+  select `config.py`, `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh` (needs `pip install mpremote`).
+
+Verify with `./tools/upload.sh --list`, or just look at the bottom pane in
+Thonny — you should see `config.py`, `drivers/` and `flight/` at the root.
+
+Re-upload whenever you change anything under `src/`.
+
 ## Running the test
 
 Run `test_hmc5883l_compass.py`. It detects the chip, runs a 30-second
@@ -57,6 +78,8 @@ lazy figure-of-eight in all three axes — for the whole 30 seconds.
 
 ```
 === HMC5883L / QMC5883L test ===
+LED pulses for as long as this runs
+
 I2C devices : ['0x1e', '0x68']
 detected    : HMC5883L
 
@@ -81,10 +104,13 @@ matter:
   A magnitude that swings wildly means calibration failed or something magnetic
   is too close.
 
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
+
 ## If it fails
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | Not in the I2C scan | Wrong pins, or no power. Both this and the IMU must appear |
 | `0x1E responded but ID was...` | Clone at the HMC address. Harmless, driven identically |
 | Heading jumps rather than sweeping | Data register order — you likely have a QMC misdetected as HMC |

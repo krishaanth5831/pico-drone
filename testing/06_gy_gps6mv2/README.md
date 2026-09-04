@@ -34,6 +34,27 @@ Wire it anyway — you will want it to push the module to 5 Hz.
   radiate. On a small quad this means a nylon standoff lifting it a couple of
   centimetres above the frame.
 
+## Upload the library first
+
+This script imports `config`, `drivers` and `flight`. **Those imports resolve
+against the Pico's filesystem, not your computer's** — opening the file in an
+editor is not enough. Without this step you get:
+
+```
+ImportError: no module named 'config'
+```
+
+Upload once, and it stays there until you overwrite it:
+
+- **Thonny** — `View → Files` so both panes show. In the top (computer) pane
+  select `config.py`, `drivers` and `flight`, right-click → **Upload to /**.
+- **Terminal** — `./tools/upload.sh` (needs `pip install mpremote`).
+
+Verify with `./tools/upload.sh --list`, or just look at the bottom pane in
+Thonny — you should see `config.py`, `drivers/` and `flight/` at the root.
+
+Re-upload whenever you change anything under `src/`.
+
 ## Running the test
 
 **Take it outside.** The NEO-6M will not get a fix indoors — it needs actual
@@ -74,10 +95,13 @@ moment a fix is acquired — that is hardware confirmation, independent of any
 code. Cold start outdoors takes 30 s to several minutes; the onboard backup
 battery then makes later warm starts a few seconds.
 
+**The onboard LED pulses throughout.** If it stops and restarts, the board reset — see [07](../07_lipo_power/README.md).
+
 ## If it fails
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | No output at all | TX/RX swapped. Swap GP0 and GP1 — this fixes it most of the time |
 | Garbage bytes | Baud mismatch. Try 38400; some clones ship reconfigured |
 | Sentences arrive, never a fix, indoors | Expected. Go outside |
