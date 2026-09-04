@@ -93,9 +93,17 @@ Index and safety notes: [`testing/README.md`](testing/README.md).
 
 ### 4. Run it
 
-Copy the contents of `src/` to the board's filesystem **root** and reset. You get
-live attitude, heading and GPS status streamed to the REPL, with the motors held
-hardware-disarmed throughout.
+**Do this separately from the bench tests above, and remove it again afterwards.**
+`main.py` auto-runs on every boot and soft-reboot, so leaving it on the board
+hijacks every test run in step 3 - if you go back to bench testing after this,
+delete it first (`./tools/upload.sh` does this for you automatically).
+
+```bash
+mpremote fs cp src/main.py :
+```
+
+Then reset the board. You get live attitude, heading and GPS status streamed to
+the REPL, with the motors held hardware-disarmed throughout.
 
 ## Safety model
 
