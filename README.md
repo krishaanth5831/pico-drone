@@ -10,6 +10,12 @@ with a hardware disarm line that a software bug cannot override.
 > on the airframe, so `main.py` deliberately stops at sensor bring-up and never
 > arms the motors. See [`docs/roadmap.md`](docs/roadmap.md).
 
+> **Before running anything: `config.py`, `drivers/` and `flight/` must be
+> copied onto the Pico's own filesystem first.** Opening a script in Thonny and
+> pressing Run does not upload anything — without this step every script fails
+> with `ImportError: no module named 'config'`. Run `./tools/upload.sh`, or see
+> [step 2 below](#2-put-the-library-on-the-board) for the Thonny method.
+
 ## Hardware
 
 | Part | Role |
