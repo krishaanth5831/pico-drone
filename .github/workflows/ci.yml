@@ -82,23 +82,31 @@ jobs:
       - uses: actions/checkout@v7
       - name: Check relative links resolve
         run: |
-          fail=0
+          # Collect into a file rather than setting a flag inside the loop: the
+          # pipeline puts the inner loop in a subshell, so a variable set there
+          # never reaches the parent and the job would always pass.
+          broken=$(mktemp)
           while IFS= read -r file; do
-            # Pull out markdown links that point at repo paths, not URLs.
-            grep -oE '\]\(([^)#][^)]*)\)' "$file" 2>/dev/null \
+            # Pull out markdown links pointing at repo paths, not URLs.
+            targets=$(grep -oE '\]\(([^)#][^)]*)\)' "$file" 2>/dev/null \
               | sed -E 's/^\]\(//; s/\)$//' \
-              | grep -vE '^(https?|mailto):' \
-              | while read -r target; do
-                  target="${target%%#*}"
-                  [ -z "$target" ] && continue
-                  resolved="$(dirname "$file")/$target"
-                  if [ ! -e "$resolved" ]; then
-                    echo "::error file=$file::broken link -> $target"
-                    fail=1
-                  fi
-                done
+              | grep -vE '^(https?|mailto):' || true)
+            for target in $targets; do
+              target="${target%%#*}"
+              [ -z "$target" ] && continue
+              if [ ! -e "$(dirname "$file")/$target" ]; then
+                echo "::error file=$file::broken link -> $target"
+                echo "$file -> $target" >> "$broken"
+              fi
+            done
           done < <(find . -name '*.md' -not -path './.git/*')
-          exit $fail
+
+          count=$(wc -l < "$broken")
+          if [ "$count" -gt 0 ]; then
+            echo "$count broken link(s)"
+            exit 1
+          fi
+          echo "all relative links resolve"
 
   summary:
     name: CI passed
