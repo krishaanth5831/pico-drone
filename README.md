@@ -69,6 +69,12 @@ pip install mpremote
 Or in Thonny: `View → Files`, select `config.py`, `drivers` and `flight`,
 right-click → **Upload to /**. Re-upload after any change under `src/`.
 
+`main.py` is deliberately excluded. MicroPython auto-runs it on every boot *and
+every soft-reboot* — which is what Thonny's Run button always does first — so a
+`main.py` on the board hijacks every test run before your script executes. If
+you see the shell print `MPY: soft reboot` repeatedly with none of your test's
+own output, this is why: run `./tools/upload.sh` again, which removes it.
+
 ### 3. Work through the bench tests
 
 Do these **in order** — each assumes the previous one passes.

@@ -154,6 +154,7 @@ discharged, or its internal resistance is too high.
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | `boot #2` appears mid-test | Brownout confirmed. Add or move the capacitors closer to the drivers |
 | LED pulse stops and restarts | Same thing, seen live — the board reset under load |
 | Thonny disconnects when motors spool | Same thing, seen from the host side |

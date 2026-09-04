@@ -64,6 +64,24 @@ for folder in component_dirs:
             fail(f"{script.relative_to(ROOT)} has no module docstring")
 
 
+# --- upload.sh must never put main.py where it can hijack bench testing ------
+# MicroPython auto-runs main.py on every boot AND every soft-reboot, and
+# Thonny's Run button always soft-reboots first. A main.py on the board during
+# bench testing silently swallows every test run - see tools/upload.sh's header
+# comment for the full story. This regressed once already; keep it from doing
+# so again.
+upload_script = ROOT / "tools" / "upload.sh"
+if upload_script.exists():
+    checked += 1
+    body = upload_script.read_text()
+    # Match only an actual invocation of the upload command, not the advisory
+    # prose later in the file that tells a user how to do this manually.
+    if re.search(r'\$\{MPR\[@\]\}"\s+fs cp\s+src/main\.py\s+:', body):
+        fail("tools/upload.sh copies main.py to the board root - it will hijack every test run")
+    if "remove_main_py" not in body and "main.py" not in body:
+        fail("tools/upload.sh no longer guards against a stale main.py on the board")
+
+
 # --- scripts importing from src/ must explain how to get it there ------------
 # These imports resolve against the BOARD's filesystem. Without a guard the
 # failure is a bare "ImportError: no module named 'config'", which says nothing

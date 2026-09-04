@@ -110,6 +110,7 @@ matter:
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | Not in the I2C scan | Wrong pins, or no power. Both this and the IMU must appear |
 | `0x1E responded but ID was...` | Clone at the HMC address. Harmless, driven identically |
 | Heading jumps rather than sweeping | Data register order — you likely have a QMC misdetected as HMC |

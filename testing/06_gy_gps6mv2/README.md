@@ -101,6 +101,7 @@ battery then makes later warm starts a few seconds.
 
 | Symptom | Cause |
 |---|---|
+| Only `MPY: soft reboot` printed, twice, nothing else | `main.py` is on the board and is hijacking every soft-reboot before your script runs. Run `./tools/upload.sh` to remove it |
 | No output at all | TX/RX swapped. Swap GP0 and GP1 — this fixes it most of the time |
 | Garbage bytes | Baud mismatch. Try 38400; some clones ship reconfigured |
 | Sentences arrive, never a fix, indoors | Expected. Go outside |
