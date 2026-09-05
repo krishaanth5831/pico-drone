@@ -40,6 +40,10 @@ ignore = [
 # SIM105 wants contextlib.suppress(), which MicroPython does not ship - the
 # firmware has no contextlib at all, so try/except/pass is the only option.
 "src/drivers/heartbeat.py" = ["SIM105"]
+# Same rationale as the testing/ exemption above: MicroPython's exception-
+# chaining syntax support varies by build, and the ImportError guard's entire
+# job is producing a readable message, not a chained traceback.
+"firmware/*.py" = ["E402", "B904"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["config", "drivers", "flight"]
+known-first-party = ["config", "drivers", "flight", "tuning"]
