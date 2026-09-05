@@ -113,6 +113,14 @@ for d in drivers flight; do
   done
 done
 
+# firmware/tuning.py is your hand-edited PID gains and safety limits - it lives
+# next to config.py at the board root so flight_controller.py can "import tuning"
+# the same way it imports config. flight_controller.py itself is NOT uploaded:
+# like the testing/ scripts, you open and run it directly from Thonny.
+if [ -f firmware/tuning.py ]; then
+  "${MPR[@]}" fs cp firmware/tuning.py :
+fi
+
 echo "done."
 list_board
 

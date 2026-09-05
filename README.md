@@ -142,6 +142,16 @@ It does not prove the main loop is progressing — a soft timer keeps firing eve
 if the code above it hangs. It catches reset and power loss, which is the failure
 this hardware actually has.
 
+## Firmware
+
+[`firmware/`](firmware/README.md) is the integrated flight controller — sensor
+fusion, cascaded PID, motor mixing, and the arm/disarm safety logic, built on
+the drivers and control maths in `src/`. It self-levels and holds a heading; it
+does not hold altitude or position, since nothing on this airframe measures
+either. Read `firmware/README.md` in full before running it — it explains the
+safety model and the manual tuning procedure, both of which matter more than
+usual given there is still no control link or physical kill switch.
+
 ## Development
 
 ```bash
