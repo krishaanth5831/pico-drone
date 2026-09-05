@@ -2,12 +2,17 @@
 
 ## Branching
 
-Plain version control. One branch, `main`. No branch protection, no required
-PRs, no CI. Commit and push directly.
+`main` is protected: no direct pushes (rejected by GitHub, verified), PR
+required, force-push and deletion disabled, and the rule applies to admins too
+- so this applies to Claude pushing as much as anyone. No CI is attached to the
+gate; it is a pure human-merge checkpoint.
 
-Claude does not create or merge pull requests here unless explicitly asked to -
-not because of any repo-level gate, just as a matter of not taking actions the
-user has not asked for.
+Day-to-day work goes on `dev` (or a feature branch cut from `dev`). Land it on
+`main` by opening a `dev` -> `main` PR.
+
+**Claude creates PRs when asked, and never merges one.** Not `gh pr merge`, not
+the API equivalent, not ever. A human - the repo owner - performs every merge.
+When a PR is ready, say so and hand over the URL, then stop there.
 
 ## Hardware safety rules that affect code
 
