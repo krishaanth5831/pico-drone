@@ -6,6 +6,174 @@ It builds entirely on the drivers and control maths already validated in
 `src/` and `testing/` — nothing here is new hardware code, only the loop that
 ties it together.
 
+## Wiring — every component, in one place
+
+This mirrors [`docs/pinout.md`](../docs/pinout.md) and the per-component
+tables in `testing/`, gathered here so the full airframe wiring is on one
+page once you're past bench-testing individual parts and wiring the real
+thing. `src/config.py` is the authoritative source if this ever drifts from
+it — pins are imported from there, never hardcoded.
+
+Hold the Pico 2 W with the **USB port at the top**. Pin 1 is the top-left
+pad; numbers run down the left side (1–20), then continue up the right side
+(21–40).
+
+### Pico 2 W — onboard LED
+
+| Signal | Pico 2 W | Physical pin | Note |
+|---|---|---|---|
+| Onboard LED | `Pin("LED")` | — | Behind the CYW43 WiFi chip on "W" boards — on/off only, cannot be PWM'd |
+
+`GP23`, `GP24`, `GP25`, `GP29` (physical 29, 31, 32, 34) are wired to the
+CYW43 WiFi/Bluetooth chip and are **reserved** — never assign these.
+
+### DRV8833 #1 (motors 1 and 2)
+
+| DRV8833 pin | Pico 2 W | Physical pin | Note |
+|---|---|---|---|
+| `VM` / `VCC` / `VMOT` | Battery + direct | — | Not from the Pico. On the bench only, VBUS (pin 40) can substitute |
+| `GND` | GND | 38 | Star-grounded at the battery |
+| `SLP` / `nSLEEP` / `EEP` | GP15 | 20 | Shared with DRV #2 — hardware arm/disarm for all four motors |
+| `AIN1` | GP10 | 14 | Motor 1 PWM |
+| `AIN2` | GND | — | Tie low — channel A unidirectional |
+| `BIN1` | GP11 | 15 | Motor 2 PWM |
+| `BIN2` | GND | — | Tie low — channel B unidirectional |
+| `nFAULT` *(if present)* | GP14 | 19 | Shared with DRV #2, open-drain, low = fault |
+| `AOUT1`/`AOUT2` | Motor 1 leads | — | Polarity picks spin direction, not software |
+| `BOUT1`/`BOUT2` | Motor 2 leads | — | Polarity picks spin direction, not software |
+
+### DRV8833 #2 (motors 3 and 4)
+
+Identical to #1, sharing the same `SLP`, `VM`, and `GND`:
+
+| DRV8833 pin | Pico 2 W | Physical pin | Note |
+|---|---|---|---|
+| `VM` | Battery + direct | — | |
+| `GND` | GND | 38 | |
+| `SLP` | GP15 | 20 | Same net as DRV #1 |
+| `AIN1` | GP12 | 16 | Motor 3 PWM |
+| `AIN2` | GND | — | Tie low |
+| `BIN1` | GP13 | 17 | Motor 4 PWM |
+| `BIN2` | GND | — | Tie low |
+| `nFAULT` | GP14 | 19 | Same net as DRV #1 |
+| `AOUT1`/`AOUT2` | Motor 3 leads | — | |
+| `BOUT1`/`BOUT2` | Motor 4 leads | — | |
+
+### Motors — airframe positions
+
+Standard X quad, viewed from above, nose up the page. Diagonal pairs share a
+rotation direction so their yaw torques cancel in the hover.
+
+```
+      M3 (CW)          M1 (CCW)
+        \                 /
+         \   +--------+  /
+          +--|  PICO  |-+
+             |   IMU  |
+          +--|        |-+
+         /   +--------+  \
+        /                 \
+      M2 (CCW)          M4 (CW)
+```
+
+| Motor | Position | Rotation | Driver channel | PWM pin |
+|---|---|---|---|---|
+| M1 | front-right | CCW | DRV #1 ch A | GP10 |
+| M2 | rear-left | CCW | DRV #1 ch B | GP11 |
+| M3 | front-left | CW | DRV #2 ch A | GP12 |
+| M4 | rear-right | CW | DRV #2 ch B | GP13 |
+
+### GY-521 (MPU6050) — IMU, on I2C0
+
+| GY-521 pin | Pico 2 W | Physical pin | Note |
+|---|---|---|---|
+| `VCC` | 3V3(OUT) | 36 | |
+| `GND` | GND | 38 | |
+| `SDA` | GP4 | 6 | I2C0 data, shared with the compass |
+| `SCL` | GP5 | 7 | I2C0 clock, shared with the compass |
+| `XDA`, `XCL`, `ADO`, `INT` | — | — | Leave unconnected (`ADO` floating = address `0x68`) |
+
+Mount as close to the airframe's centre of mass as possible, and decouple
+from vibration (foam tape) — bolted rigidly to the frame, prop vibration
+feeds straight into the accelerometer and corrupts the attitude estimate.
+
+### HMC5883L — compass, shares I2C0 with the IMU
+
+| HMC5883L pin | Pico 2 W | Physical pin | Note |
+|---|---|---|---|
+| `VCC` | 3V3(OUT) | 36 | |
+| `GND` | GND | 38 | |
+| `SDA` | GP4 | 6 | Same bus as the IMU, wired in parallel |
+| `SCL` | GP5 | 7 | Same bus as the IMU, wired in parallel |
+| `DRDY` | — | — | Leave unconnected |
+
+No address conflict with the IMU (`0x68` vs `0x1E`/`0x0D` for the QMC5883L
+clone). Mount as far from motors and battery wiring as physically possible —
+a magnetometer reads in the microtesla range and motor current swamps it at
+close range. **Calibrate with the airframe fully assembled and the battery
+connected**, and copy the result into `tuning.py`'s `MAG_OFFSET`/`MAG_SCALE`
+(see Setup below) — a bench calibration is worthless once bolted to the
+frame.
+
+### GY-GPS6MV2 (NEO-6M) — GPS, on UART0
+
+| GY-GPS6MV2 pin | Pico 2 W | Physical pin | Note |
+|---|---|---|---|
+| `VCC` | 3V3(OUT) | 36 | |
+| `GND` | GND | 3 | Directly below GP0/GP1, keeps the wire short |
+| `TX` | GP1 = UART0 RX | 2 | **Crossover** — GPS transmit to Pico receive |
+| `RX` | GP0 = UART0 TX | 1 | **Crossover**, only needed to reconfigure the module |
+
+Check the board's silkscreen before wiring — these ship in `VCC RX TX GND`
+and `GND TX RX VCC` header orders depending on the batch; the label is
+authoritative, not the pin position. Mount with the ceramic antenna facing
+up, clear view of sky, away from motors and power wiring.
+
+### Power
+
+```
+1S LiPo (+) --+-------------------> DRV #1 VM --+-- 470uF -- GND
+              |                                  |
+              +-------------------> DRV #2 VM --+-- 470uF -- GND
+              |
+              +--[ SS14 Schottky ]-> Pico VSYS (physical pin 39)
+
+1S LiPo (-) ---- star point ----+--> DRV #1 GND
+                                +--> DRV #2 GND
+                                +--> Pico GND (physical pin 38)
+```
+
+| Connection | Pico 2 W | Physical pin | Note |
+|---|---|---|---|
+| Battery + via Schottky | VSYS | 39 | VSYS accepts 1.8–5.5 V |
+| Battery − (star ground) | GND | 38 | |
+| Battery + direct | — | — | To both DRV8833 `VM` pins, not to the Pico |
+| *(bench only)* USB 5 V | VBUS | 40 | Alternative driver supply for bench work |
+
+**Never connect battery + to 3V3 (pin 36)** — that regulator only supplies
+~300 mA, nowhere near enough for a motor.
+
+The 470 µF capacitors sit right at each driver's `VM`/`GND` pins as a local
+energy reservoir — the battery chemistry can't respond to a millisecond
+current spike, the capacitor can. The Schottky diode on VSYS stops a motor's
+current surge from browning out the Pico through the shared battery rail.
+
+### I2C addresses (I2C0, GP4/GP5, shared bus)
+
+| Device | Address |
+|---|---|
+| MPU6050 / GY-521 | `0x68` (`0x69` with `ADO` high) |
+| HMC5883L | `0x1E` |
+| QMC5883L clone | `0x0D` |
+
+### Full wiring diagrams and mounting detail
+
+Each `testing/0X_*/README.md` covers its component in more depth — soldering
+gotchas, why AIN2/BIN2 are tied low, why the GPS crossover trips people up,
+what a `nFAULT` low actually means. Work through those in order
+(`testing/README.md` is the index) before wiring the full airframe from this
+page.
+
 ## Read this before you run anything
 
 **This is attitude stabilization, not hover.** It self-levels roll and pitch
