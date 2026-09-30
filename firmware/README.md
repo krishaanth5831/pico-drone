@@ -220,6 +220,7 @@ the code — worth remembering if you extend this file.
 |---|---|
 | `flight_controller.py` | The control loop. Open it directly in Thonny and run it, same as anything in `testing/` |
 | `tuning.py` | Every gain, limit, and the `LIVE_MOTORS` switch — the only file you should need to edit while tuning |
+| `lift.py` | Standalone lift test: ramp up, hold, ramp down with self-levelling. Gains and the `WIRING` mode live inline at the top, so Thonny edits take effect without re-uploading |
 
 ## Setup
 

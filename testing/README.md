@@ -9,12 +9,13 @@ a wiring table in physical pin numbers and a runnable script.
 | # | Component | What it proves | Motors spin? |
 |---|---|---|---|
 | [01](01_pico_2w/README.md) | Raspberry Pi Pico 2 W | MicroPython runs, serial works, LED blinks | no |
-| [02](02_drv8833/README.md) | DRV8833 driver | Chip wakes, outputs swing — measured, no motor | no |
+| [02](02_drv8833/README.md) | DRV8833 drivers | Both boards wake, all four outputs swing — measured, no motor | no |
 | [03](03_coreless_motor/README.md) | Coreless motors | Each motor spins, mapping and direction correct | **yes** |
 | [04](04_gy521_imu/README.md) | GY-521 / MPU6050 | Gyro + accel read, attitude tracks tilt | no |
 | [05](05_hmc5883l_compass/README.md) | HMC5883L compass | Heading sweeps 0–360 correctly | no |
 | [06](06_gy_gps6mv2/README.md) | GY-GPS6MV2 GPS | NMEA arrives, fix acquired outdoors | no |
 | [07](07_lipo_power/README.md) | 1S LiPo power | No brownout under full four-motor load | **yes** |
+| [08](08_full_stack_dry_run/README.md) | Everything together | Whole control loop closes at rate, signs correct | no |
 
 ## Before running anything that spins
 

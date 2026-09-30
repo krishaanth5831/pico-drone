@@ -1,8 +1,12 @@
 # 02 — DRV8833 dual H-bridge
 
-Verifies the driver board **with no motor attached**. You are checking that the
-chip wakes up and that its outputs actually swing, using a multimeter. Doing this
-before connecting a motor means a wiring fault costs you nothing.
+Verifies **both driver boards** with no motor attached. You are checking that
+each chip wakes up and that all four outputs actually swing, using a multimeter.
+Doing this before connecting a motor means a wiring fault costs you nothing.
+
+The script walks every channel in turn — DRV #1 `AOUT1`/`BOUT1`, then DRV #2
+`AOUT1`/`BOUT1` — naming the board and pad to probe at each step. Budget about
+a minute with the meter in hand.
 
 > **No motor connected for this test.** Connect motors in `03_coreless_motor`.
 
@@ -75,24 +79,36 @@ Re-upload whenever you change anything under `src/`.
 1. Wire as above, **no motors**.
 2. Multimeter in DC volts, black probe on GND.
 3. Run `test_drv8833.py`.
-4. When prompted, put the red probe on `AOUT1`, then `BOUT1`.
+4. Follow the prompts — each names which board and which pad to probe. The
+   script pauses six seconds on each, long enough to move the probe.
 
 ## What you should see
 
 ```
 === DRV8833 driver check ===
 no motors should be connected
+4 channels across 2 boards, about 54 s total
 LED pulses for as long as this runs
 
-SLP low  -> drivers asleep
-  measure AOUT1 now: expect ~0 V (high impedance)
-SLP high -> drivers awake
+SLP low  -> both drivers asleep
+  measure DRV #1 AOUT1 now: expect ~0 V (high impedance)
+  measure DRV #1 BOUT1 now: expect ~0 V (high impedance)
+  measure DRV #2 AOUT1 now: expect ~0 V (high impedance)
+  measure DRV #2 BOUT1 now: expect ~0 V (high impedance)
+
+SLP high -> both drivers awake
+
+-- channel 1: DRV #1 AIN1 -> AOUT1 (GP10) --
   AIN1 at 50% duty
-  measure AOUT1 now: expect roughly 2.0-2.7 V
-  AIN1 at 0%
-  measure AOUT1 now: expect ~0 V
+  measure DRV #1 AOUT1 now: expect roughly 2.0-2.7 V
+  back to 0%
+  measure DRV #1 AOUT1 now: expect ~0 V
+
+-- channel 2: DRV #1 BIN1 -> BOUT1 (GP11) --
+  ...
+
 nFAULT  : OK (high)
-=== disarmed ===
+=== disarmed, LED off ===
 ```
 
 A PWM output measured with a cheap multimeter reads the **average**, so 50% duty
@@ -109,7 +125,9 @@ that band is a pass. What matters is that it moves when the duty changes.
 | `AOUT1` stays at 0 V always | `SLP` not reaching 3.3 V. Measure it directly — this is the most common failure and produces no error message |
 | `AOUT1` sits at full 5 V | `AIN2` not tied to GND |
 | `nFAULT: TRIPPED` | Over-current or thermal. With no motor attached this means an output is shorted to GND |
-| Nothing on either channel | `VM` unpowered, or GND not shared with the Pico |
+| Nothing on either channel of ONE board | That board's `VM` unpowered, or its GND not shared with the Pico |
+| Nothing on any channel of EITHER board | `SLP` not reaching 3.3 V, or no common ground |
+| `nFAULT` trips partway through | The message names the channel that was live — start there. Both boards share the line |
 
 ## Thermal reality check
 
