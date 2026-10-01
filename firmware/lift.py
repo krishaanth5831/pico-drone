@@ -73,7 +73,7 @@ except ImportError as exc:
 WIRING = "SHARED"
 
 # --- throttle profile (0.0-1.0, scaled to the wiring's duty ceiling) --------
-LIFT_THROTTLE = 0.40   # raise if it won't leave the ground, lower if it rockets
+LIFT_THROTTLE = 0.50   # raise if it won't leave the ground, lower if it rockets
 RAMP_UP_S = 2.5        # slow ramp: a step to full current browns out a 1S pack
 HOLD_S = None          # time at LIFT_THROTTLE; None = hold until Stop / Ctrl-C
 RAMP_DOWN_S = 2.0      # descent ramp back to zero
@@ -98,7 +98,7 @@ PITCH_ANGLE_KP = 4.0
 
 MAX_ANGLE_RATE_DPS = 150.0   # clamp on what the angle loop may request
 RATE_I_LIMIT = 50.0          # integral clamp, deg/s * s
-I_ENABLE_THROTTLE = 0.35     # integrators held at zero below this - stops them
+I_ENABLE_THROTTLE = 0.55     # integrators held at zero below this - stops them
                              # winding up while the quad still sits on the ground
 TRIM_ROLL = 0.0              # constant roll correction, if it always drifts one way
 TRIM_PITCH = 0.0
