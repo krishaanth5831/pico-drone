@@ -13,6 +13,7 @@ At the prompt:
 
 Flight profile, all automatic (there is no control link yet):
   0 -> LIFT_THROTTLE over RAMP_UP_S, hold for HOLD_S, back to 0 over RAMP_DOWN_S.
+  HOLD_S = None holds forever - press Thonny's Stop button (Ctrl-C) to end it.
 Auto-disarms on tilt past TILT_LIMIT_DEG, on nFAULT, on Ctrl-C, on any error.
 
 No altitude sensor exists, so "lift" here means open-loop throttle with the
@@ -69,14 +70,14 @@ except ImportError as exc:
 #     pulses are interleaved: motor A fires at the start of each 50 us period,
 #     motor B at the end. Each motor gets at most 50% of the time - roughly
 #     half the thrust - and all motor current flows through the ground rail.
-WIRING = "STANDARD"
+WIRING = "SHARED"
 
 # --- throttle profile (0.0-1.0, scaled to the wiring's duty ceiling) --------
-LIFT_THROTTLE = 0.85   # raise if it won't leave the ground, lower if it rockets
+LIFT_THROTTLE = 0.40   # raise if it won't leave the ground, lower if it rockets
 RAMP_UP_S = 2.5        # slow ramp: a step to full current browns out a 1S pack
-HOLD_S = 3.0           # time at LIFT_THROTTLE
+HOLD_S = None          # time at LIFT_THROTTLE; None = hold until Stop / Ctrl-C
 RAMP_DOWN_S = 2.0      # descent ramp back to zero
-IDLE = 0.10            # mixer floor while throttle > 0
+IDLE = 0.30            # mixer floor while throttle > 0
 
 # --- safety -------------------------------------------------------------------
 TILT_LIMIT_DEG = 35.0  # auto-disarm past this roll or pitch
@@ -225,7 +226,10 @@ def throttle_at(t):
     if t < RAMP_UP_S:
         return LIFT_THROTTLE * t / RAMP_UP_S
     t -= RAMP_UP_S
-    if t < HOLD_S:
+    # No hold time set: stay at LIFT_THROTTLE forever. Thonny's Stop button
+    # sends Ctrl-C, which lands in run()'s KeyboardInterrupt handler and the
+    # finally block disarms - motors cut straight to zero, no ramp down.
+    if HOLD_S is None or t < HOLD_S:
         return LIFT_THROTTLE
     t -= HOLD_S
     if t < RAMP_DOWN_S:
@@ -235,8 +239,12 @@ def throttle_at(t):
 
 def run():
     print("\n=== pico-drone lift test ===")
-    print("wiring %s, throttle %.2f, profile %.1fs up / %.1fs hold / %.1fs down"
-          % (WIRING, LIFT_THROTTLE, RAMP_UP_S, HOLD_S, RAMP_DOWN_S))
+    if HOLD_S is None:
+        print("wiring %s, throttle %.2f, profile %.1fs up / hold until Stop (Ctrl-C)"
+              % (WIRING, LIFT_THROTTLE, RAMP_UP_S))
+    else:
+        print("wiring %s, throttle %.2f, profile %.1fs up / %.1fs hold / %.1fs down"
+              % (WIRING, LIFT_THROTTLE, RAMP_UP_S, HOLD_S, RAMP_DOWN_S))
 
     # Motors first, so SLP is low before anything that can fail or block.
     motors = Motors(WIRING)
