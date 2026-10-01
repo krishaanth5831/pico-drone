@@ -1,0 +1,2050 @@
+(kicad_sch (version 20250114) (generator "eeschema") (generator_version "9.0")
+(uuid "4012ecc6-0bb7-4126-9bbf-8b169a9b7976")
+(paper "A3")
+(title_block (title "Pico Drone - full wiring") (date "2026-10-01") (rev "1") (company "github.com/krishaanth5831/pico-drone") (comment 1 "Motor wiring: STANDARD") (comment 2 "Pins and nets from src/config.py and firmware/README.md") (comment 3 "Pico pin numbers are physical pins (USB at the top)"))
+(lib_symbols
+(symbol "pico-drone:Pico2W"
+(pin_names (offset 1.016))
+(exclude_from_sim no) (in_bom yes) (on_board yes)
+(property "Reference" "U" (at -17.78 29.21 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
+(property "Value" "Raspberry Pi Pico 2 W" (at 0 -29.21 0) (effects (font (size 1.27 1.27)) (justify top)))
+(property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "Raspberry Pi Pico 2 W module, physical pin numbering" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(symbol "Pico2W_0_1" (rectangle (start -17.78 27.94) (end 17.78 -27.94) (stroke (width 0.254) (type default)) (fill (type background))) (rectangle (start -5.08 30.48) (end 5.08 27.94) (stroke (width 0.254) (type default)) (fill (type outline))) (text "USB" (at 0 29.21 0) (effects (font (size 1.016 1.016) (bold yes)))) (text "Raspberry Pi" (at 0 8.89 0) (effects (font (size 1.27 1.27)))) (text "Pico 2 W" (at 0 6.35 0) (effects (font (size 1.778 1.778) (bold yes)))) (text "RP2350" (at 0 3.81 0) (effects (font (size 1.27 1.27)))) (text "top view" (at 0 -1.27 0) (effects (font (size 1.27 1.27)))) (text "pin numbers" (at 0 -3.81 0) (effects (font (size 1.27 1.27)))) (text "= physical" (at 0 -6.35 0) (effects (font (size 1.27 1.27)))))
+(symbol "Pico2W_1_1" (pin bidirectional line (at -22.86 24.13 0) (length 5.08) (name "GP0" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 21.59 0) (length 5.08) (name "GP1" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))) (pin power_in line (at -22.86 19.05 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 16.51 0) (length 5.08) (name "GP2" (effects (font (size 1.27 1.27)))) (number "4" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 13.97 0) (length 5.08) (name "GP3" (effects (font (size 1.27 1.27)))) (number "5" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 11.43 0) (length 5.08) (name "GP4" (effects (font (size 1.27 1.27)))) (number "6" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 8.89 0) (length 5.08) (name "GP5" (effects (font (size 1.27 1.27)))) (number "7" (effects (font (size 1.27 1.27))))) (pin power_in line (at -22.86 6.35 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "8" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 3.81 0) (length 5.08) (name "GP6" (effects (font (size 1.27 1.27)))) (number "9" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 1.27 0) (length 5.08) (name "GP7" (effects (font (size 1.27 1.27)))) (number "10" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -1.27 0) (length 5.08) (name "GP8" (effects (font (size 1.27 1.27)))) (number "11" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -3.81 0) (length 5.08) (name "GP9" (effects (font (size 1.27 1.27)))) (number "12" (effects (font (size 1.27 1.27))))) (pin power_in line (at -22.86 -6.35 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "13" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -8.89 0) (length 5.08) (name "GP10" (effects (font (size 1.27 1.27)))) (number "14" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -11.43 0) (length 5.08) (name "GP11" (effects (font (size 1.27 1.27)))) (number "15" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -13.97 0) (length 5.08) (name "GP12" (effects (font (size 1.27 1.27)))) (number "16" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -16.51 0) (length 5.08) (name "GP13" (effects (font (size 1.27 1.27)))) (number "17" (effects (font (size 1.27 1.27))))) (pin power_in line (at -22.86 -19.05 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "18" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -21.59 0) (length 5.08) (name "GP14" (effects (font (size 1.27 1.27)))) (number "19" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -22.86 -24.13 0) (length 5.08) (name "GP15" (effects (font (size 1.27 1.27)))) (number "20" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 -24.13 180) (length 5.08) (name "GP16" (effects (font (size 1.27 1.27)))) (number "21" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 -21.59 180) (length 5.08) (name "GP17" (effects (font (size 1.27 1.27)))) (number "22" (effects (font (size 1.27 1.27))))) (pin power_in line (at 22.86 -19.05 180) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "23" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 -16.51 180) (length 5.08) (name "GP18" (effects (font (size 1.27 1.27)))) (number "24" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 -13.97 180) (length 5.08) (name "GP19" (effects (font (size 1.27 1.27)))) (number "25" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 -11.43 180) (length 5.08) (name "GP20" (effects (font (size 1.27 1.27)))) (number "26" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 -8.89 180) (length 5.08) (name "GP21" (effects (font (size 1.27 1.27)))) (number "27" (effects (font (size 1.27 1.27))))) (pin power_in line (at 22.86 -6.35 180) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "28" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 -3.81 180) (length 5.08) (name "GP22" (effects (font (size 1.27 1.27)))) (number "29" (effects (font (size 1.27 1.27))))) (pin input line (at 22.86 -1.27 180) (length 5.08) (name "RUN" (effects (font (size 1.27 1.27)))) (number "30" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 1.27 180) (length 5.08) (name "GP26_A0" (effects (font (size 1.27 1.27)))) (number "31" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 3.81 180) (length 5.08) (name "GP27_A1" (effects (font (size 1.27 1.27)))) (number "32" (effects (font (size 1.27 1.27))))) (pin power_in line (at 22.86 6.35 180) (length 5.08) (name "AGND" (effects (font (size 1.27 1.27)))) (number "33" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at 22.86 8.89 180) (length 5.08) (name "GP28_A2" (effects (font (size 1.27 1.27)))) (number "34" (effects (font (size 1.27 1.27))))) (pin passive line (at 22.86 11.43 180) (length 5.08) (name "ADC_VREF" (effects (font (size 1.27 1.27)))) (number "35" (effects (font (size 1.27 1.27))))) (pin power_out line (at 22.86 13.97 180) (length 5.08) (name "3V3(OUT)" (effects (font (size 1.27 1.27)))) (number "36" (effects (font (size 1.27 1.27))))) (pin input line (at 22.86 16.51 180) (length 5.08) (name "3V3_EN" (effects (font (size 1.27 1.27)))) (number "37" (effects (font (size 1.27 1.27))))) (pin power_in line (at 22.86 19.05 180) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "38" (effects (font (size 1.27 1.27))))) (pin power_in line (at 22.86 21.59 180) (length 5.08) (name "VSYS" (effects (font (size 1.27 1.27)))) (number "39" (effects (font (size 1.27 1.27))))) (pin passive line (at 22.86 24.13 180) (length 5.08) (name "VBUS" (effects (font (size 1.27 1.27)))) (number "40" (effects (font (size 1.27 1.27))))))
+(embedded_fonts no))
+(symbol "pico-drone:DRV8833_Module"
+(pin_numbers (hide yes))
+(pin_names (offset 1.016))
+(exclude_from_sim no) (in_bom yes) (on_board yes)
+(property "Reference" "DRV" (at -17.78 16.51 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
+(property "Value" "DRV8833 breakout" (at 0 -21.59 0) (effects (font (size 1.27 1.27)) (justify top)))
+(property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "DRV8833 dual H-bridge breakout; silkscreen names vary, both shown" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(symbol "DRV8833_Module_0_1" (rectangle (start -17.78 15.24) (end 17.78 -20.32) (stroke (width 0.254) (type default)) (fill (type background))) (text "DRV8833" (at 0 10.16 0) (effects (font (size 1.524 1.524) (bold yes)))) (text "dual H-bridge" (at 0 -15.24 0) (effects (font (size 1.27 1.27)))))
+(symbol "DRV8833_Module_1_1" (pin power_in line (at -22.86 12.7 0) (length 5.08) (name "VM/VCC" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27))))) (pin input line (at -22.86 7.62 0) (length 5.08) (name "SLP/EEP" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))) (pin open_collector line (at -22.86 5.08 0) (length 5.08) (name "nFAULT/ULT" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27))))) (pin input line (at -22.86 2.54 0) (length 5.08) (name "AIN1/IN1" (effects (font (size 1.27 1.27)))) (number "4" (effects (font (size 1.27 1.27))))) (pin input line (at -22.86 0 0) (length 5.08) (name "BIN1/IN3" (effects (font (size 1.27 1.27)))) (number "5" (effects (font (size 1.27 1.27))))) (pin input line (at -22.86 -5.08 0) (length 5.08) (name "AIN2/IN2" (effects (font (size 1.27 1.27)))) (number "6" (effects (font (size 1.27 1.27))))) (pin input line (at -22.86 -7.62 0) (length 5.08) (name "BIN2/IN4" (effects (font (size 1.27 1.27)))) (number "7" (effects (font (size 1.27 1.27))))) (pin power_in line (at -22.86 -12.7 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "8" (effects (font (size 1.27 1.27))))) (pin output line (at 22.86 12.7 180) (length 5.08) (name "AOUT1/OUT1" (effects (font (size 1.27 1.27)))) (number "9" (effects (font (size 1.27 1.27))))) (pin output line (at 22.86 0 180) (length 5.08) (name "AOUT2/OUT2" (effects (font (size 1.27 1.27)))) (number "10" (effects (font (size 1.27 1.27))))) (pin output line (at 22.86 -5.08 180) (length 5.08) (name "BOUT1/OUT3" (effects (font (size 1.27 1.27)))) (number "11" (effects (font (size 1.27 1.27))))) (pin output line (at 22.86 -17.78 180) (length 5.08) (name "BOUT2/OUT4" (effects (font (size 1.27 1.27)))) (number "12" (effects (font (size 1.27 1.27))))))
+(embedded_fonts no))
+(symbol "pico-drone:GY-521"
+(pin_numbers (hide yes))
+(pin_names (offset 1.016))
+(exclude_from_sim no) (in_bom yes) (on_board yes)
+(property "Reference" "IMU" (at -15.24 12.7 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
+(property "Value" "GY-521 (MPU6050)" (at 0 -12.7 0) (effects (font (size 1.27 1.27)) (justify top)))
+(property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "GY-521 MPU6050 IMU breakout" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(symbol "GY-521_0_1" (rectangle (start -15.24 11.43) (end 15.24 -11.43) (stroke (width 0.254) (type default)) (fill (type background))) (text "GY-521" (at 3.81 3.81 0) (effects (font (size 1.524 1.524) (bold yes)))) (text "MPU6050 IMU" (at 3.81 1.27 0) (effects (font (size 1.27 1.27)))) (text "I2C 0x68" (at 3.81 -1.27 0) (effects (font (size 1.27 1.27)))))
+(symbol "GY-521_1_1" (pin power_in line (at -20.32 8.89 0) (length 5.08) (name "VCC" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27))))) (pin power_in line (at -20.32 6.35 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -20.32 3.81 0) (length 5.08) (name "SCL" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -20.32 1.27 0) (length 5.08) (name "SDA" (effects (font (size 1.27 1.27)))) (number "4" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -20.32 -1.27 0) (length 5.08) (name "XDA" (effects (font (size 1.27 1.27)))) (number "5" (effects (font (size 1.27 1.27))))) (pin output line (at -20.32 -3.81 0) (length 5.08) (name "XCL" (effects (font (size 1.27 1.27)))) (number "6" (effects (font (size 1.27 1.27))))) (pin input line (at -20.32 -6.35 0) (length 5.08) (name "AD0" (effects (font (size 1.27 1.27)))) (number "7" (effects (font (size 1.27 1.27))))) (pin output line (at -20.32 -8.89 0) (length 5.08) (name "INT" (effects (font (size 1.27 1.27)))) (number "8" (effects (font (size 1.27 1.27))))))
+(embedded_fonts no))
+(symbol "pico-drone:HMC5883L"
+(pin_numbers (hide yes))
+(pin_names (offset 1.016))
+(exclude_from_sim no) (in_bom yes) (on_board yes)
+(property "Reference" "MAG" (at -15.24 8.89 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
+(property "Value" "HMC5883L (GY-271)" (at 0 -8.89 0) (effects (font (size 1.27 1.27)) (justify top)))
+(property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "HMC5883L compass breakout" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(symbol "HMC5883L_0_1" (rectangle (start -15.24 7.62) (end 15.24 -7.62) (stroke (width 0.254) (type default)) (fill (type background))) (text "GY-271" (at 3.81 2.54 0) (effects (font (size 1.524 1.524) (bold yes)))) (text "HMC5883L" (at 3.81 0 0) (effects (font (size 1.27 1.27)))) (text "I2C 0x1E" (at 3.81 -2.54 0) (effects (font (size 1.27 1.27)))))
+(symbol "HMC5883L_1_1" (pin power_in line (at -20.32 5.08 0) (length 5.08) (name "VCC" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27))))) (pin power_in line (at -20.32 2.54 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -20.32 0 0) (length 5.08) (name "SCL" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27))))) (pin bidirectional line (at -20.32 -2.54 0) (length 5.08) (name "SDA" (effects (font (size 1.27 1.27)))) (number "4" (effects (font (size 1.27 1.27))))) (pin output line (at -20.32 -5.08 0) (length 5.08) (name "DRDY" (effects (font (size 1.27 1.27)))) (number "5" (effects (font (size 1.27 1.27))))))
+(embedded_fonts no))
+(symbol "pico-drone:GY-GPS6MV2"
+(pin_numbers (hide yes))
+(pin_names (offset 1.016))
+(exclude_from_sim no) (in_bom yes) (on_board yes)
+(property "Reference" "GPS" (at -15.24 7.62 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
+(property "Value" "GY-GPS6MV2 (NEO-6M)" (at 0 -7.62 0) (effects (font (size 1.27 1.27)) (justify top)))
+(property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "u-blox NEO-6M GPS breakout" (at 0 0 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(symbol "GY-GPS6MV2_0_1" (rectangle (start -15.24 6.35) (end 15.24 -6.35) (stroke (width 0.254) (type default)) (fill (type background))) (text "GY-GPS6MV2" (at 3.81 2.54 0) (effects (font (size 1.524 1.524) (bold yes)))) (text "u-blox NEO-6M" (at 3.81 0 0) (effects (font (size 1.27 1.27)))) (text "UART 9600 baud" (at 3.81 -2.54 0) (effects (font (size 1.27 1.27)))))
+(symbol "GY-GPS6MV2_1_1" (pin power_in line (at -20.32 3.81 0) (length 5.08) (name "VCC" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27))))) (pin input line (at -20.32 1.27 0) (length 5.08) (name "RX" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))) (pin output line (at -20.32 -1.27 0) (length 5.08) (name "TX" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27))))) (pin power_in line (at -20.32 -3.81 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "4" (effects (font (size 1.27 1.27))))))
+(embedded_fonts no))
+(symbol "pico-drone:VSYS"
+		(power)
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "#PWR"
+			(at 0 -3.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "VSYS"
+			(at 0 3.556 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"VSYS\""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "global power"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "VSYS_0_1"
+			(polyline
+				(pts
+					(xy -0.762 1.27) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 2.54) (xy 0.762 1.27)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 0) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "VSYS_1_1"
+			(pin power_in line
+				(at 0 0 90)
+				(length 0)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "Device:D_Schottky"
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 1.016)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "D"
+			(at 0 2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "D_Schottky"
+			(at 0 -2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Schottky diode"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "diode Schottky"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "D_Schottky_0_1"
+			(polyline
+				(pts
+					(xy -1.905 0.635) (xy -1.905 1.27) (xy -1.27 1.27) (xy -1.27 -1.27) (xy -0.635 -1.27) (xy -0.635 -0.635)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 1.27 0) (xy -1.27 0)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "D_Schottky_1_1"
+			(pin passive line
+				(at -3.81 0 0)
+				(length 2.54)
+				(name "K"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 3.81 0 180)
+				(length 2.54)
+				(name "A"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "Device:C_Polarized"
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0.254)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "C"
+			(at 0.635 2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "C_Polarized"
+			(at 0.635 -2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 0.9652 -3.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Polarized capacitor"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "cap capacitor"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_fp_filters" "CP_*"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "C_Polarized_0_1"
+			(rectangle
+				(start -2.286 0.508)
+				(end 2.286 1.016)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy -1.778 2.286) (xy -0.762 2.286)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy -1.27 2.794) (xy -1.27 1.778)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(rectangle
+				(start 2.286 -0.508)
+				(end -2.286 -1.016)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type outline)
+				)
+			)
+		)
+		(symbol "C_Polarized_1_1"
+			(pin passive line
+				(at 0 3.81 270)
+				(length 2.794)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 0 -3.81 90)
+				(length 2.794)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "Device:Battery_Cell"
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "BT"
+			(at 2.54 2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Battery_Cell"
+			(at 2.54 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 1.524 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 0 1.524 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Single-cell battery"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Device" "V"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Type" "DC"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=+ 2=-"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "battery cell"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "Battery_Cell_0_1"
+			(rectangle
+				(start -2.286 1.778)
+				(end 2.286 1.524)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type outline)
+				)
+			)
+			(rectangle
+				(start -1.524 1.016)
+				(end 1.524 0.508)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type outline)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 1.778) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 0.762) (xy 0 0)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 3.048) (xy 1.778 3.048)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 1.27 3.556) (xy 1.27 2.54)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "Battery_Cell_1_1"
+			(pin passive line
+				(at 0 5.08 270)
+				(length 2.54)
+				(name "+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 0 -2.54 90)
+				(length 2.54)
+				(name "-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "Motor:Motor_DC"
+		(pin_names
+			(offset 0)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "M"
+			(at 2.54 2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Motor_DC"
+			(at 2.54 -5.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 -2.286 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 0 -2.286 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "DC Motor"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "DC Motor"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_fp_filters" "PinHeader*P2.54mm* TerminalBlock*"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "Motor_DC_0_0"
+			(polyline
+				(pts
+					(xy -1.27 -3.302) (xy -1.27 0.508) (xy 0 -2.032) (xy 1.27 0.508) (xy 1.27 -3.302)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "Motor_DC_0_1"
+			(polyline
+				(pts
+					(xy 0 2.032) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 1.7272) (xy 0 2.0828)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(circle
+				(center 0 -1.524)
+				(radius 3.2512)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 -4.7752) (xy 0 -5.1816)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 -7.62) (xy 0 -7.112)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "Motor_DC_1_1"
+			(pin passive line
+				(at 0 5.08 270)
+				(length 2.54)
+				(name "+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 0 -7.62 90)
+				(length 2.54)
+				(name "-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "power:GND"
+		(power)
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "#PWR"
+			(at 0 -6.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 0 -3.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "global power"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "GND_0_1"
+			(polyline
+				(pts
+					(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "GND_1_1"
+			(pin power_in line
+				(at 0 0 270)
+				(length 0)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "power:+3V3"
+		(power)
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "#PWR"
+			(at 0 -3.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 0 3.556 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "global power"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "+3V3_0_1"
+			(polyline
+				(pts
+					(xy -0.762 1.27) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 2.54) (xy 0.762 1.27)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 0) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "+3V3_1_1"
+			(pin power_in line
+				(at 0 0 90)
+				(length 0)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "power:+BATT"
+		(power)
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "#PWR"
+			(at 0 -3.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+BATT"
+			(at 0 3.556 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "global power battery"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "+BATT_0_1"
+			(polyline
+				(pts
+					(xy -0.762 1.27) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 2.54) (xy 0.762 1.27)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0 0) (xy 0 2.54)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "+BATT_1_1"
+			(pin power_in line
+				(at 0 0 90)
+				(length 0)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+(symbol "power:PWR_FLAG"
+		(power)
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "#FLG"
+			(at 0 1.905 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 0 3.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Special symbol for telling ERC where power comes from"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "flag power"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "PWR_FLAG_0_0"
+			(pin power_out line
+				(at 0 0 90)
+				(length 0)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(symbol "PWR_FLAG_0_1"
+			(polyline
+				(pts
+					(xy 0 0) (xy 0 1.27) (xy -1.016 1.905) (xy 0 2.54) (xy 1.016 1.905) (xy 0 1.27)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+)
+(text "PICO DRONE  -  FULL WIRING" (exclude_from_sim no) (at 17.78 22.86 0) (effects (font (size 3.81 3.81) (bold yes)) (justify left bottom)) (uuid "ad642c2d-336f-4bcd-9964-9fc18ec0e90e"))
+(text "Raspberry Pi Pico 2 W  ·  2x DRV8833  ·  4x 8520 coreless motors  ·  GY-521 IMU  ·  HMC5883L compass  ·  GY-GPS6MV2 GPS (optional)  ·  1S LiPo" (exclude_from_sim no) (at 17.78 29.21 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "ae049c94-5591-4507-9d9b-9b23625d53d2"))
+(text "Motor wiring: STANDARD   ·   pins from src/config.py   ·   2026-10-01" (exclude_from_sim no) (at 405.13 29.21 0) (effects (font (size 1.524 1.524) (bold yes)) (justify right bottom)) (uuid "4537be51-2334-4f8c-a470-ec605db6fe1b"))
+(rectangle (start 185.42 35.56) (end 281.94 124.46) (stroke (width 0.3) (type dash) (color 15 125 55 1)) (fill (type color) (color 15 125 55 0.05)) (uuid "a616c4e4-6a1b-4939-8c5f-3addf908d837"))
+(text "FLIGHT CONTROLLER" (exclude_from_sim no) (at 187.96 40.64 0) (effects (font (size 2.032 2.032) (bold yes) (color 15 125 55 1)) (justify left bottom)) (uuid "a8f9ad29-ff35-42b7-a0d3-92e778572c9a"))
+(text "Raspberry Pi Pico 2 W, top view, USB at the top. Pin numbers are PHYSICAL pins." (exclude_from_sim no) (at 187.96 45.72 0) (effects (font (size 1.27 1.27) (color 15 125 55 1)) (justify left bottom)) (uuid "092f8ca2-46f6-4177-8672-889089324037"))
+(symbol (lib_id "pico-drone:Pico2W") (at 233.68 86.36 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "f18ab3a6-d8f6-4958-b2e5-4ecd05f545fc")
+(property "Reference" "U1" (at 215.9 57.15 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "Raspberry Pi Pico 2 W" (at 215.9 116.84 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Footprint" "" (at 233.68 86.36 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 233.68 86.36 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 233.68 86.36 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "64b0d373-be47-4fe2-b4d6-e1cf8c905ee5"))
+(pin "2" (uuid "dfdb43a9-e1a5-4dae-b2dd-0e1e3e8f336e"))
+(pin "3" (uuid "dd3c5440-c797-4bfe-a6b9-a0e7e9d7383a"))
+(pin "4" (uuid "846acbe8-d5bf-43b2-ba54-cb73a85cc712"))
+(pin "5" (uuid "d3330577-9290-4a87-bcc6-af3185f9da09"))
+(pin "6" (uuid "a9eef73f-d948-4b02-b6e8-2a0a6bfafc1c"))
+(pin "7" (uuid "58375a2f-a318-4c23-b0a5-9750f84ba987"))
+(pin "8" (uuid "a9689501-0c7e-4cec-9d25-621c2d92445e"))
+(pin "9" (uuid "83721349-9bee-4dd1-b5a8-95be0dfd143d"))
+(pin "10" (uuid "1c3b0f8e-f2fe-4508-bfa5-71c8fc33a2f8"))
+(pin "11" (uuid "944d4380-1d73-4ee5-b1af-cb4f27a1dc99"))
+(pin "12" (uuid "3bb0b5e6-cd72-4a82-9483-a20df927616f"))
+(pin "13" (uuid "5f03f3ac-6f15-412b-a613-757e036a0f76"))
+(pin "14" (uuid "4654cf4f-b2b4-48c1-aefe-8d6ef791f371"))
+(pin "15" (uuid "6a89a683-41f5-41d2-8afe-5456933c977a"))
+(pin "16" (uuid "8ad5e909-b225-4e3d-8229-6ecd09c5228c"))
+(pin "17" (uuid "5bc04d7c-e426-438c-9ae1-7b8a06b9e4c6"))
+(pin "18" (uuid "dc697037-1bee-4af1-81a9-c652155e976d"))
+(pin "19" (uuid "c4ca4e64-d408-4766-9547-8494299448af"))
+(pin "20" (uuid "63b1df30-0302-4bd3-b582-78d38c48c760"))
+(pin "21" (uuid "1db3e03d-e45a-4efb-ad00-1d1cb9c401f8"))
+(pin "22" (uuid "a4d37599-2038-4810-84db-477870a74036"))
+(pin "23" (uuid "af46b864-3234-4fa9-8428-1423560c5062"))
+(pin "24" (uuid "4cbb0098-930f-42ae-8526-4d2ca8b6ce67"))
+(pin "25" (uuid "2b96e423-2158-4068-a43f-1e64b02e7957"))
+(pin "26" (uuid "ab290fa5-3f75-455a-82b5-508acef8bb5f"))
+(pin "27" (uuid "79d1cd7e-7d23-4b34-bb0d-c54090f0ee2e"))
+(pin "28" (uuid "cc547295-7cb6-4652-9dcc-78b0af341160"))
+(pin "29" (uuid "8fcb6eb3-cf57-4644-8b3f-bd64e9145194"))
+(pin "30" (uuid "b520df2b-e9ef-4fac-957b-a913b1633486"))
+(pin "31" (uuid "f5ec0f91-c55d-47aa-a4dd-2bd26cafe265"))
+(pin "32" (uuid "6df49d31-7bc3-4d37-805f-a2ca15273f07"))
+(pin "33" (uuid "96205141-44e9-403f-8746-3767c637596d"))
+(pin "34" (uuid "f95f63f2-ff31-4964-9a07-94e1fb0a8943"))
+(pin "35" (uuid "e581d983-d632-4efb-9b99-c8c7ac194121"))
+(pin "36" (uuid "93f7c51b-23e1-4811-8229-023df78c2276"))
+(pin "37" (uuid "3a3b6236-0252-486d-a8cc-957fed30d719"))
+(pin "38" (uuid "b5f4f02b-a0e2-44f8-8949-137c6936c94b"))
+(pin "39" (uuid "a1a7279c-a58b-40dc-842f-cad1f23aeda1"))
+(pin "40" (uuid "fe4df561-c7ad-4fd3-86e9-f5c0148d5840"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "U1") (unit 1)))))
+(text "USB to laptop (Thonny)" (exclude_from_sim no) (at 233.68 52.07 0) (effects (font (size 1.27 1.27) (italic yes)) (justify bottom)) (uuid "81336a97-d081-4a00-a43a-4ae0b505c5af"))
+(wire (pts (xy 210.82 62.23) (xy 203.2 62.23)) (stroke (width 0) (type default)) (uuid "e022c47e-ad50-4637-b2fa-df779683f0ee"))
+(global_label "UART0_TX" (shape output) (at 203.2 62.23 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "17a6498d-2f23-4747-a18a-004942d780ef") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 62.23 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 210.82 64.77) (xy 203.2 64.77)) (stroke (width 0) (type default)) (uuid "cd193b01-a63c-4540-a9df-691dd54ebc5d"))
+(global_label "UART0_RX" (shape input) (at 203.2 64.77 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "b1f2893d-3c73-4f2c-90d2-fd3968558811") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 64.77 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 210.82 67.31) (xy 203.2 67.31)) (stroke (width 0) (type default)) (uuid "9ea7b728-6d37-4e28-b1ae-74e8e0d9914b"))
+(symbol (lib_id "power:GND") (at 203.2 67.31 270) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "0e252793-e36d-4151-8fae-d86a88a44e1d")
+(property "Reference" "#PWR01" (at 203.2 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 198.12 67.31 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 203.2 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 203.2 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 203.2 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "db773a2b-7e95-44e1-8b14-524fcb2df64f"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR01") (unit 1)))))
+(no_connect (at 210.82 69.85) (uuid "5eed6604-63ff-407a-ad98-23955878a245"))
+(no_connect (at 210.82 72.39) (uuid "0ef00b03-c289-4aad-8b7d-734fbf305378"))
+(wire (pts (xy 210.82 74.93) (xy 203.2 74.93)) (stroke (width 0) (type default)) (uuid "da743aab-2bca-4dc3-a0f8-0338923c29cc"))
+(global_label "I2C0_SDA" (shape bidirectional) (at 203.2 74.93 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "efddc6b9-575c-4310-9518-014320fab897") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 74.93 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 210.82 77.47) (xy 203.2 77.47)) (stroke (width 0) (type default)) (uuid "30a3ea94-23fc-4f72-b7e4-3cabc023fcba"))
+(global_label "I2C0_SCL" (shape bidirectional) (at 203.2 77.47 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "008cb70c-55c3-4126-bef8-95d6cea4bda7") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 77.47 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(no_connect (at 210.82 80.01) (uuid "25299dae-6f32-4d2d-942c-909679c96ba8"))
+(no_connect (at 210.82 82.55) (uuid "e5817eca-7ca3-4b28-877c-5bf7ffa6d21e"))
+(no_connect (at 210.82 85.09) (uuid "c9b7e626-654b-4491-bda0-0f9ceb64aef2"))
+(no_connect (at 210.82 87.63) (uuid "3efc5d5d-6c7f-43a3-94ab-47bddb98f18c"))
+(no_connect (at 210.82 90.17) (uuid "6326bb11-eafe-46a9-876e-47775b3b705c"))
+(no_connect (at 210.82 92.71) (uuid "09a0892b-39ef-4aae-af97-06d2fc6ece80"))
+(wire (pts (xy 210.82 95.25) (xy 203.2 95.25)) (stroke (width 0) (type default)) (uuid "8f30796b-a97a-4c46-863c-beefb8c1bb09"))
+(global_label "M1_PWM" (shape output) (at 203.2 95.25 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "2d2da703-66f5-427c-b1f9-6d095be8f506") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 95.25 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 210.82 97.79) (xy 203.2 97.79)) (stroke (width 0) (type default)) (uuid "9090f3b6-1dff-4dba-b335-79571a4b1763"))
+(global_label "M2_PWM" (shape output) (at 203.2 97.79 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "de84a9ca-dc7a-4cb1-a146-08ff6b9f8580") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 97.79 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 210.82 100.33) (xy 203.2 100.33)) (stroke (width 0) (type default)) (uuid "2f2f1e0f-a634-4d78-a7dc-d07124d34af3"))
+(global_label "M3_PWM" (shape output) (at 203.2 100.33 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "4e86f29a-50ab-409f-b598-98105f71e4fb") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 100.33 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 210.82 102.87) (xy 203.2 102.87)) (stroke (width 0) (type default)) (uuid "f9433025-e3dd-4497-97bf-4f40bf8b1cee"))
+(global_label "M4_PWM" (shape output) (at 203.2 102.87 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "9499bd84-427c-40b5-8c9e-5c9f609530ff") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 102.87 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(no_connect (at 210.82 105.41) (uuid "69405837-d9d9-4775-ac4d-390c1a09735b"))
+(wire (pts (xy 210.82 107.95) (xy 203.2 107.95)) (stroke (width 0) (type default)) (uuid "b675a826-bbad-4315-8c3f-a8a5206f496e"))
+(global_label "DRV_nFAULT" (shape input) (at 203.2 107.95 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "5abb9385-9163-45b3-a69b-1b6f5ebb9dba") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 107.95 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 210.82 110.49) (xy 203.2 110.49)) (stroke (width 0) (type default)) (uuid "6a0cc98a-3c15-435a-bed0-45804a5d0f8e"))
+(global_label "MOTOR_ARM" (shape output) (at 203.2 110.49 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "8aad61ec-c2ae-40f9-84fc-a462f995a52e") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 203.2 110.49 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(no_connect (at 256.54 110.49) (uuid "9c46ace5-49c6-41dc-acbf-aa92341493fa"))
+(no_connect (at 256.54 107.95) (uuid "93146b1f-057c-4183-ba5e-971d22cb944a"))
+(no_connect (at 256.54 105.41) (uuid "5383f30d-715a-4c19-a10c-fdefacd9d42b"))
+(no_connect (at 256.54 102.87) (uuid "7e3f1d6a-50f6-4028-9ad0-f233b2188452"))
+(no_connect (at 256.54 100.33) (uuid "89c1ef76-dc48-4851-9c50-889f4a509a11"))
+(no_connect (at 256.54 97.79) (uuid "34e64bb9-96ce-49da-aec6-d775c9b12ec6"))
+(no_connect (at 256.54 95.25) (uuid "f25540a8-4150-4fc7-9f79-b60735e9498c"))
+(no_connect (at 256.54 92.71) (uuid "63e73ff6-7c36-4edd-99af-e739af16969b"))
+(no_connect (at 256.54 90.17) (uuid "6f7b6fbf-2ced-47dc-a2f9-590c54ac343e"))
+(no_connect (at 256.54 87.63) (uuid "ae2cbf8c-d679-47ad-9a97-c5d11fa4729b"))
+(no_connect (at 256.54 85.09) (uuid "7b617732-783b-4305-a7f6-c3a34136ad0a"))
+(no_connect (at 256.54 82.55) (uuid "b09123b8-887e-40b7-91e6-690e88f04351"))
+(no_connect (at 256.54 80.01) (uuid "c1f3d74e-a322-4afa-bcd6-53f1c708352a"))
+(no_connect (at 256.54 77.47) (uuid "fda8e7f2-d158-4a78-9b9c-096bfb49f2b5"))
+(no_connect (at 256.54 74.93) (uuid "aa6d5163-eca2-48cb-b04e-3c6c48d56b59"))
+(wire (pts (xy 256.54 72.39) (xy 264.16 72.39)) (stroke (width 0) (type default)) (uuid "7ff253b0-c886-4f0c-8ce1-97f20ad4b3ea"))
+(symbol (lib_id "power:+3V3") (at 264.16 72.39 270) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "a4be1d90-29b2-41f8-ace1-a17b6d14d5e8")
+(property "Reference" "#PWR02" (at 264.16 72.39 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "+3V3" (at 269.875 72.39 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 264.16 72.39 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 264.16 72.39 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 264.16 72.39 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "f690a16a-fd62-4096-ac57-f35f3b35f5de"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR02") (unit 1)))))
+(no_connect (at 256.54 69.85) (uuid "746bbdee-67ef-4ee4-ab83-ea96821aef97"))
+(wire (pts (xy 256.54 67.31) (xy 264.16 67.31)) (stroke (width 0) (type default)) (uuid "42b191e0-7b1e-492c-b434-99b3e85e3486"))
+(symbol (lib_id "power:GND") (at 264.16 67.31 90) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "d817cb30-6423-4a57-8244-d544a7f39844")
+(property "Reference" "#PWR03" (at 264.16 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 269.24 67.31 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 264.16 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 264.16 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 264.16 67.31 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "51b228da-737f-4112-9007-825c9f7fc00e"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR03") (unit 1)))))
+(wire (pts (xy 256.54 64.77) (xy 264.16 64.77)) (stroke (width 0) (type default)) (uuid "62c70c5f-54e3-40c1-8654-5a0083446d12"))
+(symbol (lib_id "pico-drone:VSYS") (at 264.16 64.77 270) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "4a2f977e-6081-4fc4-b594-3d8376a76a07")
+(property "Reference" "#PWR04" (at 264.16 64.77 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "VSYS" (at 269.875 64.77 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 264.16 64.77 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 264.16 64.77 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 264.16 64.77 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "7a83cc80-5a18-40e5-9b38-d9917f5901d4"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR04") (unit 1)))))
+(no_connect (at 256.54 62.23) (uuid "3d73b8fb-3291-4205-8774-cfc4722edbca"))
+(text "USB 5 V - leave NC" (exclude_from_sim no) (at 259.08 62.23 0) (effects (font (size 1.27 1.27) (color 200 0 0 1)) (justify left)) (uuid "997a620d-6c63-4a99-b455-8ce4943bd25c"))
+(rectangle (start 287.02 35.56) (end 405.13 118.11) (stroke (width 0.3) (type dash) (color 195 35 35 1)) (fill (type color) (color 195 35 35 0.05)) (uuid "784af244-fc8c-4025-84f3-8972de416291"))
+(text "POWER  (1S LiPo)" (exclude_from_sim no) (at 289.56 40.64 0) (effects (font (size 2.032 2.032) (bold yes) (color 195 35 35 1)) (justify left bottom)) (uuid "cb80b0a0-cecf-412f-8325-c895b714c6ba"))
+(symbol (lib_id "Device:Battery_Cell") (at 302.26 81.28 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "ac8ae60f-96d1-457e-9b3f-5033e027d273")
+(property "Reference" "BT1" (at 306.07 80.01 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "1S LiPo  3.7 V" (at 306.07 82.55 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Footprint" "" (at 302.26 81.28 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 302.26 81.28 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 302.26 81.28 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "eb6ea0b4-265a-4446-842d-6f219c896186"))
+(pin "2" (uuid "f8ef433a-9d50-43d7-ba55-2e3a8a6d9cef"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "BT1") (unit 1)))))
+(text "3.0 - 4.2 V" (exclude_from_sim no) (at 306.07 85.09 0) (effects (font (size 1.27 1.27)) (justify left)) (uuid "987ff5e7-4f23-4195-ba42-a5d0cc413f4c"))
+(symbol (lib_id "Device:D_Schottky") (at 330.2 60.96 180) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "e71e6ae9-600b-442c-b632-f95dfd0ae2b7")
+(property "Reference" "D1" (at 330.2 57.15 0) (effects (font (size 1.27 1.27))))
+(property "Value" "SS14 Schottky" (at 330.2 64.77 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 330.2 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 330.2 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 330.2 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "33ce0849-9267-4eaa-b0ca-034179599616"))
+(pin "2" (uuid "15bbfe26-aa7c-4bda-a9d4-daa3ce2e8a4c"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "D1") (unit 1)))))
+(wire (pts (xy 302.26 76.2) (xy 302.26 60.96)) (stroke (width 0) (type default)) (uuid "110a1144-ba29-4d78-ad40-f244bdec1f6c"))
+(wire (pts (xy 302.26 60.96) (xy 314.96 60.96)) (stroke (width 0) (type default)) (uuid "439c5e42-f18f-4611-8165-48fc59aacefb"))
+(wire (pts (xy 314.96 60.96) (xy 326.39 60.96)) (stroke (width 0) (type default)) (uuid "0396818a-550b-4bb4-a536-5f51e0807da9"))
+(symbol (lib_id "power:+BATT") (at 302.26 60.96 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "40c21188-8152-496d-b6d8-50220a2f173f")
+(property "Reference" "#PWR05" (at 302.26 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "+BATT" (at 302.26 57.15 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 302.26 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 302.26 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 302.26 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "52100a35-d49d-4a31-8668-98ce83754610"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR05") (unit 1)))))
+(junction (at 302.26 60.96) (diameter 0) (color 0 0 0 0) (uuid "716c89da-8e50-4c5b-b23a-065fc6b2e107"))
+(symbol (lib_id "power:PWR_FLAG") (at 314.96 60.96 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "5e66eace-69e8-4607-82a9-0eb2cc230576")
+(property "Reference" "#FLG01" (at 314.96 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "PWR_FLAG" (at 314.96 57.15 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Footprint" "" (at 314.96 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 314.96 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 314.96 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "4de9b3b5-d6d3-4428-9875-74f090813dc2"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#FLG01") (unit 1)))))
+(junction (at 314.96 60.96) (diameter 0) (color 0 0 0 0) (uuid "217d4206-919d-4ddf-9e28-b8ba518f10ec"))
+(wire (pts (xy 334.01 60.96) (xy 342.9 60.96)) (stroke (width 0) (type default)) (uuid "9b3423a8-5255-417a-9aaa-428e9776cea8"))
+(wire (pts (xy 342.9 60.96) (xy 350.52 60.96)) (stroke (width 0) (type default)) (uuid "6e76c881-05af-47eb-ab0d-47d8862d03be"))
+(symbol (lib_id "power:PWR_FLAG") (at 342.9 60.96 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "866d241d-0535-447e-beec-7f791e7bd27f")
+(property "Reference" "#FLG02" (at 342.9 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "PWR_FLAG" (at 342.9 57.15 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Footprint" "" (at 342.9 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 342.9 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 342.9 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "473318bf-ac47-4faa-b8ec-7e36e38668b5"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#FLG02") (unit 1)))))
+(junction (at 342.9 60.96) (diameter 0) (color 0 0 0 0) (uuid "34f3e25f-9578-4408-a225-15e5686bb320"))
+(symbol (lib_id "pico-drone:VSYS") (at 350.52 60.96 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "28101aef-48c9-433f-b49e-2d9e304db4b4")
+(property "Reference" "#PWR06" (at 350.52 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "VSYS" (at 350.52 57.15 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 350.52 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 350.52 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 350.52 60.96 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "93a8c3eb-a6a0-4eca-93a5-5f7cce01ba3f"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR06") (unit 1)))))
+(text "to Pico pin 39" (exclude_from_sim no) (at 353.06 60.325 0) (effects (font (size 1.27 1.27)) (justify left)) (uuid "df88041e-52cb-4717-ac5e-c252ae779384"))
+(wire (pts (xy 302.26 83.82) (xy 302.26 91.44)) (stroke (width 0) (type default)) (uuid "9fd9c660-ba02-43c3-8e00-c6ae8bdc0a13"))
+(wire (pts (xy 302.26 91.44) (xy 302.26 96.52)) (stroke (width 0) (type default)) (uuid "07e10418-7a95-4b17-9eb8-2d2b6900e84e"))
+(symbol (lib_id "power:GND") (at 302.26 96.52 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "3d5b1c17-968e-455c-a536-b8fce49010e3")
+(property "Reference" "#PWR07" (at 302.26 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 302.26 100.33 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 302.26 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 302.26 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 302.26 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "6d42c197-edb2-4aa9-95b4-0f76b236acdf"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR07") (unit 1)))))
+(wire (pts (xy 302.26 91.44) (xy 294.64 91.44)) (stroke (width 0) (type default)) (uuid "e56dbb7d-7985-4dd3-93b2-7e4e1aa61b75"))
+(symbol (lib_id "power:PWR_FLAG") (at 294.64 91.44 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "00025183-44ef-4f0d-8a6d-17f3d100773a")
+(property "Reference" "#FLG03" (at 294.64 91.44 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "PWR_FLAG" (at 294.64 87.63 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Footprint" "" (at 294.64 91.44 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 294.64 91.44 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 294.64 91.44 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "ed641e5b-6a8b-4081-81f9-89cb27f2deb7"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#FLG03") (unit 1)))))
+(junction (at 302.26 91.44) (diameter 0) (color 0 0 0 0) (uuid "08a90e13-4993-4629-9dc2-6a8f4fa6cc84"))
+(text "stripe (cathode) faces VSYS" (exclude_from_sim no) (at 330.2 69.85 0) (effects (font (size 1.27 1.27) (italic yes)) (justify bottom)) (uuid "f635124f-12e1-4f08-9ca7-b24454036284"))
+(text "+BATT, short thick wires, DIRECT to:" (exclude_from_sim no) (at 309.88 46.99 0) (effects (font (size 1.27 1.27) (color 195 35 35 1)) (justify left bottom)) (uuid "ec3ecd35-c007-415f-a604-10682bfdb861"))
+(text "    DRV1 VM  and  DRV2 VM" (exclude_from_sim no) (at 309.88 49.53 0) (effects (font (size 1.27 1.27) (color 195 35 35 1)) (justify left bottom)) (uuid "6ad30272-de60-45ed-bf9e-896d77fee55f"))
+(text "    D1 anode (the Pico's supply)" (exclude_from_sim no) (at 309.88 52.07 0) (effects (font (size 1.27 1.27) (color 195 35 35 1)) (justify left bottom)) (uuid "f78cd325-5917-43e7-805f-d77768c0c60b"))
+(text "STAR POINT = battery (-) terminal." (exclude_from_sim no) (at 306.07 91.44 0) (effects (font (size 1.27 1.27) (color 195 35 35 1)) (justify left bottom)) (uuid "e24d477a-400c-4f83-9f62-d4caceae79e2"))
+(text "One separate wire from here to each of:" (exclude_from_sim no) (at 306.07 93.98 0) (effects (font (size 1.27 1.27) (color 195 35 35 1)) (justify left bottom)) (uuid "74683b93-e002-40c5-8b62-21c4198565e8"))
+(text "    DRV1 GND,  DRV2 GND,  Pico pin 38" (exclude_from_sim no) (at 306.07 96.52 0) (effects (font (size 1.27 1.27) (color 195 35 35 1)) (justify left bottom)) (uuid "a60fa30a-bf71-4851-b059-be59d976e803"))
+(text "The Pico is powered only through D1 into VSYS (pin 39) - never pins 36 or 40." (exclude_from_sim no) (at 289.56 109.22 0) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "17688ece-f55c-4ab3-9848-363b76b816bd"))
+(text "D1 stops USB 5 V back-feeding the LiPo when both are plugged in." (exclude_from_sim no) (at 289.56 111.76 0) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "41a6a598-7cf2-4934-ad2d-5e679dc6c2ab"))
+(rectangle (start 15.24 35.56) (end 180.34 190.5) (stroke (width 0.3) (type dash) (color 25 85 190 1)) (fill (type color) (color 25 85 190 0.05)) (uuid "b6205bd2-c69a-4f16-99b8-63da5515b70c"))
+(text "MOTOR DRIVERS + MOTORS" (exclude_from_sim no) (at 17.78 40.64 0) (effects (font (size 2.032 2.032) (bold yes) (color 25 85 190 1)) (justify left bottom)) (uuid "a33f85d7-6f09-477f-a173-7debf4a3bbd0"))
+(symbol (lib_id "pico-drone:DRV8833_Module") (at 91.44 81.28 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "c10ee965-76d8-47e5-921c-d593208fea62")
+(property "Reference" "DRV1" (at 91.44 63.5 0) (effects (font (size 1.27 1.27))))
+(property "Value" "DRV8833 breakout" (at 91.44 104.14 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 91.44 81.28 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 91.44 81.28 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 91.44 81.28 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "349a5835-39ae-4b79-a75e-ba38281d8817"))
+(pin "2" (uuid "142f7bb1-63ae-4332-86b0-261c9fec1a99"))
+(pin "3" (uuid "9ae47a06-7d6d-497e-9da8-58dd48e16b04"))
+(pin "4" (uuid "937b3a79-6ad1-4830-b45d-3291421ef181"))
+(pin "5" (uuid "85e2ec34-111c-4469-944f-d5a91ad96029"))
+(pin "6" (uuid "77c3e0d5-05bd-431a-b68f-910db851c62b"))
+(pin "7" (uuid "1b9560fb-a5da-4c46-a5c8-272746c82568"))
+(pin "8" (uuid "8796592f-ec9a-4ead-8dee-5e3ee7026481"))
+(pin "9" (uuid "6fc5df0b-2e39-480b-9288-42472c092e8a"))
+(pin "10" (uuid "ed68ee1b-208f-4e4b-8ffa-d8d906dc29cd"))
+(pin "11" (uuid "84704086-8e6f-4c16-ab4e-03fdf7e544b4"))
+(pin "12" (uuid "4d1aa90a-85ae-44d5-827e-09dccef26f8a"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "DRV1") (unit 1)))))
+(text "DRV #1  ->  M1 + M2" (exclude_from_sim no) (at 27.94 58.42 0) (effects (font (size 1.524 1.524) (bold yes) (color 25 85 190 1)) (justify left bottom)) (uuid "3fe81586-171d-403f-b6bc-9ccea00c5069"))
+(wire (pts (xy 68.58 68.58) (xy 38.1 68.58)) (stroke (width 0) (type default)) (uuid "be28b87a-6ef5-4daa-8bb7-d39061f62925"))
+(wire (pts (xy 38.1 68.58) (xy 27.94 68.58)) (stroke (width 0) (type default)) (uuid "6445ef4d-fc5e-46dc-b7d6-36f466b5cf97"))
+(junction (at 38.1 68.58) (diameter 0) (color 0 0 0 0) (uuid "09722a89-61d8-44c5-adec-b7950b378daf"))
+(symbol (lib_id "power:+BATT") (at 27.94 68.58 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "83c50161-62db-4057-bdd5-e09a935950ab")
+(property "Reference" "#PWR08" (at 27.94 68.58 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "+BATT" (at 27.94 64.77 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 27.94 68.58 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 27.94 68.58 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 27.94 68.58 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "d8231d03-40ed-4c80-83ad-51c51d497521"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR08") (unit 1)))))
+(symbol (lib_id "Device:C_Polarized") (at 38.1 72.39 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "45675d1e-57bd-4dae-b1bd-d4be3baa7b5e")
+(property "Reference" "C1" (at 35.56 71.12 0) (effects (font (size 1.27 1.27)) (justify right)))
+(property "Value" "470µF  ≥10V" (at 35.56 73.66 0) (effects (font (size 1.27 1.27)) (justify right)))
+(property "Footprint" "" (at 38.1 72.39 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes)))
+(property "Datasheet" "" (at 38.1 72.39 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes)))
+(property "Description" "" (at 38.1 72.39 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes)))
+(pin "1" (uuid "cb56c0e3-ec11-420e-980a-6f469fbe3620"))
+(pin "2" (uuid "34ae17f9-1bae-4ffd-bf0b-0d6f38e880d1"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "C1") (unit 1)))))
+(symbol (lib_id "power:GND") (at 38.1 76.2 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "11209675-6454-4580-9727-97169065bfd6")
+(property "Reference" "#PWR09" (at 38.1 76.2 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 38.1 80.01 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 38.1 76.2 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 38.1 76.2 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 38.1 76.2 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "6ee1068f-b8ea-4dde-acfc-adc05e80424e"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR09") (unit 1)))))
+(text "C1: REQUIRED,\nnot fitted yet" (exclude_from_sim no) (at 17.78 83.82 0) (effects (font (size 1.27 1.27) (color 200 0 0 1)) (justify left top)) (uuid "3656de9e-0428-45cf-a2a5-d6d1de222ff3"))
+(wire (pts (xy 68.58 73.66) (xy 60.96 73.66)) (stroke (width 0) (type default)) (uuid "cf1cfd15-4eaa-4a45-8c59-b4a65a660774"))
+(global_label "MOTOR_ARM" (shape input) (at 60.96 73.66 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "f7aec5c8-9f24-4110-9a56-bffe9b84f79d") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 73.66 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 76.2) (xy 60.96 76.2)) (stroke (width 0) (type default)) (uuid "87a849ff-e114-4d72-a888-f460e7aeacad"))
+(global_label "DRV_nFAULT" (shape output) (at 60.96 76.2 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "3de3e7d6-d809-4e08-a720-06042f3eeb41") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 76.2 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 78.74) (xy 60.96 78.74)) (stroke (width 0) (type default)) (uuid "6160d425-5c36-4967-86b5-6b5771a0d513"))
+(global_label "M1_PWM" (shape input) (at 60.96 78.74 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "6d4c5f36-661a-460c-8438-e8b643222b2b") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 78.74 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 81.28) (xy 60.96 81.28)) (stroke (width 0) (type default)) (uuid "a943dc32-c14a-408f-9151-d91763377eaa"))
+(global_label "M2_PWM" (shape input) (at 60.96 81.28 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "cf170b76-274a-4ca3-8332-c4afb8263f45") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 81.28 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 86.36) (xy 63.5 86.36)) (stroke (width 0) (type default)) (uuid "5f6a06fe-5216-49cf-aff9-ca48cd147271"))
+(wire (pts (xy 68.58 88.9) (xy 63.5 88.9)) (stroke (width 0) (type default)) (uuid "e814edc9-e901-4f4c-9ecc-ab63950b03bd"))
+(wire (pts (xy 68.58 93.98) (xy 63.5 93.98)) (stroke (width 0) (type default)) (uuid "89229852-e980-4308-9e54-36bae05a0fb9"))
+(wire (pts (xy 63.5 86.36) (xy 63.5 88.9)) (stroke (width 0) (type default)) (uuid "f0355193-658b-4f1f-9e9c-6a684e569d40"))
+(wire (pts (xy 63.5 88.9) (xy 63.5 93.98)) (stroke (width 0) (type default)) (uuid "21ee87bc-fd1e-43c4-ae51-66dadc7c4085"))
+(wire (pts (xy 63.5 93.98) (xy 63.5 96.52)) (stroke (width 0) (type default)) (uuid "684f90cf-50ab-4586-8122-25ead0e6750c"))
+(junction (at 63.5 88.9) (diameter 0) (color 0 0 0 0) (uuid "7b4448f5-3251-48db-ad96-bb51465c737c"))
+(junction (at 63.5 93.98) (diameter 0) (color 0 0 0 0) (uuid "6022c559-eaac-4d9e-956a-18eb9cf9f661"))
+(symbol (lib_id "power:GND") (at 63.5 96.52 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "41061ca0-2176-41b0-9e4b-2a226e352a0c")
+(property "Reference" "#PWR10" (at 63.5 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 63.5 100.33 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 63.5 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 63.5 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 63.5 96.52 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "5af24c2d-0340-4559-9b03-931d1047d0bf"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR10") (unit 1)))))
+(text "IN2 + IN4 tied to GND" (exclude_from_sim no) (at 60.96 86.995 0) (effects (font (size 1.27 1.27)) (justify right)) (uuid "a88eb043-64e2-40b5-8924-51a38e7e822e"))
+(text "GND: own wire to battery (-)" (exclude_from_sim no) (at 60.96 99.695 0) (effects (font (size 1.27 1.27)) (justify right)) (uuid "a6155bde-70c2-4906-a0c7-30020ff82ece"))
+(symbol (lib_id "Motor:Motor_DC") (at 127 73.66 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "db1d6927-6b44-46aa-927a-e58b6f24d3d8")
+(property "Reference" "M1" (at 132.08 73.66 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "8520 coreless" (at 132.08 76.2 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Footprint" "" (at 127 73.66 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 127 73.66 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 127 73.66 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "6c7d67da-384f-4d26-b0c0-1b5cb6935906"))
+(pin "2" (uuid "054a33b2-320f-409f-900d-f6e4ffb360a2"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "M1") (unit 1)))))
+(text "front-right · CCW" (exclude_from_sim no) (at 132.08 78.74 0) (effects (font (size 1.27 1.27) (italic yes)) (justify left)) (uuid "1b4c74a4-6d64-45aa-b951-8e2c9a4fe6cf"))
+(symbol (lib_id "Motor:Motor_DC") (at 139.7 91.44 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "7d18f0e4-8b09-4032-8e60-a1fdd5ba525e")
+(property "Reference" "M2" (at 144.78 91.44 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "8520 coreless" (at 144.78 93.98 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Footprint" "" (at 139.7 91.44 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 139.7 91.44 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 139.7 91.44 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "77314e37-2d3e-4e17-a47b-e769452a96bc"))
+(pin "2" (uuid "b9fedf11-0c8e-431b-8b88-15f86b8597b4"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "M2") (unit 1)))))
+(text "rear-left · CCW" (exclude_from_sim no) (at 144.78 96.52 0) (effects (font (size 1.27 1.27) (italic yes)) (justify left)) (uuid "b0846589-67a5-4d79-9136-2e5a99063c91"))
+(wire (pts (xy 114.3 68.58) (xy 127 68.58)) (stroke (width 0) (type default)) (uuid "1ac1ab41-e4c9-4b6a-9cbd-f261f0701eef"))
+(wire (pts (xy 114.3 81.28) (xy 127 81.28)) (stroke (width 0) (type default)) (uuid "7c9c4579-f37a-4dbf-8cf0-e60a55cbc9ea"))
+(wire (pts (xy 114.3 86.36) (xy 139.7 86.36)) (stroke (width 0) (type default)) (uuid "ba063915-5489-4a94-8235-34e2c114f314"))
+(wire (pts (xy 114.3 99.06) (xy 139.7 99.06)) (stroke (width 0) (type default)) (uuid "e3f20156-a7c5-4e08-bf74-ee980b308cb2"))
+(symbol (lib_id "pico-drone:DRV8833_Module") (at 91.44 160.02 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "3557d78b-bef6-4b43-b6f9-5d2e96c9ba1f")
+(property "Reference" "DRV2" (at 91.44 142.24 0) (effects (font (size 1.27 1.27))))
+(property "Value" "DRV8833 breakout" (at 91.44 182.88 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 91.44 160.02 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 91.44 160.02 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 91.44 160.02 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "e308a6ef-6de1-4689-be1a-f30c2c2fae71"))
+(pin "2" (uuid "b4e59b70-02fc-4638-b14f-57a08fbb582e"))
+(pin "3" (uuid "04df2c29-abe8-4fab-a3aa-ef16a8437045"))
+(pin "4" (uuid "6c47884e-8130-445c-8b93-efef80a0be46"))
+(pin "5" (uuid "18af62e8-e03e-443c-b015-1a28e878b508"))
+(pin "6" (uuid "9570ee73-a6b0-4e9a-bc0a-91bfec38d60a"))
+(pin "7" (uuid "0d2f49f7-535b-47dd-affa-52f8ef686c01"))
+(pin "8" (uuid "0004b43a-32aa-4f32-bd9b-7c5be88952c0"))
+(pin "9" (uuid "97fe7e71-1973-473d-8659-c424fb293799"))
+(pin "10" (uuid "07fd3c9b-95c8-42da-9539-6e1444cf60ab"))
+(pin "11" (uuid "d8b2f860-8b3e-4be5-b53a-ac06c097a6e3"))
+(pin "12" (uuid "73d617d2-ff38-41b3-9746-aadb827e2c9a"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "DRV2") (unit 1)))))
+(text "DRV #2  ->  M3 + M4" (exclude_from_sim no) (at 27.94 137.16 0) (effects (font (size 1.524 1.524) (bold yes) (color 25 85 190 1)) (justify left bottom)) (uuid "256a6646-8c33-427a-a66e-bd7162ca5eb3"))
+(wire (pts (xy 68.58 147.32) (xy 38.1 147.32)) (stroke (width 0) (type default)) (uuid "9ba5b778-546b-4e5b-b352-9270eebf4e3b"))
+(wire (pts (xy 38.1 147.32) (xy 27.94 147.32)) (stroke (width 0) (type default)) (uuid "c8d0ce4b-8c1f-4e07-9999-92d1852a6573"))
+(junction (at 38.1 147.32) (diameter 0) (color 0 0 0 0) (uuid "70e74c18-13bf-40bd-93f8-286fb17148a3"))
+(symbol (lib_id "power:+BATT") (at 27.94 147.32 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "c21490b1-07f7-4910-babb-479838588396")
+(property "Reference" "#PWR11" (at 27.94 147.32 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "+BATT" (at 27.94 143.51 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 27.94 147.32 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 27.94 147.32 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 27.94 147.32 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "2116066a-4f53-4ead-90bc-5fc36039b2f5"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR11") (unit 1)))))
+(symbol (lib_id "Device:C_Polarized") (at 38.1 151.13 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "3cf103cb-28b3-4556-ae29-2b480278faad")
+(property "Reference" "C2" (at 35.56 149.86 0) (effects (font (size 1.27 1.27)) (justify right)))
+(property "Value" "470µF  ≥10V" (at 35.56 152.4 0) (effects (font (size 1.27 1.27)) (justify right)))
+(property "Footprint" "" (at 38.1 151.13 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes)))
+(property "Datasheet" "" (at 38.1 151.13 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes)))
+(property "Description" "" (at 38.1 151.13 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes)))
+(pin "1" (uuid "45e16231-081b-44ed-b72e-c47f3dd7ba94"))
+(pin "2" (uuid "3da0cbfa-6a73-4d9a-a7dc-88fc82f059a6"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "C2") (unit 1)))))
+(symbol (lib_id "power:GND") (at 38.1 154.94 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "b257e417-6a3b-48eb-b5c2-731d74695110")
+(property "Reference" "#PWR12" (at 38.1 154.94 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 38.1 158.75 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 38.1 154.94 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 38.1 154.94 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 38.1 154.94 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "85fe4533-fe41-4d75-a1ae-b00756ce5df0"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR12") (unit 1)))))
+(text "C2: REQUIRED,\nnot fitted yet" (exclude_from_sim no) (at 17.78 162.56 0) (effects (font (size 1.27 1.27) (color 200 0 0 1)) (justify left top)) (uuid "3fcfaa28-a880-441e-96b5-1b324506edfb"))
+(wire (pts (xy 68.58 152.4) (xy 60.96 152.4)) (stroke (width 0) (type default)) (uuid "22f06202-744d-48f0-9efb-45f362ae6324"))
+(global_label "MOTOR_ARM" (shape input) (at 60.96 152.4 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "33acfc40-6237-4f3a-bf7e-ae619272d4a8") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 152.4 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 154.94) (xy 60.96 154.94)) (stroke (width 0) (type default)) (uuid "0639d646-2815-4953-880a-eae2dfa6c1de"))
+(global_label "DRV_nFAULT" (shape output) (at 60.96 154.94 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "6d2210b6-37f4-46f8-b65a-57aa3a9a6ce3") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 154.94 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 157.48) (xy 60.96 157.48)) (stroke (width 0) (type default)) (uuid "ea385dec-db9a-4172-8419-4d05318b952f"))
+(global_label "M3_PWM" (shape input) (at 60.96 157.48 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "c1e920e4-17d6-4f68-b843-780c5873758f") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 157.48 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 160.02) (xy 60.96 160.02)) (stroke (width 0) (type default)) (uuid "fba8ed9e-a307-456a-839c-00dd93c54fde"))
+(global_label "M4_PWM" (shape input) (at 60.96 160.02 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "806cf678-165e-4427-9cc5-9b977b68d42a") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 60.96 160.02 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 68.58 165.1) (xy 63.5 165.1)) (stroke (width 0) (type default)) (uuid "c25c116b-a7a1-4988-a368-718df16ae0fc"))
+(wire (pts (xy 68.58 167.64) (xy 63.5 167.64)) (stroke (width 0) (type default)) (uuid "3df96fee-9d7c-4b2c-865a-81f7cd1a39de"))
+(wire (pts (xy 68.58 172.72) (xy 63.5 172.72)) (stroke (width 0) (type default)) (uuid "5322e053-aff3-4c37-b84e-bebfff5b32e2"))
+(wire (pts (xy 63.5 165.1) (xy 63.5 167.64)) (stroke (width 0) (type default)) (uuid "60622714-3fe3-4c92-a90d-de0022562f56"))
+(wire (pts (xy 63.5 167.64) (xy 63.5 172.72)) (stroke (width 0) (type default)) (uuid "39a92478-3242-4d52-a031-a59977e4d6fb"))
+(wire (pts (xy 63.5 172.72) (xy 63.5 175.26)) (stroke (width 0) (type default)) (uuid "a3d25110-5351-4161-8b47-517a0d258318"))
+(junction (at 63.5 167.64) (diameter 0) (color 0 0 0 0) (uuid "95bc7d22-e3cb-4a41-a291-26d34a002e0f"))
+(junction (at 63.5 172.72) (diameter 0) (color 0 0 0 0) (uuid "a4599319-1225-4d29-a961-29751c609ad3"))
+(symbol (lib_id "power:GND") (at 63.5 175.26 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "c22dfdd5-e8a2-47ff-83f9-3e76fbd7cdea")
+(property "Reference" "#PWR13" (at 63.5 175.26 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 63.5 179.07 0) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 63.5 175.26 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 63.5 175.26 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 63.5 175.26 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "ea3d0902-89ed-4390-bc68-e567fca93677"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR13") (unit 1)))))
+(text "IN2 + IN4 tied to GND" (exclude_from_sim no) (at 60.96 165.735 0) (effects (font (size 1.27 1.27)) (justify right)) (uuid "3f222ec2-ebd1-4f39-b229-793f0a04df7e"))
+(text "GND: own wire to battery (-)" (exclude_from_sim no) (at 60.96 178.435 0) (effects (font (size 1.27 1.27)) (justify right)) (uuid "147a8f58-01b0-4cec-b208-d5c6c138b151"))
+(symbol (lib_id "Motor:Motor_DC") (at 127 152.4 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "d8f3f490-f9fb-458f-9f47-bc9002921c0c")
+(property "Reference" "M3" (at 132.08 152.4 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "8520 coreless" (at 132.08 154.94 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Footprint" "" (at 127 152.4 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 127 152.4 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 127 152.4 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "e498eb19-1183-498c-aa92-5a5e146a5440"))
+(pin "2" (uuid "34287557-36f8-4e60-993c-ce51222c15b8"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "M3") (unit 1)))))
+(text "front-left · CW" (exclude_from_sim no) (at 132.08 157.48 0) (effects (font (size 1.27 1.27) (italic yes)) (justify left)) (uuid "822d231b-25dd-46f3-934f-6bfba7f22787"))
+(symbol (lib_id "Motor:Motor_DC") (at 139.7 170.18 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "f350f33c-047b-4d8d-a1a8-cd23b4c36b20")
+(property "Reference" "M4" (at 144.78 170.18 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "8520 coreless" (at 144.78 172.72 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Footprint" "" (at 139.7 170.18 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 139.7 170.18 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 139.7 170.18 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "609f392c-4767-4ff1-b9bd-8cd4cd512bcd"))
+(pin "2" (uuid "6fd83332-8609-4195-8412-1b90a8611cd5"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "M4") (unit 1)))))
+(text "rear-right · CW" (exclude_from_sim no) (at 144.78 175.26 0) (effects (font (size 1.27 1.27) (italic yes)) (justify left)) (uuid "c2c4199a-eb44-4aa4-816a-ab8ac9e6ff53"))
+(wire (pts (xy 114.3 147.32) (xy 127 147.32)) (stroke (width 0) (type default)) (uuid "7202d6ee-3858-4b69-8f27-92b39882812d"))
+(wire (pts (xy 114.3 160.02) (xy 127 160.02)) (stroke (width 0) (type default)) (uuid "0daca47d-37ec-451f-9c6f-73e3c6587e75"))
+(wire (pts (xy 114.3 165.1) (xy 139.7 165.1)) (stroke (width 0) (type default)) (uuid "4c13a1d6-1361-4384-b519-84c947a327c7"))
+(wire (pts (xy 114.3 177.8) (xy 139.7 177.8)) (stroke (width 0) (type default)) (uuid "11aea292-00a5-461c-a8b8-98c64fe35e0c"))
+(text "Both drivers share +BATT, GND, MOTOR_ARM (SLP) and DRV_nFAULT." (exclude_from_sim no) (at 17.78 120.65 0) (effects (font (size 1.27 1.27) (color 25 85 190 1)) (justify left bottom)) (uuid "f26a2940-5d9d-47fe-80a8-5f65a0ffbebd"))
+(text "Spin direction = which way round the motor leads go. Swap the two leads to reverse." (exclude_from_sim no) (at 17.78 123.19 0) (effects (font (size 1.27 1.27) (color 25 85 190 1)) (justify left bottom)) (uuid "4bc76a62-3f3f-4656-8005-c9a644431c1b"))
+(rectangle (start 287.02 123.19) (end 405.13 243.84) (stroke (width 0.3) (type dash) (color 115 55 175 1)) (fill (type color) (color 115 55 175 0.05)) (uuid "db64395f-2465-44f6-bd7c-eec89c5790f5"))
+(text "SENSORS  (3.3 V from Pico pin 36)" (exclude_from_sim no) (at 289.56 128.27 0) (effects (font (size 2.032 2.032) (bold yes) (color 115 55 175 1)) (justify left bottom)) (uuid "7c67d45b-7e87-41df-acff-9e0beced2557"))
+(symbol (lib_id "pico-drone:GY-521") (at 365.76 148.59 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "e9712da6-1413-4a75-998a-b4b6e44ca1e3")
+(property "Reference" "IMU1" (at 350.52 135.89 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "GY-521 (MPU6050)" (at 365.76 148.59 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Footprint" "" (at 365.76 148.59 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 365.76 148.59 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 365.76 148.59 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "c3177c1e-d0f5-4037-ba01-9684f0371be2"))
+(pin "2" (uuid "69eaf29b-22c4-4f78-8b7b-79d7a19f3627"))
+(pin "3" (uuid "96b95236-7497-43ef-8964-8836337cb2fc"))
+(pin "4" (uuid "ffdcbe8f-97ca-4e2e-b1fa-a4e577db62fc"))
+(pin "5" (uuid "9807968e-258a-4e61-8aca-14356f16fc4c"))
+(pin "6" (uuid "9e28182b-277a-417a-83ed-d12b1a9e410c"))
+(pin "7" (uuid "180a9a97-95ec-4f6d-b72b-e77a7ee37ee5"))
+(pin "8" (uuid "3ecc6b78-a314-4baa-a87b-b81c7307d08a"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "IMU1") (unit 1)))))
+(wire (pts (xy 345.44 139.7) (xy 337.82 139.7)) (stroke (width 0) (type default)) (uuid "d0640e18-94bd-4716-81be-eb8b4a47bd99"))
+(symbol (lib_id "power:+3V3") (at 337.82 139.7 90) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "74af0133-9b00-44a3-a897-816a63075616")
+(property "Reference" "#PWR14" (at 337.82 139.7 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "+3V3" (at 332.105 139.7 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 337.82 139.7 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 337.82 139.7 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 337.82 139.7 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "41d86233-916c-4f26-aede-d416e5652ae9"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR14") (unit 1)))))
+(wire (pts (xy 345.44 142.24) (xy 337.82 142.24)) (stroke (width 0) (type default)) (uuid "290d958b-de26-408e-a8eb-8fb40aab7001"))
+(symbol (lib_id "power:GND") (at 337.82 142.24 270) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "3a249bfb-1d47-429d-a3fd-f76985c9a906")
+(property "Reference" "#PWR15" (at 337.82 142.24 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 332.74 142.24 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 337.82 142.24 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 337.82 142.24 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 337.82 142.24 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "777006a0-4f68-4f5b-9a40-0326fca73275"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR15") (unit 1)))))
+(wire (pts (xy 345.44 144.78) (xy 337.82 144.78)) (stroke (width 0) (type default)) (uuid "ed785c01-fd34-4a94-9738-9e4f1d9d205f"))
+(global_label "I2C0_SCL" (shape bidirectional) (at 337.82 144.78 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "13057cc1-465f-4cbb-ba77-2b54654e7492") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 337.82 144.78 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 345.44 147.32) (xy 337.82 147.32)) (stroke (width 0) (type default)) (uuid "b8a34b70-c041-4b5f-86c9-5323b89fe7c6"))
+(global_label "I2C0_SDA" (shape bidirectional) (at 337.82 147.32 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "33d1a04e-b0f5-44e2-8159-e6807212feae") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 337.82 147.32 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(no_connect (at 345.44 149.86) (uuid "ae75684c-2edf-4ad5-a5b6-e398a8a98255"))
+(no_connect (at 345.44 152.4) (uuid "bb154ce1-5773-44b4-a587-01fd6b98bf9f"))
+(no_connect (at 345.44 154.94) (uuid "f293b425-4b90-4239-a24e-6a7ee40c741b"))
+(no_connect (at 345.44 157.48) (uuid "4a3d43bd-23d2-46f5-b683-fce2aa5144fa"))
+(text "Mount at the centre of mass, on foam tape." (exclude_from_sim no) (at 345.44 163.83 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "05830553-fe2c-4e04-a5ec-6ae9f261eb6f"))
+(text "AD0 left open = address 0x68." (exclude_from_sim no) (at 345.44 166.37 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "247892dc-0a85-4d20-97e7-5027dee59169"))
+(symbol (lib_id "pico-drone:HMC5883L") (at 365.76 184.15 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "cb5ae6be-2f31-431e-8e64-2fd0b305db5d")
+(property "Reference" "MAG1" (at 350.52 175.26 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "HMC5883L (GY-271)" (at 365.76 184.15 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Footprint" "" (at 365.76 184.15 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 365.76 184.15 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 365.76 184.15 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "870457e1-7b3e-43da-be48-c45b7f51b0c5"))
+(pin "2" (uuid "e26b3d73-35b8-4012-8773-e0a3e2d8f8f9"))
+(pin "3" (uuid "aeb19aff-2882-4a69-9962-8c9ec8c58813"))
+(pin "4" (uuid "ee996e73-bef2-4c0b-873e-adbf7a4de34e"))
+(pin "5" (uuid "a539254e-b9aa-4609-990f-bbbb48df8bc0"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "MAG1") (unit 1)))))
+(wire (pts (xy 345.44 179.07) (xy 337.82 179.07)) (stroke (width 0) (type default)) (uuid "db805b96-8860-44c2-8343-b3f86cdbcc57"))
+(symbol (lib_id "power:+3V3") (at 337.82 179.07 90) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "ae703272-3e04-4f0b-ac65-1b5979443309")
+(property "Reference" "#PWR16" (at 337.82 179.07 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "+3V3" (at 332.105 179.07 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 337.82 179.07 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 337.82 179.07 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 337.82 179.07 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "98f408ac-e201-436c-966b-c415cb3325dd"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR16") (unit 1)))))
+(wire (pts (xy 345.44 181.61) (xy 337.82 181.61)) (stroke (width 0) (type default)) (uuid "9ed81875-7a37-4216-a516-ece883bb2135"))
+(symbol (lib_id "power:GND") (at 337.82 181.61 270) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "42971d23-74c6-4b05-8f62-aa9b12ccd62f")
+(property "Reference" "#PWR17" (at 337.82 181.61 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 332.74 181.61 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 337.82 181.61 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 337.82 181.61 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 337.82 181.61 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "a9ad746f-376d-4bfd-bc91-6da73c8ecb3c"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR17") (unit 1)))))
+(wire (pts (xy 345.44 184.15) (xy 337.82 184.15)) (stroke (width 0) (type default)) (uuid "26bbd9f5-3b78-41d7-a46f-571807797e08"))
+(global_label "I2C0_SCL" (shape bidirectional) (at 337.82 184.15 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "5624a4d9-80ca-44bd-b6ca-2ad8bc640625") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 337.82 184.15 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 345.44 186.69) (xy 337.82 186.69)) (stroke (width 0) (type default)) (uuid "cb13bcb7-d8b5-4137-93e0-bcd75b861323"))
+(global_label "I2C0_SDA" (shape bidirectional) (at 337.82 186.69 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "386e8216-6680-46df-80d2-f79ebd934fd2") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 337.82 186.69 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(no_connect (at 345.44 189.23) (uuid "bb26b61b-00a1-44aa-aace-5839718519fe"))
+(text "Same I2C wires as the IMU, in parallel." (exclude_from_sim no) (at 345.44 195.58 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "67dfefee-e2d4-42f6-96b6-825b6838df03"))
+(text "Mount far from motors + battery wires." (exclude_from_sim no) (at 345.44 198.12 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "5052dcf2-6c6a-4b84-bd2f-c1fa985fe35a"))
+(text "QMC5883L clone answers at 0x0D." (exclude_from_sim no) (at 345.44 200.66 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "f7de6d7e-7742-47b4-999b-940df8e5d6b7"))
+(symbol (lib_id "pico-drone:GY-GPS6MV2") (at 365.76 220.98 0) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "b1454c28-f4b0-44c4-a290-a844932a509c")
+(property "Reference" "GPS1" (at 350.52 213.36 0) (effects (font (size 1.27 1.27)) (justify left)))
+(property "Value" "GY-GPS6MV2 (NEO-6M)" (at 365.76 220.98 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Footprint" "" (at 365.76 220.98 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Datasheet" "" (at 365.76 220.98 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(property "Description" "" (at 365.76 220.98 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+(pin "1" (uuid "aaa1d32c-7240-4576-b220-4475797b32a2"))
+(pin "2" (uuid "a690f53b-ac27-4e49-bb2c-8c8147d95890"))
+(pin "3" (uuid "70e8b143-68ad-49bd-9044-8bf62cb77d45"))
+(pin "4" (uuid "3c6f4bb0-5026-42c5-be2b-2cbd8a7e12b8"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "GPS1") (unit 1)))))
+(wire (pts (xy 345.44 217.17) (xy 337.82 217.17)) (stroke (width 0) (type default)) (uuid "8d36ce40-d730-434f-a0d1-19bad9f27e5e"))
+(symbol (lib_id "power:+3V3") (at 337.82 217.17 90) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "2febd66e-445a-4dae-97a9-381734b76784")
+(property "Reference" "#PWR18" (at 337.82 217.17 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "+3V3" (at 332.105 217.17 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 337.82 217.17 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 337.82 217.17 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 337.82 217.17 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "20c332ed-43e9-4f25-938e-870d67281ebb"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR18") (unit 1)))))
+(wire (pts (xy 345.44 219.71) (xy 337.82 219.71)) (stroke (width 0) (type default)) (uuid "a7716e00-6968-41f1-aabd-893f5b7d6b48"))
+(global_label "UART0_TX" (shape input) (at 337.82 219.71 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "eac3031d-a6a4-49af-81d4-0ee174a057e3") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 337.82 219.71 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 345.44 222.25) (xy 337.82 222.25)) (stroke (width 0) (type default)) (uuid "e09bd066-3464-4ca3-b396-5d862073036b"))
+(global_label "UART0_RX" (shape output) (at 337.82 222.25 180) (effects (font (size 1.27 1.27)) (justify right)) (uuid "c57cd121-678f-465d-a56c-7644cfb70ea5") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 337.82 222.25 0) (effects (font (size 1.27 1.27)) (justify right) (hide yes))))
+(wire (pts (xy 345.44 224.79) (xy 337.82 224.79)) (stroke (width 0) (type default)) (uuid "fbdb7a46-34cd-4ed7-9d7b-b6b42d148e55"))
+(symbol (lib_id "power:GND") (at 337.82 224.79 270) (unit 1)
+(exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+(uuid "65c96d6c-11cb-41f6-bf95-ce0f49710917")
+(property "Reference" "#PWR19" (at 337.82 224.79 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Value" "GND" (at 332.74 224.79 90) (effects (font (size 1.27 1.27))))
+(property "Footprint" "" (at 337.82 224.79 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Datasheet" "" (at 337.82 224.79 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "Description" "" (at 337.82 224.79 90) (effects (font (size 1.27 1.27)) (hide yes)))
+(pin "1" (uuid "a0adc45c-e883-435f-999d-7dbd30081ba2"))
+(instances (project "pico-drone" (path "/4012ecc6-0bb7-4126-9bbf-8b169a9b7976" (reference "#PWR19") (unit 1)))))
+(text "OPTIONAL for v1 (~14 g). TX/RX cross over." (exclude_from_sim no) (at 345.44 231.14 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "4bbe008d-886f-41cb-8c86-0e5530ae8dc2"))
+(text "Header order varies by batch: trust the silkscreen." (exclude_from_sim no) (at 345.44 233.68 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "64f55aba-2e59-4df6-9280-c9fba7c49122"))
+(text "GND to Pico pin 3. Antenna side up." (exclude_from_sim no) (at 345.44 236.22 0) (effects (font (size 1.27 1.27) (color 115 55 175 1)) (justify left bottom)) (uuid "9839172f-c535-4d7b-9651-f14863784e84"))
+(rectangle (start 185.42 129.54) (end 281.94 281.94) (stroke (width 0.3) (type dash) (color 170 100 0 1)) (fill (type color) (color 170 100 0 0.05)) (uuid "b10f47e7-ca5e-4b74-932a-bdf493624f9c"))
+(text "BUILD NOTES" (exclude_from_sim no) (at 187.96 134.62 0) (effects (font (size 2.032 2.032) (bold yes) (color 170 100 0 1)) (justify left bottom)) (uuid "a1b5afb3-2105-4c6d-8f4b-fcfac4aa44f7"))
+(text "1. Battery (+) goes DIRECT to DRV1 VM and DRV2 VM." (exclude_from_sim no) (at 187.96 142.24 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "f5cdb4b3-de78-4fee-b8fc-ac0f0f737bf8"))
+(text "    The Pico is powered only through D1 into VSYS (pin 39)." (exclude_from_sim no) (at 187.96 145.415 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "57194d31-9d26-4049-a2d9-aa2336cdb8a4"))
+(text "2. C1, C2: 470 µF ≥10 V electrolytic, soldered right at each" (exclude_from_sim no) (at 187.96 149.86 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "71dbc647-5888-4814-bd35-41b45bbd6678"))
+(text "    driver's VM/GND pins, stripe (-) to GND. REQUIRED - not fitted" (exclude_from_sim no) (at 187.96 153.035 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "734ac605-e518-41fc-9de0-cbaa111c5f54"))
+(text "    on the current build." (exclude_from_sim no) (at 187.96 156.21 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "8670759e-ed17-44ac-a639-467186fee2d4"))
+(text "3. Until C1/C2 are fitted: connect the battery BEFORE USB." (exclude_from_sim no) (at 187.96 160.655 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "26eeb565-33c9-496e-a96c-a3611276d576"))
+(text "4. Star ground: one wire each from battery (-) to DRV1 GND," (exclude_from_sim no) (at 187.96 165.1 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "8139d2b9-68f1-49f6-9f7d-a45ca70a7f84"))
+(text "    DRV2 GND and Pico pin 38. Never daisy-chain them." (exclude_from_sim no) (at 187.96 168.275 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "5e8f3a78-7722-46b4-bcf3-67e1e03a54f4"))
+(text "5. Pin 40 (VBUS) is USB 5 V: leave it unconnected." (exclude_from_sim no) (at 187.96 172.72 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "8d1373e4-bff1-4852-8228-bdbd39f5a7e0"))
+(text "    Pin 36 (3V3 OUT) feeds the sensors only, never motors." (exclude_from_sim no) (at 187.96 175.895 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "9137e9d0-b6d9-4f75-9a0c-a2a2a0193add"))
+(text "6. MOTOR_ARM (GP15) and DRV_nFAULT (GP14) go to BOTH drivers." (exclude_from_sim no) (at 187.96 180.34 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "ac8560a6-31ba-4ce9-84dd-f52046a985a8"))
+(text "    nFAULT uses the Pico's internal pull-up; skip it if your" (exclude_from_sim no) (at 187.96 183.515 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "29aae39e-58fd-4ccc-bf76-f9b7e271954d"))
+(text "    board has no nFAULT / ULT pin." (exclude_from_sim no) (at 187.96 186.69 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "f8260cae-1d8c-42e6-82fa-2318b2dd64c2"))
+(text "7. Spin: M1, M2 CCW and M3, M4 CW, seen from above." (exclude_from_sim no) (at 187.96 191.135 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "17086e3e-0ee7-4463-a338-42fec816cafd"))
+(text "    Swap a motor's two leads to reverse it." (exclude_from_sim no) (at 187.96 194.31 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "a4bccd08-0d18-4d0e-9eaf-ea90c8a52f49"))
+(text "8. Firmware: this sheet is STANDARD wiring, so set" (exclude_from_sim no) (at 187.96 198.755 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "6c6bc478-4e0b-4e92-b7cf-d0a5b92a523d"))
+(text "    lift.py WIRING = \"STANDARD\" (it defaults to \"SHARED\")." (exclude_from_sim no) (at 187.96 201.93 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "9f3f874a-c7c7-4378-a98b-aeb9b9b0e959"))
+(text "9. GPS is optional for v1. UART crosses over:" (exclude_from_sim no) (at 187.96 206.375 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "b551e5df-6b39-46eb-a1cc-18362cc776ce"))
+(text "    GPS TX -> GP1 (pin 2), GPS RX <- GP0 (pin 1)." (exclude_from_sim no) (at 187.96 209.55 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "56a4ae5f-638c-403c-8137-948243069c18"))
+(text "10. Props OFF for every bench test except lift.py." (exclude_from_sim no) (at 187.96 213.995 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "0a9d7445-933f-4aaf-91d3-350e2c62ac8a"))
+(text "HOW TO READ THIS SHEET" (exclude_from_sim no) (at 187.96 223.52 0) (effects (font (size 1.778 1.778) (bold yes) (color 170 100 0 1)) (justify left bottom)) (uuid "3b1a47e2-b4be-49cd-b611-4bc22f9c5d90"))
+(text "Tags with the same name (e.g. M1_PWM) are wired together." (exclude_from_sim no) (at 187.96 227.965 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "2a7c21b5-5be3-4120-9b13-b8fe0697c429"))
+(text "X on a pin = leave that pin unconnected." (exclude_from_sim no) (at 187.96 231.14 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "763c35cc-d473-4580-be24-8271c0c07c4b"))
+(text "GND, +3V3, +BATT and VSYS symbols = connect to that rail." (exclude_from_sim no) (at 187.96 234.315 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "d22446e6-22db-4e37-b23e-536fcebb13e7"))
+(text "Green dot = wires joined at that point." (exclude_from_sim no) (at 187.96 237.49 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "282c7dff-164e-4472-a0d4-794738472bb8"))
+(text "Small diamonds (PWR_FLAG) are KiCad markers, not parts." (exclude_from_sim no) (at 187.96 240.665 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "2a2fdc3c-9848-4d2a-a11d-5f5b74fa8911"))
+(text "Pico numbers 1-40 are the physical header pins." (exclude_from_sim no) (at 187.96 243.84 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "9bb5067a-8d49-4bbb-ae6e-df9bb645c2bc"))
+(rectangle (start 15.24 195.58) (end 180.34 281.94) (stroke (width 0.3) (type dash) (color 80 80 80 1)) (fill (type color) (color 80 80 80 0.05)) (uuid "2c92be0e-e7e6-476d-84ec-80ba35b4ff5c"))
+(text "WIRING TABLE" (exclude_from_sim no) (at 17.78 200.66 0) (effects (font (size 2.032 2.032) (bold yes) (color 80 80 80 1)) (justify left bottom)) (uuid "17f11329-0ae1-421c-86d7-6a4cce03f81e"))
+(text "NET" (exclude_from_sim no) (at 17.78 205.74 0) (effects (font (size 1.524 1.524) (bold yes) (color 80 80 80 1)) (justify left bottom)) (uuid "9d52c1ae-d94c-47fc-bf35-0d9b5efeba1f"))
+(text "PICO 2 W PIN" (exclude_from_sim no) (at 48.26 205.74 0) (effects (font (size 1.524 1.524) (bold yes) (color 80 80 80 1)) (justify left bottom)) (uuid "cdd3b864-a104-4d4b-9553-0a4a820fd642"))
+(text "CONNECTS TO" (exclude_from_sim no) (at 81.28 205.74 0) (effects (font (size 1.524 1.524) (bold yes) (color 80 80 80 1)) (justify left bottom)) (uuid "c6346340-4240-47d6-903a-9930bb12c2d2"))
+(text "MOTOR_ARM" (exclude_from_sim no) (at 17.78 210.185 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "e1ece99c-3728-44d5-b4a8-cff41761d494"))
+(text "20 (GP15)" (exclude_from_sim no) (at 48.26 210.185 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "72f47701-8f42-4abf-b2a0-57ad3ed8d770"))
+(text "DRV1 SLP, DRV2 SLP" (exclude_from_sim no) (at 81.28 210.185 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "60d8ee12-a670-47e6-8e9c-0791391c666b"))
+(text "DRV_nFAULT" (exclude_from_sim no) (at 17.78 213.995 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "a82c06b3-657b-4043-8b19-61749ab17b43"))
+(text "19 (GP14)" (exclude_from_sim no) (at 48.26 213.995 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "f8aabe8c-1ebc-4d5e-b03a-726c0a49e5ae"))
+(text "DRV1 nFAULT, DRV2 nFAULT (optional)" (exclude_from_sim no) (at 81.28 213.995 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "87304bc4-4256-4c8e-8751-e01bf6f368a2"))
+(text "M1_PWM" (exclude_from_sim no) (at 17.78 217.805 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "6498647c-2f1b-478c-a514-155d010b2642"))
+(text "14 (GP10)" (exclude_from_sim no) (at 48.26 217.805 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "85441d0a-b053-41c0-9a9a-67f9ba5438a1"))
+(text "DRV1 AIN1 (IN1)" (exclude_from_sim no) (at 81.28 217.805 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "8d00bdc0-e1f1-4d1d-865d-80adb22b2fc1"))
+(text "M2_PWM" (exclude_from_sim no) (at 17.78 221.615 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "29af57ba-16ac-4e69-8cd8-d7f05379c595"))
+(text "15 (GP11)" (exclude_from_sim no) (at 48.26 221.615 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "83fe9494-4f11-4c33-a067-275d430bdd26"))
+(text "DRV1 BIN1 (IN3)" (exclude_from_sim no) (at 81.28 221.615 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "420aadfd-20da-4b7b-804f-d8fccacf4974"))
+(text "M3_PWM" (exclude_from_sim no) (at 17.78 225.425 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "607c6155-6471-4897-b6f7-7b4731c10d22"))
+(text "16 (GP12)" (exclude_from_sim no) (at 48.26 225.425 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "d9660942-e391-49fb-bfdb-10d531c62199"))
+(text "DRV2 AIN1 (IN1)" (exclude_from_sim no) (at 81.28 225.425 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "cfc45d97-6702-4a30-8b92-9b6b8fd3cd70"))
+(text "M4_PWM" (exclude_from_sim no) (at 17.78 229.235 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "1b8b5522-bdb8-4770-8830-a021e932a2a1"))
+(text "17 (GP13)" (exclude_from_sim no) (at 48.26 229.235 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "eb56f596-4915-4579-9a30-d5b7f044ac57"))
+(text "DRV2 BIN1 (IN3)" (exclude_from_sim no) (at 81.28 229.235 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "0b029ded-7e16-4535-ac73-550491aed05f"))
+(text "I2C0_SDA" (exclude_from_sim no) (at 17.78 233.045 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "eaf2a0a8-4f85-4082-9473-eec1e5a4c3c4"))
+(text "6 (GP4)" (exclude_from_sim no) (at 48.26 233.045 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "ea104a2b-d054-4065-866c-0da36de5b610"))
+(text "GY-521 SDA, HMC5883L SDA" (exclude_from_sim no) (at 81.28 233.045 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "cd389430-0faa-48e6-9e41-f667aabbd8b0"))
+(text "I2C0_SCL" (exclude_from_sim no) (at 17.78 236.855 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "a4e70f74-3521-4548-b3a7-d81ed50cedb6"))
+(text "7 (GP5)" (exclude_from_sim no) (at 48.26 236.855 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "482676b0-b28e-47f6-b48d-8b3e03feaa05"))
+(text "GY-521 SCL, HMC5883L SCL" (exclude_from_sim no) (at 81.28 236.855 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "24bf8353-7222-4041-8a88-8cf2b5737d1c"))
+(text "UART0_TX" (exclude_from_sim no) (at 17.78 240.665 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "ee5f64b2-05e5-4ea6-b8ec-be0179876640"))
+(text "1 (GP0)" (exclude_from_sim no) (at 48.26 240.665 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "3c150efa-e8fa-4b47-ab47-4370262a7785"))
+(text "GPS RX" (exclude_from_sim no) (at 81.28 240.665 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "7998f434-86d7-4022-980b-2473b4c9025b"))
+(text "UART0_RX" (exclude_from_sim no) (at 17.78 244.475 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "860620cd-67ec-41bd-9286-c832a0c64235"))
+(text "2 (GP1)" (exclude_from_sim no) (at 48.26 244.475 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "b11d8673-a651-42f0-9bf4-13e883dea96d"))
+(text "GPS TX" (exclude_from_sim no) (at 81.28 244.475 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "481800e7-89a7-4826-88b9-bc123dbb7953"))
+(text "+3V3" (exclude_from_sim no) (at 17.78 248.285 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "5f8a2ce5-58c0-45e4-b8b3-c7e72f787d9b"))
+(text "36 (3V3 OUT)" (exclude_from_sim no) (at 48.26 248.285 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "09c7a50d-de92-423e-bd12-29fde7670b57"))
+(text "GY-521 VCC, HMC5883L VCC, GPS VCC" (exclude_from_sim no) (at 81.28 248.285 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "79558ea2-b3cc-4ca8-9f8c-4bd773bc0e7e"))
+(text "VSYS" (exclude_from_sim no) (at 17.78 252.095 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "3ac00fd4-6a26-44f6-93d1-cefbc2e954f2"))
+(text "39 (VSYS)" (exclude_from_sim no) (at 48.26 252.095 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "ef4da482-018c-4713-92ff-0cb47f560af0"))
+(text "D1 cathode (battery + through the SS14)" (exclude_from_sim no) (at 81.28 252.095 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "051b0aa1-c2b4-455e-8fdb-aae3daf81070"))
+(text "GND" (exclude_from_sim no) (at 17.78 255.905 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "11faf472-1ae4-42e3-883a-1d0528a32f30"))
+(text "38, and 3" (exclude_from_sim no) (at 48.26 255.905 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "4fc64373-1c7f-45bc-ab4d-a148733b1bef"))
+(text "battery (-) star point, DRV1 + DRV2 GND, sensors (GPS GND on pin 3)" (exclude_from_sim no) (at 81.28 255.905 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "22cdd803-4e2b-418f-8da9-e77e06bd6b6c"))
+(text "+BATT" (exclude_from_sim no) (at 17.78 259.715 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "86ae9346-2e7d-4768-ace0-0fe566954212"))
+(text "-" (exclude_from_sim no) (at 48.26 259.715 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "6670451a-bb4e-4204-819d-84a3c7eaab33"))
+(text "battery (+), DRV1 VM, DRV2 VM, D1 anode, C1 + C2 (+)" (exclude_from_sim no) (at 81.28 259.715 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "0625ce8e-2e7a-4e60-a1d9-98146011ee87"))
+(text "tie to GND" (exclude_from_sim no) (at 17.78 263.525 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "161294b5-fdd8-499a-a4fb-c1cd37f07fa4"))
+(text "-" (exclude_from_sim no) (at 48.26 263.525 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "da9047ba-04f1-4b03-9746-991953a5c490"))
+(text "AIN2 (IN2) + BIN2 (IN4) on both drivers" (exclude_from_sim no) (at 81.28 263.525 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "38c7bdb1-e5c0-4d7f-9441-a85c9d22a644"))
+(text "motor leads" (exclude_from_sim no) (at 17.78 267.335 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "89b64a8e-6cae-4c0b-8744-cfe3add5e890"))
+(text "-" (exclude_from_sim no) (at 48.26 267.335 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "f9a287ff-b213-4bf5-a048-9575bb7a17bf"))
+(text "M1: DRV1 AOUT1/AOUT2   M2: DRV1 BOUT1/BOUT2   M3, M4: same on DRV2" (exclude_from_sim no) (at 81.28 267.335 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "12eb96d6-9ed4-47ec-8799-1253b8dd3d06"))
+(text "(nothing)" (exclude_from_sim no) (at 17.78 271.145 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "6d725743-b1f1-4126-b777-b75a69571c1d"))
+(text "40 (VBUS)" (exclude_from_sim no) (at 48.26 271.145 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "5fd70224-1eac-4665-866a-9234b08ae1c7"))
+(text "USB 5 V only - leave unconnected" (exclude_from_sim no) (at 81.28 271.145 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "edb0e8ac-3005-477b-9e27-92fda56e6b33"))
+(sheet_instances (path "/" (page "1")))
+(embedded_fonts no))

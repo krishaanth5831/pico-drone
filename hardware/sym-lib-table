@@ -1,0 +1,4 @@
+(sym_lib_table (version 7)
+  (lib (name "pico-drone")(type "KiCad")(uri "${KIPRJMOD}/pico-drone.kicad_sym")(options "")(descr "Pico drone breakout-module symbols"))
+  (lib (name "pico-drone-wiring")(type "KiCad")(uri "${KIPRJMOD}/pico-drone-wiring.kicad_sym")(options "")(descr "Pico drone board-style symbols for the wiring diagram"))
+)
