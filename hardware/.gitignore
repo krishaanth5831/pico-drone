@@ -1,0 +1,8 @@
+# KiCad per-user and temporary files
+~*.lck
+*.kicad_prl
+*-backups/
+_autosave-*
+fp-info-cache
+# regenerable with: kicad-cli sch export svg
+*.svg
