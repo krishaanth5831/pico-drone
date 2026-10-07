@@ -49,6 +49,8 @@ src/
 
 testing/               per-component bench procedures + scripts
 docs/                  pinout, power/thrust/weight, roadmap
+hardware/              KiCad schematic + wiring diagram
+  frame/               3D-printed airframe: STLs + Onshape FeatureScript source
 tests/                 CPython tests against a mocked hardware layer
 tools/                 repo convention checks run in CI
 ```
