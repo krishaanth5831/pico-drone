@@ -16,6 +16,11 @@ Flight profile, all automatic (there is no control link yet):
   HOLD_S = None holds forever - press Thonny's Stop button (Ctrl-C) to end it.
 Auto-disarms on tilt past TILT_LIMIT_DEG, on nFAULT, on Ctrl-C, on any error.
 
+With SHOW_GPS on, a "gps:" line shows the lock quality and coordinates before
+the ARM prompt and once a second during the run. It is display only - nothing
+in the control loop uses the position, and a GPS with no data or no fix never
+stops the run.
+
 No altitude sensor exists, so "lift" here means open-loop throttle with the
 attitude loop holding it level. If it doesn't leave the ground, raise
 LIFT_THROTTLE. If it shoots up, lower it. Keep a hand on the battery lead.
@@ -36,7 +41,7 @@ import time
 
 sys.path.append("/")
 
-from machine import I2C, PWM, Pin  # noqa: E402
+from machine import I2C, PWM, UART, Pin  # noqa: E402
 
 try:
     import config  # noqa: E402
@@ -49,6 +54,12 @@ except ImportError as exc:
     print("\n%s\n\nLibrary not on the Pico. Run ./tools/upload.sh, or in Thonny\n"
           "View -> Files, select config.py, drivers, flight -> 'Upload to /'.\n" % exc)
     raise SystemExit()
+
+# The GPS is display only, so a board without drivers/gps.py still flies.
+try:
+    from drivers.gps import GPS  # noqa: E402
+except ImportError:
+    GPS = None
 
 
 # =============================================================================
@@ -101,6 +112,13 @@ LEVEL_AT_START = True
 # seconds. Four coreless motors starting at the same instant pull a current spike
 # big enough to knock the IMU off the I2C bus before the first reading.
 SPINUP_S = 0.4
+
+# --- GPS readout ----------------------------------------------------------------
+# True = print GPS lock quality and coordinates (needs drivers/gps.py on the board
+# and the GY-GPS6MV2 on GP0/GP1). The NEO-6M needs open sky for a fix; indoors it
+# will sit at "no fix" with a few satellites, which is normal.
+SHOW_GPS = True
+GPS_PRINT_S = 1.0      # seconds between gps lines during the run
 
 # --- safety -------------------------------------------------------------------
 TILT_LIMIT_DEG = 35.0  # auto-disarm past this roll or pitch
@@ -244,6 +262,55 @@ def unstick_i2c(verbose=True):
     time.sleep_us(10)
 
 
+# GGA fix-quality field. The NEO-6M only ever reports 0, 1 or 6 (2 needs SBAS).
+FIX_NAMES = {0: "no fix", 1: "GPS fix", 2: "DGPS fix", 6: "estimated"}
+
+
+def start_gps():
+    """The GPS on its UART, or None if it is switched off or not on the board."""
+    if not SHOW_GPS:
+        return None
+    if GPS is None:
+        print("gps: drivers/gps.py not on the board - upload drivers to see GPS")
+        return None
+    # A 1 KB receive buffer holds a full second of NMEA, so nothing is lost
+    # while the loop is busy or the ARM prompt is waiting.
+    uart = UART(config.GPS_UART_ID, baudrate=config.GPS_BAUD,
+                tx=Pin(config.GPS_TX_PIN), rx=Pin(config.GPS_RX_PIN), rxbuf=1024)
+    return GPS(uart)
+
+
+def hdop_rating(hdop):
+    """Horizontal dilution of precision: lower is better, under 2 is good."""
+    if hdop is None:
+        return "?"
+    if hdop < 1.0:
+        return "ideal"
+    if hdop < 2.0:
+        return "excellent"
+    if hdop < 5.0:
+        return "good"
+    if hdop < 10.0:
+        return "moderate"
+    return "poor"
+
+
+def gps_line(gps):
+    """One-line GPS status: lock quality, then coordinates once there is a fix."""
+    if gps.sentences_seen == 0:
+        return ("gps: no data - check GPS TX -> GP%d (pin 2), and GPS VCC on "
+                "VBUS (pin 40)" % config.GPS_RX_PIN)
+    fix = gps.fix
+    quality = FIX_NAMES.get(fix.quality, "quality %d" % fix.quality)
+    if not fix.valid or fix.lat is None:
+        return "gps: %s, %d sats - needs open sky" % (quality, fix.satellites)
+    hdop = "%.1f" % fix.hdop if fix.hdop is not None else "?"
+    alt = "%.0fm" % fix.alt_m if fix.alt_m is not None else "?"
+    return ("gps: %s, %d sats, hdop %s (%s)  lat %.6f lon %.6f  alt %s"
+            % (quality, fix.satellites, hdop, hdop_rating(fix.hdop),
+               fix.lat, fix.lon, alt))
+
+
 def throttle_at(t):
     """The flight profile. Returns None once it is over."""
     if t < RAMP_UP_S:
@@ -280,6 +347,9 @@ def run():
     heartbeat = Heartbeat("solid").start()
 
     try:
+        # Started first so it is already collecting sentences during the gyro
+        # calibration, and has something to show by the ARM prompt.
+        gps = start_gps()
         unstick_i2c()
         i2c = I2C(config.IMU_I2C_ID, sda=Pin(config.IMU_SDA_PIN),
                   scl=Pin(config.IMU_SCL_PIN), freq=I2C_FREQ)
@@ -313,6 +383,10 @@ def run():
             level_roll, level_pitch = fusion.roll_deg, fusion.pitch_deg
             print("level = roll %+.1f pitch %+.1f (as it sits now)" % (level_roll, level_pitch))
 
+        if gps is not None:
+            gps.update()
+            print(gps_line(gps))
+
         answer = input("\nProps on, clear area. Type ARM to fly, DRY for a motors-off "
                        "run, anything else aborts: ").strip().upper()
         if answer == "ARM":
@@ -337,6 +411,7 @@ def run():
         i2c_errors = 0     # total, shown in the printout
         frozen = 0         # consecutive bit-identical IMU readings
         prev = None
+        last_gps_print = start
 
         try:
             if live:
@@ -353,6 +428,7 @@ def run():
                 start = time.ticks_ms()
                 last = time.ticks_us()
                 last_print = start
+                last_gps_print = start
 
             while True:
                 now_ms = time.ticks_ms()
@@ -442,6 +518,13 @@ def run():
                           % (t, throttle, roll, pitch, accel[2] / 9.81,
                              out[1], out[2], out[3], out[4], loops / max(t, 0.001),
                              i2c_errors))
+
+                # Non-blocking: drains whatever NMEA arrived since the last loop.
+                if gps is not None:
+                    gps.update()
+                    if time.ticks_diff(now_ms, last_gps_print) > GPS_PRINT_S * 1000:
+                        last_gps_print = now_ms
+                        print(gps_line(gps))
         except KeyboardInterrupt:
             reason = "Ctrl-C"
 
