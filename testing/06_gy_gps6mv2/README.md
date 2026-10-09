@@ -8,8 +8,8 @@ lift budget. See `docs/power.md` for the weight discussion.
 
 | GY-GPS6MV2 pin | Pico 2 W | Physical pin | Note |
 |---|---|---|---|
-| `VCC` | 3V3(OUT) | **36** | Onboard MIC5205 LDO drops ~110 mV at 50 mA, giving the NEO-6M ~3.19 V — inside its 2.7–3.6 V range |
-| `GND` | GND | **3** | Pin 3 sits directly below GP0/GP1, keeping the wire short |
+| `VCC` | VBUS | **40** | Bench: 5 V straight from USB into the module's MIC5205 regulator. It got a satellite lock here and not on pin 36, and keeps the GPS off the IMU's 3.3 V line. On battery (no USB) use 3V3(OUT), pin 36 |
+| `GND` | GND | **3** | Straight to the Pico pin — **never a breadboard rail** when the HW-131 is on the board (the rails are motor ground; a GPS grounded there knocks the IMU off I2C when the motors spin). Pin 3 sits right below GP0/GP1 |
 | `TX` | GP1 = UART0 **RX** | **2** | **Crossover** |
 | `RX` | GP0 = UART0 **TX** | **1** | **Crossover**, only needed to reconfigure the module |
 

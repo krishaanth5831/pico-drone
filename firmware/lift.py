@@ -22,6 +22,9 @@ LIFT_THROTTLE. If it shoots up, lower it. Keep a hand on the battery lead.
 
 If it stops with "IMU stopped answering" or "IMU readings frozen": the motors
 are disturbing the GY-521, which is a wiring/power problem, not code. In order:
+  - FIRST: no sensor ground (GY-521, GPS) on a breadboard rail. With the HW-131
+    plugged in the rails are motor ground. Sensor GND straight to Pico pins,
+    one wire Pico GND -> HW-131 GND (docs/power.md, "Grounding rule")
   - 10 uF (or bigger) + 100 nF capacitor across GY-521 VCC and GND, at the board
   - SDA/SCL wires short, twisted with a GND wire, routed away from motor wires
   - fully charged battery; big (470 uF) capacitor across each DRV8833 VM/GND
@@ -70,14 +73,34 @@ except ImportError as exc:
 #     pulses are interleaved: motor A fires at the start of each 50 us period,
 #     motor B at the end. Each motor gets at most 50% of the time - roughly
 #     half the thrust - and all motor current flows through the ground rail.
-WIRING = "SHARED"
+WIRING = "STANDARD"
 
 # --- throttle profile (0.0-1.0, scaled to the wiring's duty ceiling) --------
-LIFT_THROTTLE = 0.50   # raise if it won't leave the ground, lower if it rockets
+LIFT_THROTTLE = 0.60   # raise if it won't leave the ground, lower if it rockets
 RAMP_UP_S = 2.5        # slow ramp: a step to full current browns out a 1S pack
 HOLD_S = None          # time at LIFT_THROTTLE; None = hold until Stop / Ctrl-C
 RAMP_DOWN_S = 2.0      # descent ramp back to zero
-IDLE = 0.30            # mixer floor while throttle > 0
+IDLE = 0.40            # mixer floor while throttle > 0 - keep it above the
+                       # weakest motor's start-up point, or that motor sits
+                       # stalled, drawing current without turning
+
+# --- bench mode ---------------------------------------------------------------
+# False = all four motors get the same throttle, no self-levelling. Use it on the
+# bench with props off: the board can't move, so the levelling loop just sees a
+# fixed tilt (a breadboard that isn't quite flat) and keeps slowing the motors on
+# the low side to the IDLE floor, where they stall. True for real flight.
+LEVELLING = True
+
+# True = "level" is however the board sits when the gyro calibrates, not true
+# horizontal. A breadboard that sits a few degrees off would otherwise get a
+# constant correction that pins the low-side motors to IDLE. Tilt it by hand
+# from there and the motors should answer.
+LEVEL_AT_START = True
+
+# After ARM the motors start one at a time, each easing up to IDLE over this many
+# seconds. Four coreless motors starting at the same instant pull a current spike
+# big enough to knock the IMU off the I2C bus before the first reading.
+SPINUP_S = 0.4
 
 # --- safety -------------------------------------------------------------------
 TILT_LIMIT_DEG = 35.0  # auto-disarm past this roll or pitch
@@ -245,10 +268,16 @@ def run():
     else:
         print("wiring %s, throttle %.2f, profile %.1fs up / %.1fs hold / %.1fs down"
               % (WIRING, LIFT_THROTTLE, RAMP_UP_S, HOLD_S, RAMP_DOWN_S))
+    if not LEVELLING:
+        print("LEVELLING off - bench mode, all motors get the same throttle")
 
     # Motors first, so SLP is low before anything that can fail or block.
     motors = Motors(WIRING)
-    heartbeat = Heartbeat().start()
+    # Solid, not pulse: a pulsing LED runs on a soft timer, and Thonny's Stop
+    # (Ctrl-C) can land inside that timer callback instead of the main loop -
+    # the loop then never sees it and the motors keep spinning until a second
+    # Stop. With no timer, Ctrl-C always reaches the KeyboardInterrupt below.
+    heartbeat = Heartbeat("solid").start()
 
     try:
         unstick_i2c()
@@ -277,6 +306,12 @@ def run():
         fusion = ComplementaryFilter(alpha=0.98)
         accel, gyro, _ = imu.read()
         fusion.update(accel, gyro, 0.002)
+        # The first update seeds the filter straight from the accelerometer, so
+        # this is the board's real resting attitude.
+        level_roll = level_pitch = 0.0
+        if LEVEL_AT_START:
+            level_roll, level_pitch = fusion.roll_deg, fusion.pitch_deg
+            print("level = roll %+.1f pitch %+.1f (as it sits now)" % (level_roll, level_pitch))
 
         answer = input("\nProps on, clear area. Type ARM to fly, DRY for a motors-off "
                        "run, anything else aborts: ").strip().upper()
@@ -304,6 +339,21 @@ def run():
         prev = None
 
         try:
+            if live:
+                spin = {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0}
+                steps = max(1, int(SPINUP_S / 0.02))
+                for m in (1, 2, 3, 4):
+                    for i in range(1, steps + 1):
+                        spin[m] = IDLE * i / steps
+                        motors.set_many(spin)
+                        time.sleep_ms(20)
+                print("all four spinning at IDLE %.2f" % IDLE)
+                # The profile starts now, not at ARM, so the ramp isn't half
+                # used up by the spin-up.
+                start = time.ticks_ms()
+                last = time.ticks_us()
+                last_print = start
+
             while True:
                 now_ms = time.ticks_ms()
                 t = time.ticks_diff(now_ms, start) / 1000.0
@@ -319,35 +369,43 @@ def run():
                 # Motor current spikes corrupt the odd I2C transfer. Ride out a
                 # short burst of failures with the motors held where they were,
                 # re-freeing the bus each time; only give up if it stays dead.
+                # With LEVELLING off nothing uses the IMU to drive the motors, so
+                # a dead IMU is only counted - the motors keep following the
+                # profile and the i2c err column shows how bad the noise is.
+                imu_ok = True
                 try:
                     accel, gyro, _ = imu.read()
                     bad_reads = 0
                 except OSError:
+                    imu_ok = False
                     bad_reads += 1
                     i2c_errors += 1
-                    if bad_reads > MAX_BAD_READS:
+                    if LEVELLING and bad_reads > MAX_BAD_READS:
                         reason = ("IMU stopped answering (%d failed reads in a row) - "
-                                  "motor noise or voltage sag, see top of file" % bad_reads)
+                                  "check no sensor GND is on a breadboard rail, "
+                                  "see top of file" % bad_reads)
                         break
                     unstick_i2c(verbose=False)  # count shows in the printout
                     imu.i2c = I2C(config.IMU_I2C_ID, sda=Pin(config.IMU_SDA_PIN),
                                   scl=Pin(config.IMU_SCL_PIN), freq=I2C_FREQ)
-                    continue
+                    if LEVELLING:
+                        continue
 
                 # A power dip resets the MPU6050 into sleep mode, where it keeps
                 # answering but returns the same frozen numbers forever. A live
                 # sensor is never bit-identical this many reads in a row.
-                if (accel, gyro) == prev:
+                if imu_ok and (accel, gyro) == prev:
                     frozen += 1
-                    if frozen > MAX_FROZEN_READS:
+                    if LEVELLING and frozen > MAX_FROZEN_READS:
                         reason = ("IMU readings frozen - it lost power and reset "
                                   "itself. Power/noise problem, see top of file")
                         break
-                else:
+                elif imu_ok:
                     frozen = 0
                 prev = (accel, gyro)
 
-                fusion.update(accel, gyro, dt)
+                if imu_ok:
+                    fusion.update(accel, gyro, dt)
                 roll, pitch = fusion.roll_deg, fusion.pitch_deg
 
                 if abs(roll) > TILT_LIMIT_DEG or abs(pitch) > TILT_LIMIT_DEG:
@@ -360,11 +418,14 @@ def run():
                     for pid in rate.values():
                         pid._integral = 0.0
 
-                roll_sp = angle["roll"].update(0.0, roll, dt)
-                pitch_sp = angle["pitch"].update(0.0, pitch, dt)
+                roll_sp = angle["roll"].update(level_roll, roll, dt)
+                pitch_sp = angle["pitch"].update(level_pitch, pitch, dt)
                 roll_cmd = rate["roll"].update(roll_sp, gyro[0], dt) + TRIM_ROLL
                 pitch_cmd = rate["pitch"].update(pitch_sp, gyro[1], dt) + TRIM_PITCH
                 yaw_cmd = rate["yaw"].update(0.0, gyro[2], dt)
+
+                if not LEVELLING:
+                    roll_cmd = pitch_cmd = yaw_cmd = 0.0
 
                 out = mix(throttle, roll_cmd, pitch_cmd, yaw_cmd, idle=IDLE)
 

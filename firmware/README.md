@@ -24,15 +24,16 @@ pad; numbers run down the left side (1–20), then continue up the right side
 |---|---|---|---|
 | Onboard LED | `Pin("LED")` | — | Behind the CYW43 WiFi chip on "W" boards — on/off only, cannot be PWM'd |
 
-`GP23`, `GP24`, `GP25`, `GP29` (physical 29, 31, 32, 34) are wired to the
-CYW43 WiFi/Bluetooth chip and are **reserved** — never assign these.
+`GP23`, `GP24`, `GP25`, `GP29` are wired to the CYW43 WiFi/Bluetooth chip and
+are **reserved** — never assign these. They are internal only; physical pins
+29, 31, 32 and 34 are GP22, GP26, GP27 and GP28.
 
 ### DRV8833 #1 (motors 1 and 2)
 
 | DRV8833 pin | Pico 2 W | Physical pin | Note |
 |---|---|---|---|
-| `VM` / `VCC` / `VMOT` | Battery + direct | — | Not from the Pico. On the bench only, VBUS (pin 40) can substitute |
-| `GND` | GND | 38 | Star-grounded at the battery |
+| `VM` / `VCC` / `VMOT` | Bench: HW-131 5 V rail. Airframe: battery + direct | — | Never from the Pico |
+| `GND` | Bench: HW-131 GND rail. Airframe: battery star point | — | Motor current returns here, not through the Pico |
 | `SLP` / `nSLEEP` / `EEP` | GP15 | 20 | Shared with DRV #2 — hardware arm/disarm for all four motors |
 | `AIN1` | GP10 | 14 | Motor 1 PWM |
 | `AIN2` | GND | — | Tie low — channel A unidirectional |
@@ -48,8 +49,8 @@ Identical to #1, sharing the same `SLP`, `VM`, and `GND`:
 
 | DRV8833 pin | Pico 2 W | Physical pin | Note |
 |---|---|---|---|
-| `VM` | Battery + direct | — | |
-| `GND` | GND | 38 | |
+| `VM` | Same as DRV #1 | — | |
+| `GND` | Same as DRV #1 | — | |
 | `SLP` | GP15 | 20 | Same net as DRV #1 |
 | `AIN1` | GP12 | 16 | Motor 3 PWM |
 | `AIN2` | GND | — | Tie low |
@@ -89,37 +90,30 @@ rotation direction so their yaw torques cancel in the hover.
 |---|---|---|---|
 | `VCC` | 3V3(OUT) | 36 | |
 | `GND` | GND | 38 | |
-| `SDA` | GP4 | 6 | I2C0 data, shared with the compass |
-| `SCL` | GP5 | 7 | I2C0 clock, shared with the compass |
+| `SDA` | GP4 | 6 | I2C0 data, the only device on the bus |
+| `SCL` | GP5 | 7 | I2C0 clock |
 | `XDA`, `XCL`, `ADO`, `INT` | — | — | Leave unconnected (`ADO` floating = address `0x68`) |
 
 Mount as close to the airframe's centre of mass as possible, and decouple
 from vibration (foam tape) — bolted rigidly to the frame, prop vibration
 feeds straight into the accelerometer and corrupts the attitude estimate.
 
-### HMC5883L — compass, shares I2C0 with the IMU
+### HMC5883L — compass: removed from the build
 
-| HMC5883L pin | Pico 2 W | Physical pin | Note |
-|---|---|---|---|
-| `VCC` | 3V3(OUT) | 36 | |
-| `GND` | GND | 38 | |
-| `SDA` | GP4 | 6 | Same bus as the IMU, wired in parallel |
-| `SCL` | GP5 | 7 | Same bus as the IMU, wired in parallel |
-| `DRDY` | — | — | Leave unconnected |
-
-No address conflict with the IMU (`0x68` vs `0x1E`/`0x0D` for the QMC5883L
-clone). Mount as far from motors and battery wiring as physically possible —
-a magnetometer reads in the microtesla range and motor current swamps it at
-close range. **Calibrate with the airframe fully assembled and the battery
-connected**, and copy the result into `tuning.py`'s `MAG_OFFSET`/`MAG_SCALE`
-(see Setup below) — a bench calibration is worthless once bolted to the
-frame.
+Taken out on 2026-10-09. With it attached the IMU dropped off I2C whenever the
+motors ran — most likely the breadboard-rail grounding fault later found with
+the GPS (see the grounding rule above), not the compass itself. It stays out:
+nothing needs a heading yet, and a few cm from four motors its readings are
+swamped anyway. `flight_controller.py` detects that it is missing and holds
+yaw by the gyro rate loop alone, so the heading drifts slowly. See
+[`testing/05_hmc5883l_compass/`](../testing/05_hmc5883l_compass/README.md) if
+it comes back.
 
 ### GY-GPS6MV2 (NEO-6M) — GPS, on UART0
 
 | GY-GPS6MV2 pin | Pico 2 W | Physical pin | Note |
 |---|---|---|---|
-| `VCC` | 3V3(OUT) | 36 | |
+| `VCC` | Bench: VBUS. Battery: 3V3(OUT) | 40 / 36 | VBUS is 5 V from USB into the module's own regulator — it gets a lock there and stays off the IMU's 3.3 V line |
 | `GND` | GND | 3 | Directly below GP0/GP1, keeps the wire short |
 | `TX` | GP1 = UART0 RX | 2 | **Crossover** — GPS transmit to Pico receive |
 | `RX` | GP0 = UART0 TX | 1 | **Crossover**, only needed to reconfigure the module |
@@ -129,7 +123,31 @@ and `GND TX RX VCC` header orders depending on the batch; the label is
 authoritative, not the pin position. Mount with the ceramic antenna facing
 up, clear view of sky, away from motors and power wiring.
 
-### Power
+### Power — bench (current setup, props off)
+
+No battery yet. The Pico runs from the laptop's USB; the motors from an HW-131
+breadboard power supply. Details and limits in
+[`docs/power.md`](../docs/power.md#bench-power-hw-131-breadboard-supply).
+
+```
+USB charger (>=2 A) -> HW-131 --> rail A, jumper 5 V --> DRV #1 VM, DRV #2 VM
+                              --> rail B, jumper OFF
+                              --> GND rail <--+-- DRV #1 GND, DRV #2 GND
+                                              +-- ONE wire to Pico GND
+
+Laptop USB -> Pico 2 W --> 3V3 OUT (pin 36) --> GY-521 VCC
+                       --> VBUS    (pin 40) --> GPS VCC
+                       --> GND (38) -> GY-521 GND,  GND (3) -> GPS GND
+```
+
+**Grounding rule:** once the HW-131 is plugged in, the breadboard's power rails
+are motor ground. Sensor grounds go straight to Pico GND pins (GY-521 → 38,
+GPS → 3), never to a rail; exactly one wire joins Pico GND to the HW-131 GND
+rail; the HW-131 runs off a wall charger, not the laptop. Break this and the IMU
+drops off I2C the moment the motors spin. Full explanation and a multimeter
+check in [`docs/power.md`](../docs/power.md#grounding-rule--breadboard-rails-are-motor-ground).
+
+### Power — airframe (battery)
 
 ```
 1S LiPo (+) --+-------------------> DRV #1 VM --+-- 470uF -- GND
@@ -158,13 +176,11 @@ energy reservoir — the battery chemistry can't respond to a millisecond
 current spike, the capacitor can. The Schottky diode on VSYS stops a motor's
 current surge from browning out the Pico through the shared battery rail.
 
-### I2C addresses (I2C0, GP4/GP5, shared bus)
+### I2C addresses (I2C0, GP4/GP5)
 
 | Device | Address |
 |---|---|
-| MPU6050 / GY-521 | `0x68` (`0x69` with `ADO` high) |
-| HMC5883L | `0x1E` |
-| QMC5883L clone | `0x0D` |
+| MPU6050 / GY-521 | `0x68` (`0x69` with `ADO` high) — the only device on the bus |
 
 ### Full wiring diagrams and mounting detail
 
@@ -220,7 +236,8 @@ the code — worth remembering if you extend this file.
 |---|---|
 | `flight_controller.py` | The control loop. Open it directly in Thonny and run it, same as anything in `testing/` |
 | `tuning.py` | Every gain, limit, and the `LIVE_MOTORS` switch — the only file you should need to edit while tuning |
-| `lift.py` | Standalone lift test: ramp up, hold, ramp down with self-levelling. Gains and the `WIRING` mode live inline at the top, so Thonny edits take effect without re-uploading |
+| `lift.py` | Standalone lift test: staggered spin-up, ramp, hold until Stop, with self-levelling (`LEVELLING`, level taken from how it sits at start) or bench mode (all motors equal). Gains and the `WIRING` mode live inline at the top, so Thonny edits take effect without re-uploading |
+| `imu_motor_check.py` | Runs each motor on its own while hammering the IMU and counts failed reads — finds which motor (or which power/ground path) knocks the IMU off the bus |
 
 ## Setup
 
