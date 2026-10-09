@@ -26,9 +26,11 @@ numbers run down the left side (1–20), then continue up the right side (21–4
 | Pico → GPS | GY-GPS6MV2 `RX` | GP0 | 1 |
 | — | DRV `AIN2`/`BIN2` ×4 | **tie to GND** | 3, 8, 13, 18, 23, 28, 33, 38 |
 
-The HMC5883L compass was **removed from the build on 2026-10-09**. On the shared
-I2C bus it knocked the IMU offline whenever the motors ran, and a few cm from the
-motors its readings are swamped anyway. The GY-521 alone gives roll, pitch and
+The HMC5883L compass was **removed from the build on 2026-10-09**. With it
+attached the IMU dropped off I2C whenever the motors ran — most likely the same
+breadboard-rail grounding fault later found with the GPS, not the compass itself.
+It stays out anyway: the build doesn't need a heading yet, and a few cm from the
+motors its readings are swamped. The GY-521 alone gives roll, pitch and
 yaw rate; `firmware/flight_controller.py` runs without a compass (yaw rate-hold,
 heading drifts slowly). Its component test in `testing/05_hmc5883l_compass/` is
 kept in case it comes back on a mast.
@@ -48,8 +50,12 @@ No battery. The Pico runs from the laptop's USB and the motors from an HW-131
 | HW-131 GND rail | DRV #1 `GND`, DRV #2 `GND`, one wire to Pico GND | — |
 | Pico GND | GY-521 `GND` (38), GPS `GND` (3), the one wire to the HW-131 GND rail | 3, 38 |
 
-Nothing on the sensor side touches the HW-131 rails, and HW-131 5 V never goes
-to VSYS or VBUS.
+**The breadboard's power rails are motor ground once the HW-131 is plugged in.**
+Sensor grounds go straight to Pico GND pins (GY-521 → 38, GPS → 3), never to a
+rail, and exactly one wire joins Pico GND to the HW-131 GND rail. Getting this
+wrong knocks the IMU off I2C the moment the motors spin — see the
+[grounding rule](power.md#grounding-rule--breadboard-rails-are-motor-ground).
+HW-131 5 V never goes to VSYS or VBUS.
 
 ## Power rails — airframe (battery, planned)
 

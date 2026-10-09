@@ -22,6 +22,9 @@ LIFT_THROTTLE. If it shoots up, lower it. Keep a hand on the battery lead.
 
 If it stops with "IMU stopped answering" or "IMU readings frozen": the motors
 are disturbing the GY-521, which is a wiring/power problem, not code. In order:
+  - FIRST: no sensor ground (GY-521, GPS) on a breadboard rail. With the HW-131
+    plugged in the rails are motor ground. Sensor GND straight to Pico pins,
+    one wire Pico GND -> HW-131 GND (docs/power.md, "Grounding rule")
   - 10 uF (or bigger) + 100 nF capacitor across GY-521 VCC and GND, at the board
   - SDA/SCL wires short, twisted with a GND wire, routed away from motor wires
   - fully charged battery; big (470 uF) capacitor across each DRV8833 VM/GND
@@ -379,7 +382,8 @@ def run():
                     i2c_errors += 1
                     if LEVELLING and bad_reads > MAX_BAD_READS:
                         reason = ("IMU stopped answering (%d failed reads in a row) - "
-                                  "motor noise or voltage sag, see top of file" % bad_reads)
+                                  "check no sensor GND is on a breadboard rail, "
+                                  "see top of file" % bad_reads)
                         break
                     unstick_i2c(verbose=False)  # count shows in the printout
                     imu.i2c = I2C(config.IMU_I2C_ID, sda=Pin(config.IMU_SDA_PIN),

@@ -100,9 +100,11 @@ feeds straight into the accelerometer and corrupts the attitude estimate.
 
 ### HMC5883L — compass: removed from the build
 
-Taken out on 2026-10-09. Sharing I2C0 with the GY-521, it knocked the IMU
-offline whenever the motors ran, and a few cm from four motors its readings
-are swamped anyway. `flight_controller.py` detects that it is missing and holds
+Taken out on 2026-10-09. With it attached the IMU dropped off I2C whenever the
+motors ran — most likely the breadboard-rail grounding fault later found with
+the GPS (see the grounding rule above), not the compass itself. It stays out:
+nothing needs a heading yet, and a few cm from four motors its readings are
+swamped anyway. `flight_controller.py` detects that it is missing and holds
 yaw by the gyro rate loop alone, so the heading drifts slowly. See
 [`testing/05_hmc5883l_compass/`](../testing/05_hmc5883l_compass/README.md) if
 it comes back.
@@ -137,6 +139,13 @@ Laptop USB -> Pico 2 W --> 3V3 OUT (pin 36) --> GY-521 VCC
                        --> VBUS    (pin 40) --> GPS VCC
                        --> GND (38) -> GY-521 GND,  GND (3) -> GPS GND
 ```
+
+**Grounding rule:** once the HW-131 is plugged in, the breadboard's power rails
+are motor ground. Sensor grounds go straight to Pico GND pins (GY-521 → 38,
+GPS → 3), never to a rail; exactly one wire joins Pico GND to the HW-131 GND
+rail; the HW-131 runs off a wall charger, not the laptop. Break this and the IMU
+drops off I2C the moment the motors spin. Full explanation and a multimeter
+check in [`docs/power.md`](../docs/power.md#grounding-rule--breadboard-rails-are-motor-ground).
 
 ### Power — airframe (battery)
 
