@@ -32,7 +32,7 @@ except ImportError as exc:
 
 HOLD_S = 1.5
 RAMP_S = 1.0
-PEAK = 0.55  # enough to see direction clearly, gentle on the drivers
+PEAK = 1.0  # full throttle, which MotorBank scales to config.MAX_DUTY (70%)
 
 print("\n=== coreless motor test ===")
 print("MAX_DUTY %.2f, props must be OFF" % config.MAX_DUTY)
