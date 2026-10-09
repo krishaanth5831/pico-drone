@@ -1,5 +1,10 @@
 # 05 — HMC5883L magnetometer
 
+> **Not in the current build.** The compass was removed on 2026-10-09: sharing
+> I2C0 with the GY-521, it knocked the IMU offline whenever the motors ran. The
+> flight controller runs without it. This test stays for if it comes back,
+> ideally on its own bus and up a mast away from the motors.
+
 Supplies the absolute yaw reference the MPU6050 cannot. Without it, heading
 drifts slowly over a flight. You do not need it to fly manually — you do need it
 for GPS position hold or return-to-home, because otherwise the controller knows

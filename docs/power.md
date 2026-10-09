@@ -2,7 +2,40 @@
 
 The three numbers that decide whether this build flies.
 
-## Power topology
+## Bench power (HW-131 breadboard supply)
+
+The current setup, props off, no battery. The Pico runs from the laptop's USB
+(Thonny needs it anyway); the motors run from an HW-131 (MB102-style)
+breadboard supply plugged into the breadboard's rails.
+
+```
+USB charger (>=2 A) -> HW-131 --> rail A, jumper 5 V --> DRV #1 VM, DRV #2 VM
+                              --> rail B, jumper OFF
+                              --> GND rail <--+-- DRV #1 GND, DRV #2 GND
+                                              +-- ONE wire to Pico GND
+
+Laptop USB -> Pico 2 W --> 3V3 OUT (pin 36) --> GY-521 VCC
+                       --> VBUS    (pin 40) --> GPS VCC
+```
+
+- **Feed the HW-131 from a USB charger, not the barrel jack.** On the barrel
+  jack its 5 V comes through an AMS1117 that gives up around 0.7 A. On most
+  boards the USB input bypasses that regulator, so the charger sets the limit.
+  Not the laptop: it is already feeding the Pico.
+- **The sensors stay on the Pico.** Off the HW-131 they would see every motor
+  sag, and switching one supply off while the other is on back-powers through
+  the I2C lines.
+- **Exactly one wire joins the two grounds.** Every sensor ground goes to a Pico
+  GND pin, never to the HW-131 rail, so motor current has no path through the
+  IMU's ground.
+- **5 V on the motors is fine with props off.** `MAX_DUTY` 0.70 averages
+  ~3.5 V, right at the coreless 3.7 V rating. Never raise `MAX_DUTY` on 5 V.
+- **The breadboard rails carry ~1 A per contact.** Keep both DRVs close to the
+  HW-131 and check for a split in the middle of long rails.
+- **Kill switch:** the HW-131's power button cuts the motors instantly.
+- Power-up: HW-131 on, then Pico USB. Power-down: Stop in Thonny, then HW-131 off.
+
+## Power topology (airframe, battery)
 
 Motor current and Pico current take separate paths from the battery, meeting only
 at the terminals:
@@ -71,7 +104,7 @@ what commercial coreless drones use.
 |---|---|
 | Pico 2 W (with headers) | ~10 g |
 | 2× DRV8833 breakouts | ~5 g |
-| GY-521 + HMC5883L | ~3 g |
+| GY-521 (HMC5883L removed 2026-10-09) | ~2 g |
 | GY-GPS6MV2 | ~14 g |
 | 1S 600 mAh LiPo | ~15 g |
 | 4 motors + props | ~22 g |

@@ -77,10 +77,19 @@ def build_sensors():
     print("calibrating gyro - hold completely still...")
     print("  bias %.2f %.2f %.2f deg/s" % imu.calibrate_gyro())
 
-    mag = hmc5883l.detect(i2c)
-    mag.offset = tuning.MAG_OFFSET
-    mag.scale = tuning.MAG_SCALE
-    print("MAG         : %s (offset/scale from firmware/tuning.py)" % type(mag).__name__)
+    # The compass is optional: the HMC5883L was taken out of the build on
+    # 2026-10-09 (it upset the IMU on the shared bus, and a few cm from the
+    # motors its readings are swamped anyway). Without it yaw is held by the
+    # gyro rate loop alone - no spinning, but the heading slowly drifts.
+    try:
+        mag = hmc5883l.detect(i2c)
+    except OSError:
+        mag = None
+        print("MAG         : none - yaw rate-hold only, heading will drift")
+    else:
+        mag.offset = tuning.MAG_OFFSET
+        mag.scale = tuning.MAG_SCALE
+        print("MAG         : %s (offset/scale from firmware/tuning.py)" % type(mag).__name__)
 
     return imu, mag
 
@@ -131,12 +140,16 @@ def control_step(imu, mag, fusion, rate_pid, angle_pid, heading_setpoint, dt):
     roll_rate_sp = angle_pid["roll"].update(0.0, roll_deg, dt)
     pitch_rate_sp = angle_pid["pitch"].update(0.0, pitch_deg, dt)
 
-    heading = mag.heading(fusion.pitch, fusion.roll)
-    heading_error = wrap_deg_error(heading_setpoint, heading)
-    yaw_rate_sp = max(
-        -tuning.MAX_YAW_RATE_DPS,
-        min(tuning.MAX_YAW_RATE_DPS, tuning.HEADING_KP * heading_error),
-    )
+    if mag is None:
+        # No compass: ask for zero yaw rotation instead of a heading.
+        heading, heading_error, yaw_rate_sp = None, 0.0, 0.0
+    else:
+        heading = mag.heading(fusion.pitch, fusion.roll)
+        heading_error = wrap_deg_error(heading_setpoint, heading)
+        yaw_rate_sp = max(
+            -tuning.MAX_YAW_RATE_DPS,
+            min(tuning.MAX_YAW_RATE_DPS, tuning.HEADING_KP * heading_error),
+        )
 
     roll_cmd = rate_pid["roll"].update(roll_rate_sp, gyro_x, dt)
     pitch_cmd = rate_pid["pitch"].update(pitch_rate_sp, gyro_y, dt)
@@ -158,8 +171,10 @@ def run():
     # First reading seeds the fusion filter and locks the heading to hold.
     accel, gyro, _ = imu.read()
     fusion.update(accel, gyro, 0.002)
-    heading_setpoint = mag.heading(fusion.pitch, fusion.roll)
-    print("heading lock: %.1f degrees\n" % heading_setpoint)
+    heading_setpoint = None
+    if mag is not None:
+        heading_setpoint = mag.heading(fusion.pitch, fusion.roll)
+        print("heading lock: %.1f degrees\n" % heading_setpoint)
 
     # Deliberately NOT "with MotorBank() as bank:" - MotorBank.__enter__ calls
     # arm() unconditionally, which would spin the motors before confirm_arm()
@@ -231,11 +246,15 @@ def run():
                 if time.ticks_diff(now_ms, last_print) > 200:
                     last_print = now_ms
                     hz = loop_count / max(elapsed_s, 0.001)
+                    if heading is None:
+                        hdg = "hdg   --- (no compass)"
+                    else:
+                        hdg = "hdg %5.1f (err %+5.1f)" % (heading, heading_error)
                     print(
-                        "t=%4.1fs  roll %+5.1f pitch %+5.1f hdg %5.1f (err %+5.1f)  "
+                        "t=%4.1fs  roll %+5.1f pitch %+5.1f %s  "
                         "thr %.2f  m%s  %3.0fHz"
                         % (
-                            elapsed_s, roll_deg, pitch_deg, heading, heading_error,
+                            elapsed_s, roll_deg, pitch_deg, hdg,
                             throttle,
                             {k: round(v, 2) for k, v in outputs.items()},
                             hz,
