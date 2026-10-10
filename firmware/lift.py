@@ -87,7 +87,7 @@ except ImportError:
 WIRING = "STANDARD"
 
 # --- throttle profile (0.0-1.0, scaled to the wiring's duty ceiling) --------
-LIFT_THROTTLE = 0.60   # raise if it won't leave the ground, lower if it rockets
+LIFT_THROTTLE = 1.0   # raise if it won't leave the ground, lower if it rockets
 RAMP_UP_S = 2.5        # slow ramp: a step to full current browns out a 1S pack
 HOLD_S = None          # time at LIFT_THROTTLE; None = hold until Stop / Ctrl-C
 RAMP_DOWN_S = 2.0      # descent ramp back to zero
