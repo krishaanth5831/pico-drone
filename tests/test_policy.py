@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-from flight.policy import ACT_SCALE, OBS_SIZE, Policy, build_obs
+from flight.policy import ACT_SCALE, OBS_SIZE, Policy, build_obs, load
 
 
 def _identity_net():
@@ -38,3 +38,14 @@ def test_build_obs_layout():
 
 def test_macs():
     assert _identity_net().macs == 2 * 2 + 3 * 2
+
+
+def test_shipped_weights_load_and_stay_bounded():
+    # src/flight/policy_weights.py, written by sim/export_policy.py.
+    p = load()
+    assert p.in_size == OBS_SIZE
+    assert p.out_size == 3
+    for obs in ([0.0] * OBS_SIZE, [1.0] * OBS_SIZE, [-5.0] * OBS_SIZE):
+        out = p.act(obs)
+        assert len(out) == 3
+        assert all(abs(v) <= ACT_SCALE + 1e-12 for v in out)
