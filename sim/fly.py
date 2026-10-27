@@ -353,6 +353,13 @@ class Flight:
             self.nominal = copy.deepcopy(self.nominal)
             self.nominal.com_offset_mm = [args.com[0], args.com[1], self.nominal.com_offset_mm[2]]
             self.params, self.drone_label = self.nominal, "CoM moved"
+        if args.extreme:
+            from autotune_sim import EXTREMES
+
+            self.nominal = copy.deepcopy(self.nominal)
+            for k, v in EXTREMES[args.extreme].items():
+                setattr(self.nominal, k, v)
+            self.params, self.drone_label = self.nominal, args.extreme
         if args.random:
             self.new_drone()
         self.paused = False
@@ -505,11 +512,24 @@ class Flight:
                 env.last_action = np.clip(cmd / ACT_SCALE, -1.0, 1.0)
                 cmd = cmd.copy()
                 cmd[2] += YAW_KP * (env.yaw_rate_sp - env.gyro[2])
+            cmd = self.adjust_cmd(cmd)
         _, _, term, _, info = env.step_cmd(cmd)
+        self.after_step()
         if term and not self.disarmed and thr > 0.0:
             # lift.py's cut-out: past 35 deg it stops all four motors.
             self.disarmed = "tilted past %.0f deg - lift.py cuts the motors" % TILT_LIMIT_DEG
         self.history.append((env.t, info["roll"], info["pitch"], env.target[0], env.target[1], env.airborne))
+
+    # Hooks for sitl.py (the autotune session): add to the controller's output
+    # just before the mixer, and see each loop once the motors and IMU have run.
+    def adjust_cmd(self, cmd):
+        return cmd
+
+    def after_step(self):
+        pass
+
+    def extra_rows(self):
+        return []
 
     def rms_error(self):
         e = [(r - tr) ** 2 + (q - tq) ** 2 for _, r, q, tr, tq, air in self.history if air]
@@ -591,6 +611,9 @@ def status_text(f):
         ("ground effect", "x%.2f thrust" % env.ground_effect),
         ("drone", "%s: %.0f g, hover %.2f, CoM %+.1f %+.1f mm" % (f.drone_label, p.mass_g, p.hover_throttle,
                                                                    *p.com_offset_mm[:2])),
+    ]
+    rows += f.extra_rows()
+    rows += [
         ("sim time", "%.1f s%s" % (env.t, "   PAUSED" if f.paused else "")),
     ]
     return "\n".join(r[0] for r in rows), "\n".join(r[1] for r in rows)
@@ -606,11 +629,11 @@ HELP = (
 
 
 # --- the window ------------------------------------------------------------------------
-def run_window(f):
+def run_window(f, title="pico-drone: fly it"):
     if not glfw.init():
         raise SystemExit("could not start GLFW (no display?)")
     glfw.window_hint(glfw.SAMPLES, 4)
-    win = glfw.create_window(1500, 950, "pico-drone: fly it", None, None)
+    win = glfw.create_window(1500, 950, title, None, None)
     glfw.make_context_current(win)
     glfw.swap_interval(1)
 
@@ -784,9 +807,10 @@ def check(args):
                 print("          ", f.disarmed)
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--ctrl", choices=CONTROLLERS, default="policy")
+def make_parser(doc=__doc__, ctrl="policy"):
+    """fly.py's options (sitl.py reuses them)."""
+    ap = argparse.ArgumentParser(description=doc, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--ctrl", choices=CONTROLLERS, default=ctrl)
     ap.add_argument("--manual", action="store_true", help="start with manual throttle (no altitude hold)")
     ap.add_argument("--wind", action="store_true", help="start with gusts on")
     ap.add_argument("--loiter", action="store_true", help="start with loiter (sim-only position hold) on")
@@ -799,7 +823,13 @@ def main():
                     help="PID gains: lift.py's, or autotune_sim.py's result (with its trim)")
     ap.add_argument("--com", type=float, nargs=2, metavar=("FWD_MM", "LEFT_MM"),
                     help="centre of mass moved this far by wires/tape (+x nose, +y left)")
+    ap.add_argument("--extreme", help='an autotune_sim.py --check edge case, e.g. "weak motors, heavy"')
     ap.add_argument("--seed", type=int, default=0)
+    return ap
+
+
+def main():
+    ap = make_parser()
     ap.add_argument("--check", action="store_true", help="no window: scripted flight, policy vs PID")
     args = ap.parse_args()
     if args.check:
