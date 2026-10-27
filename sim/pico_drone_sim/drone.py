@@ -158,6 +158,10 @@ class Drone:
                 self._external_forces()
                 mujoco.mj_step(self.model, self.data)
             self.data.qvel[:] = 0.0
+        # Motor and balloon forces in place before the sensors are computed, so
+        # the first accelerometer read is what the board would feel, not free fall.
+        self.data.ctrl[:] = self.thrust
+        self._external_forces()
         mujoco.mj_forward(self.model, self.data)
         self._gyro_f = d.sensordata[0:3].copy()
         self._accel_f = d.sensordata[3:6].copy()

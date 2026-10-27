@@ -70,7 +70,8 @@ class HoverEnv(gym.Env):
             self.drone.reset(
                 roll_deg=float(rng.uniform(-tilt, tilt)), pitch_deg=float(rng.uniform(-tilt, tilt)),
                 yaw_deg=float(rng.uniform(-180, 180)), z=1.0,
-                rates_dps=rng.uniform(-80, 80, 3), throttles=(p.hover_throttle,) * 4)
+                rates_dps=rng.uniform(-80, 80, 3) * options.get("rate_scale", 1.0),
+                throttles=(p.hover_throttle,) * 4)
         # Slow throttle wander: a battery sagging, a balloon drifting.
         self.wander_amp = float(rng.uniform(0.0, 0.03))
         self.wander_hz = float(rng.uniform(0.05, 0.3))
@@ -82,6 +83,16 @@ class HoverEnv(gym.Env):
         self.fusion = ComplementaryFilter(alpha=0.98)
         accel, gyro = self.drone.read_imu(rng)
         self.fusion.update(accel, gyro, 0.002)
+        if not ground:
+            # Mid-air start: pretend the filter has been tracking since take-off,
+            # i.e. it reads the true attitude through the IMU mount, +-1 deg.
+            # Seeding it from one accelerometer read instead (as on the floor)
+            # is meaningless in flight - thrust, not gravity, dominates it - and
+            # put the estimate up to 70 deg off, so the first second of every
+            # mid-air episode was spent chasing a phantom tilt.
+            roll, pitch, _ = self.drone.attitude_deg()
+            self.fusion.roll = math.radians(self.level[0] + roll + float(rng.normal(0, 1.0)))
+            self.fusion.pitch = math.radians(self.level[1] + pitch + float(rng.normal(0, 1.0)))
 
         self.t = 0.0
         self.integral = [0.0, 0.0]
