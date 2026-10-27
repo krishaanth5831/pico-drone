@@ -252,10 +252,13 @@ class Gcs:
         apply = tk.Frame(right, bg=PANEL)
         apply.pack(fill="x", padx=16, pady=(10, 14))
         self.label(apply, "Apply").pack(side="left")
+        self.when_buttons = {}
         for value, text in (("now", "now (checked in flight for 3 s)"), ("landing", "after landing")):
-            tk.Radiobutton(apply, text=text, value=value, variable=self.when, font=self.f["body"], bg=PANEL,
-                           fg=TEXT, selectcolor=RAISED, activebackground=PANEL, activeforeground=TEXT,
-                           highlightthickness=0, bd=0).pack(side="left", padx=(10, 0))
+            b = tk.Radiobutton(apply, text=text, value=value, variable=self.when, font=self.f["body"], bg=PANEL,
+                               fg=TEXT, selectcolor=RAISED, activebackground=PANEL, activeforeground=TEXT,
+                               highlightthickness=0, bd=0)
+            b.pack(side="left", padx=(10, 0))
+            self.when_buttons[value] = b
         self.reject_btn = self.button(apply, "Reject", self.reject)
         self.reject_btn.pack(side="right")
         self.accept_btn = self.button(apply, "Accept", self.accept, "ok")
@@ -386,12 +389,17 @@ class Gcs:
             chips.append("ARMED" if tel.get("armed") else "disarmed")
             chips.append("flying" if tel.get("airborne") else "on the ground")
             if tel.get("hz"):
-                chips.append("%.0f Hz loop" % tel["hz"])
+                worst = tel.get("dtmax")
+                chips.append("%.0f Hz loop%s" % (tel["hz"], " (worst %.0f ms)" % worst if worst else ""))
             if tel.get("z") is not None:
                 chips.append("%.2f m" % tel["z"])
             if tel.get("bat") is not None:
                 chips.append("%.2f V" % tel["bat"])
         self.chips.configure(text="   ·   ".join(chips))
+        # The board can't tell landed from hovering (no altitude sensor), so
+        # there it is PX4's "apply on disarm".
+        pico = bool(tel) and tel.get("veh") == "pico"
+        self.when_buttons["landing"].configure(text="on disarm" if pico else "after landing")
         st = tel.get("st") if tel else None
         running = st in RUNNING
         self.enable(self.start_btn, bool(tel) and st not in RUNNING + ("result", "staged"))

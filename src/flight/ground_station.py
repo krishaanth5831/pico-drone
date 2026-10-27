@@ -6,7 +6,8 @@ can't tell them apart except by the "veh" field.
 
 Messages, vehicle -> ground station:
   tel    10 Hz: state, progress, armed/airborne, attitude, rates, throttle,
-         motor outputs, loop rate (and height / battery if the vehicle knows them)
+         motor outputs, loop rate + worst loop time (and height / battery if the
+         vehicle knows them)
   txt    a status text, like PX4's "[autotune] ..." messages
   ack    the answer to a command: ok, or why not
   res    the autotune result: per axis K, lag, R^2, old/new gains, the model
@@ -99,7 +100,7 @@ class GroundStation:
             self._last_tel = now
             tel = {"t": "tel", "veh": self.vehicle, "st": s.state, "pg": rounded(s.progress(), 3),
                    "why": s.reason}
-            for key in ("armed", "airborne", "att", "rates", "thr", "out", "hz", "z", "bat"):
+            for key in ("armed", "airborne", "att", "rates", "thr", "out", "hz", "dtmax", "z", "bat"):
                 if key in state:
                     tel[key] = rounded(state[key], 2)
             self.link.send(tel)

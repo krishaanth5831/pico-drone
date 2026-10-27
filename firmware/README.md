@@ -236,7 +236,8 @@ the code — worth remembering if you extend this file.
 |---|---|
 | `flight_controller.py` | The control loop. Open it directly in Thonny and run it, same as anything in `testing/` |
 | `tuning.py` | Every gain, limit, and the `LIVE_MOTORS` switch — the only file you should need to edit while tuning |
-| `lift.py` | Standalone lift test: staggered spin-up, ramp, hold until Stop, with self-levelling (`LEVELLING`, level taken from how it sits at start) or bench mode (all motors equal). Gains and the `WIRING` mode live inline at the top, so Thonny edits take effect without re-uploading |
+| `lift.py` | Standalone lift test: staggered spin-up, ramp, hold until Stop, with self-levelling (`LEVELLING`, level taken from how it sits at start) or bench mode (all motors equal). Gains and the `WIRING` mode live inline at the top, so Thonny edits take effect without re-uploading. With `USE_SAVED_GAINS` (default on) it flies the autotune's `/gains.json` instead of its inline rate gains and trim, and prints which ones it is using |
+| `autotune.py` | PX4-style autotune flight: hovers at `HOVER_THROTTLE` under the balloons and lets the ground station (`gcs/gcs.py`, over the Pico 2 W's WiFi) run the autotune. Saves accepted gains to `/gains.json` after disarm. **Untested on hardware** |
 | `imu_motor_check.py` | Runs each motor on its own while hammering the IMU and counts failed reads — finds which motor (or which power/ground path) knocks the IMU off the bus |
 
 ## Setup
@@ -276,15 +277,74 @@ If anything oscillates violently or looks like it's about to flip: set
 `LIVE_MOTORS = False` and pull the battery. That's not a tuning problem to
 push through — it's the signal to lower gains and re-check the rig.
 
-## Why not autotune, why not RL
+## Autotune flight (PX4-style, over WiFi)
 
-**Relay-based autotune** (forcing an oscillation and computing gains from its
-period and amplitude — what Betaflight/ArduPilot's "autotune" features do
-under the hood) is a legitimate, ML-free technique that could run entirely on
-the Pico. It isn't built into this first version because it drives the motors
-autonomously to find the oscillation, and this bench has no kill switch faster
-than the battery connector. Worth adding once a physical kill switch or a real
-control link exists — see `docs/roadmap.md`.
+**Untested on hardware.** `firmware/autotune.py` runs the same session and
+link code the simulator checks end to end (`sim/sitl.py --check`), and
+`tests/test_firmware_autotune.py` runs this exact script under CPython with a
+fake IMU and WiFi. None of that covers the real radio, I2C noise or loop
+timing. The ground station's DISARM is software over WiFi, **not a kill
+switch**: the tether and the battery lead are still the real stop.
+
+**This procedure spins the motors with props ON.** The DRY step (3) is the
+only motors-off step.
+
+Prerequisites:
+- the balloons on, strings tied above the balance point
+- a slack tether
+- `HOVER_THROTTLE` found with lift.py: the throttle where it just hovers under the balloons
+
+The balloons are what make the autotune possible. It adds and removes thrust
+around the hover throttle, and at full throttle there is nothing left to add.
+Above `MAX_TUNE_THROTTLE` (0.85) it refuses to start.
+
+1. Upload the library (the autotune adds files to `drivers/` and `flight/`):
+   `./tools/upload.sh`, or in Thonny upload `config.py`, `drivers`, `flight`.
+2. Open `firmware/autotune.py` in Thonny, set `HOVER_THROTTLE` in EDIT HERE,
+   and press Run. WiFi comes up first. Join the network it prints
+   (`pico-drone` by default) from the laptop, then start the ground station
+   with the command it prints:
+   ```bash
+   python3 gcs/gcs.py --vehicle 192.168.4.1
+   ```
+3. **DRY first.** Type `DRY`. SLP stays low and nothing can spin. The ground
+   station's light turns green. Tilt the board by hand: the horizon must
+   follow, right side down when you roll it right and nose down when you
+   pitch it forward. Watch the console's `Hz (worst .. ms)`: it should hold
+   about 100 Hz with the worst loop well under 20 ms. **Start autotune** must
+   be refused with "DRY run". Stop with Thonny's Stop.
+4. Run again and type `ARM`. Let it hover for a minute **without** starting
+   the autotune. WiFi transmit bursts plus motor current are exactly the kind
+   of supply dip that has knocked the IMU off I2C before. If `i2c err`
+   climbs, fix the power first (see the top of `lift.py`).
+5. Hovering steadily: **Start autotune**. About 25 s. It aborts by itself
+   past 25°, if the link drops for 1.5 s, or on **Abort**. The old gains keep
+   flying in every case.
+6. Read the result:
+   - R² 0.90 or higher on each axis
+   - the authority compared with the reference
+   - the predicted step response
+
+   Then **Accept**:
+   - *now*: flies them, checks 3 s for wobble, reverts if worse
+   - *on disarm*: applied when the motors stop
+
+   Or **Reject**.
+7. **DISARM** from the ground station or Thonny's Stop. Accepted gains are
+   written to `/gains.json` only now, with the motors off, because a flash
+   write stalls the CPU. The console prints them. From then on `lift.py`
+   and `autotune.py` fly them (`USE_SAVED_GAINS`). To go back to the
+   defaults, delete `/gains.json` in Thonny's Files view or set
+   `USE_SAVED_GAINS = False`.
+
+## Why not relay autotune, why not RL
+
+The autotune above is PX4's kind: system identification while flying on
+the existing gains, with every change reviewed before it is applied.
+**Relay-based autotune** (forcing an oscillation and computing gains from
+its period and amplitude, which is what Betaflight's and ArduPilot's
+"autotune" features do under the hood) was not built. Deliberately making
+the drone oscillate needs a faster kill switch than this bench has.
 
 **On-device reinforcement learning** was ruled out outright. Training a
 continuous-control policy from scratch typically needs 10⁴–10⁷ real

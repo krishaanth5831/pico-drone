@@ -39,6 +39,7 @@ from pico_drone_sim.controllers import LIFT_GAINS
 # (pico_drone_sim above puts ../src on sys.path, so these import after it)
 from drivers.gcs_link import VEHICLE_PORT, Link
 
+from flight import gains_file
 from flight.autotune_session import AXES, RESULT, AutotuneSession
 from flight.ground_station import GroundStation
 
@@ -47,22 +48,12 @@ GAINS_FILE = HERE / "runs" / "sitl_gains.json"
 BASE = {name: LIFT_GAINS[name + "_rate"] for name in AXES}
 
 
-def load_gains(path):
-    """(gains, trim) from a gains file, or lift.py's defaults. Same format as the board's /gains.json."""
-    try:
-        raw = json.loads(Path(path).read_text())
-        gains = {n: tuple(float(v) for v in raw["gains"][n]) for n in AXES}
-        return gains, (float(raw["trim"][0]), float(raw["trim"][1])), "from %s" % path
-    except (OSError, ValueError, KeyError, IndexError, TypeError):
-        return dict(BASE), (0.0, 0.0), "lift.py defaults"
-
-
 class SitlFlight(fly.Flight):
     def __init__(self, args):
         self.session = None
         super().__init__(args)
         self.gains_file = Path(args.gains_file)
-        gains, trim, source = load_gains(self.gains_file)
+        gains, trim, source = gains_file.load(str(self.gains_file), BASE)
         print("PID gains:", source, flush=True)
         self.session = AutotuneSession(BASE, gains, trim)
         self.link = Link(port=args.port)
@@ -132,8 +123,7 @@ class SitlFlight(fly.Flight):
         if save is not None:
             gains, trim = save
             self.gains_file.parent.mkdir(exist_ok=True)
-            self.gains_file.write_text(json.dumps({"gains": {n: list(gains[n]) for n in AXES},
-                                                   "trim": list(trim)}, indent=2))
+            gains_file.save(str(self.gains_file), gains, trim)
             s.say("saved to %s" % self.gains_file.name)
 
     def adjust_cmd(self, cmd):

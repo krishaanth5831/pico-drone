@@ -42,10 +42,20 @@ src/
     mpu6050.py         GY-521 gyro + accelerometer
     hmc5883l.py        magnetometer, auto-detects the QMC5883L clone
     gps.py             NEO-6M NMEA parser
+    gcs_link.py        ground-station link: JSON over UDP (WiFi)
   flight/
     fusion.py          complementary filter -> roll and pitch
     pid.py             rate controller, anti-windup, no derivative kick
     mixer.py           X-quad motor mixing with desaturation
+    autotune.py        PX4-style system identification + gain scaling
+    autotune_session.py  start / abort / accept / verify around it
+    ground_station.py  the vehicle's side of the ground-station link
+    gains_file.py      /gains.json: saved autotune gains
+    step_response.py   predicted step response for the ground station
+
+firmware/              Thonny scripts: lift.py, autotune.py, flight_controller.py
+sim/                   MuJoCo drone: training, fly.py, sitl.py (sim/README.md)
+gcs/                   QGC-style ground station, autotune page (gcs/README.md)
 
 testing/               per-component bench procedures + scripts
 docs/                  pinout, power/thrust/weight, roadmap

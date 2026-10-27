@@ -39,8 +39,9 @@ def encode(msg):
 def decode(data):
     """A message dict, or None for anything that isn't one."""
     try:
-        msg = json.loads(data)
-    except (ValueError, UnicodeError):
+        # str first: MicroPython's json.loads may not take bytes.
+        msg = json.loads(data.decode() if isinstance(data, bytes) else data)
+    except (ValueError, TypeError, UnicodeError):
         return None
     if not isinstance(msg, dict) or "t" not in msg:
         return None
@@ -72,6 +73,7 @@ class Link:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((host, port))
         self.sock.setblocking(False)
+        self._port = port
         self.last_rx = None
         self.rx_count = 0
         self.tx_count = 0
@@ -79,7 +81,11 @@ class Link:
 
     @property
     def port(self):
-        return self.sock.getsockname()[1]
+        # MicroPython sockets have no getsockname(), and the board always
+        # binds a fixed port; port 0 (any free one) is for the PC side.
+        if self._port == 0:
+            return self.sock.getsockname()[1]
+        return self._port
 
     def poll(self, now):
         """Messages received since the last poll. `now` in seconds (any clock, same as alive())."""

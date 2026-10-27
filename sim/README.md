@@ -128,6 +128,54 @@ over the real CoM: level, with half the motor effort, and it hangs within about 
 with no controller. On the real drone, balance the frame (battery and wires
 in) on a pencil tip and tie the strings there.
 
+## Autotune from the ground station, like PX4 + QGC (two windows)
+
+`sitl.py` is the simulated drone as a vehicle (PX4's "SITL"): fly.py's room,
+balloons and keys, flying lift.py's PID, plus the board's autotune session and
+WiFi link. `gcs/gcs.py` is the ground station. Both talk UDP on this PC, the
+same protocol the Pico speaks over WiFi.
+
+```bash
+cd sim
+uv run python sitl.py                          # terminal 1: the drone (MuJoCo window)
+python3 ../gcs/gcs.py                          # terminal 2: the ground station (its own window)
+```
+
+1. Click the drone window and hold **W** until it hovers at about 1 m.
+   Altitude hold and loiter are on.
+2. In the ground station, check the top bar shows a green **connected** and the
+   horizon moves. Then **Start autotune**. Hands off the keys: arrows or A/D
+   abort it, just as moving the sticks does on PX4.
+3. About 25 s of wiggles (roll, then pitch, then yaw), with per-axis progress.
+4. The result shows the fit quality (R²), how much authority this drone has
+   compared with the reference, the lag, the old and new gains, the trim, and
+   the predicted step response before and after.
+5. Click **Accept**, choosing *now* or *after landing*, or **Reject**. *Now*
+   flies the new gains for 3 s and puts the old ones back if they wobble.
+   Applied gains go to `runs/sitl_gains.json`, the sim's `/gains.json`, and
+   `sitl.py` loads them next time it starts.
+
+Other drones to tune: `--extreme "weak motors, heavy"`, `--com 4 -3`,
+`--random --seed N`, `--no-balloons` (lumped relief, as in training).
+
+```bash
+uv run python sitl.py --check                  # no windows: the whole flow over real UDP
+uv run python sitl.py --check --extreme "weak motors, heavy" --amp 0.10
+```
+
+`--check` runs these steps:
+- tune, then accept now
+- verify, then save
+- a second run, rejected: the gains don't compound
+- link loss mid-run aborts it
+- stick input aborts it
+- DISARM from the ground station
+
+Last results:
+- **Lumped relief:** every axis within 3 % of the reference (scale x0.99–1.03).
+- **Balloons on strings:** R² 0.98–0.99, but the drone looks 24–29 % stronger and about 12 ms slower than the reference. The autotune therefore *lowers* roll/pitch gain to x0.6. The predicted step response shows why: lift.py's defaults ring on that model (59 % overshoot), and the new gains ring less (48 %) without being fully damped.
+- **"Weak motors, heavy":** roll and pitch tune fine, but yaw's fit stays under R² 0.90 even at amplitude 0.10. Yaw keeps its old gains, as PX4 does with an axis it can't identify.
+
 ## What is modelled
 
 | Thing | How | Why it matters |
