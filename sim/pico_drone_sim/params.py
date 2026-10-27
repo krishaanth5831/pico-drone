@@ -15,15 +15,20 @@ import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import airframe
+
 PARAMS_PATH = Path(__file__).resolve().parent.parent / "drone_params.json"
 G = 9.81
 
 
 @dataclass
 class DroneParams:
-    mass_g: float = 80.0
+    # Mass, CoM and inertia come from the CAD parts (airframe.py). These are
+    # what the CAD doesn't know: wires/tape, and how far they pull the CoM.
+    gps_fitted: bool = True
+    mag_fitted: bool = False
+    extra_mass_g: float = 6.0
     com_offset_mm: list = field(default_factory=lambda: [0.0, 0.0, 0.0])
-    motor_half_pitch_mm: float = 42.0
     inertia_scale: float = 1.0
     thrust_full_g: float = 15.0
     thrust_curve_exp: float = 1.7
@@ -52,6 +57,10 @@ class DroneParams:
 
     # --- derived quantities ---------------------------------------------------
     @property
+    def mass_g(self):
+        return airframe.cad_mass_g(self.gps_fitted, self.mag_fitted) + self.extra_mass_g
+
+    @property
     def mass(self):
         return self.mass_g / 1000.0
 
@@ -73,23 +82,6 @@ class DroneParams:
         """
         motors = 4.0 * self.thrust_n(self.hover_throttle) * (1.0 - self.supply_sag * self.hover_throttle)
         return max(0.0, self.mass * G - motors)
-
-    def inertia(self):
-        """
-        Diagonal inertia (kg m^2), from a rough mass split: 4 motor+prop pods
-        (~5.5 g each) at the motor positions, the rest as a 60 x 45 x 15 mm box.
-        Scaled by inertia_scale, which is randomized because this is a guess.
-        """
-        m = self.mass
-        pod = min(0.022, 0.3 * m) / 4.0
-        body = m - 4.0 * pod
-        a = self.motor_half_pitch_mm / 1000.0
-        bx, by, bz = 0.060, 0.045, 0.015
-        ixx = body * (by * by + bz * bz) / 12.0 + 4.0 * pod * a * a
-        iyy = body * (bx * bx + bz * bz) / 12.0 + 4.0 * pod * a * a
-        izz = body * (bx * bx + by * by) / 12.0 + 4.0 * pod * 2.0 * a * a
-        s = self.inertia_scale
-        return [ixx * s, iyy * s, izz * s]
 
 
 def load(path=PARAMS_PATH):
@@ -126,7 +118,7 @@ def randomize(nominal, rng, scale=1.0):
         hi = nominal_value + (hi - nominal_value) * scale
         return float(rng.uniform(min(lo, hi), max(lo, hi)))
 
-    for name in ("mass_g", "inertia_scale", "thrust_full_g", "thrust_curve_exp",
+    for name in ("extra_mass_g", "inertia_scale", "thrust_full_g", "thrust_curve_exp",
                  "throttle_deadband", "motor_tau_up_ms", "yaw_coef_mm", "supply_sag",
                  "hover_throttle", "control_hz", "latency_ms", "gyro_noise_dps",
                  "gyro_vibration_dps", "accel_noise_ms2", "accel_vibration_ms2",
@@ -154,9 +146,9 @@ def randomize(nominal, rng, scale=1.0):
 
 def describe(p):
     """One line for printouts."""
-    return ("mass %.0fg  CoM %+.1f,%+.1f,%+.1f mm  thrust %.1fg/motor  hover %.2f  "
+    return ("mass %.0fg (%.0f wires)  CoM %+.1f,%+.1f,%+.1f mm  thrust %.1fg/motor  hover %.2f  "
             "relief %.0fg  tau %.0f/%.0fms  %3.0f Hz  lat %.1fms"
-            % (p.mass_g, *p.com_offset_mm, p.thrust_full_g, p.hover_throttle,
+            % (p.mass_g, p.extra_mass_g, *p.com_offset_mm, p.thrust_full_g, p.hover_throttle,
                p.relief_n / G * 1000.0, p.motor_tau_up_ms, p.motor_tau_down_ms,
                p.control_hz, p.latency_ms))
 

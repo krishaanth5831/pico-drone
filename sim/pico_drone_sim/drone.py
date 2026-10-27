@@ -24,45 +24,35 @@ import math
 import mujoco
 import numpy as np
 
+from . import airframe
 from .params import G, rad
 
-# Motor number -> (x sign, y sign, spin). From flight/mixer.py: M1 front-right
-# CCW, M2 rear-left CCW, M3 front-left CW, M4 rear-right CW. Right is -y.
-MOTORS = {
-    1: (+1, -1, "CCW"),
-    2: (-1, +1, "CCW"),
-    3: (+1, +1, "CW"),
-    4: (-1, -1, "CW"),
-}
+# Motor number -> (x sign, y sign, spin), from the frame's `arms` and
+# flight/mixer.py: M1 front-right CCW, M2 rear-left CCW, M3 front-left CW,
+# M4 rear-right CW. Right is -y.
+MOTORS = airframe.ARMS
 
 PHYSICS_DT = 0.001            # s, MuJoCo timestep
 IMU_DLPF_HZ = 44.0            # MPU6050 DLPF setting 3, as the driver configures it
-START_Z = 0.0125              # body origin height when resting on the floor
+START_Z = -airframe.Z_FLOOR / 1000.0 + 0.0005   # body origin height resting on the bay floor
+WIRES_AT_MM = (0.0, 0.0, -6.0)  # wiring bay under the deck, between the header pins
 
 
 def _mjcf(p):
-    a = p.motor_half_pitch_mm / 1000.0
-    pods, props, legs, sites, arms = [], [], [], [], []
-    for n, (sx, sy, spin) in MOTORS.items():
-        x, y = sx * a, sy * a
-        colour = "0.85 0.35 0.25 0.55" if spin == "CCW" else "0.25 0.5 0.9 0.55"
-        pods.append(f'<geom name="pod{n}" type="cylinder" pos="{x} {y} 0.002" size="0.0045 0.006" '
-                    f'rgba="0.2 0.2 0.22 1" contype="0" conaffinity="0"/>')
-        props.append(f'<geom name="prop{n}" type="cylinder" pos="{x} {y} 0.0095" size="0.0275 0.0006" '
-                     f'rgba="{colour}" contype="0" conaffinity="0"/>')
-        legs.append(f'<geom name="leg{n}" type="sphere" pos="{x} {y} -0.0095" size="0.003" '
-                    f'rgba="0.2 0.2 0.22 1"/>')
-        sites.append(f'<site name="m{n}" pos="{x} {y} 0.008" size="0.002"/>')
-        arms.append(f'<geom type="capsule" fromto="0 0 0 {x} {y} 0" size="0.0025" '
-                    f'rgba="0.92 0.92 0.9 1" contype="0" conaffinity="0"/>')
-    actuators = "\n".join(
-        f'<motor name="thrust{n}" site="m{n}" gear="0 0 1 0 0 0"/>' for n in MOTORS
-    )
-    ix, iy, iz = p.inertia()
-    nl = "\n        "
+    a = airframe.A / 1000.0
+    zs = (airframe.M_RISE + 3.0) / 1000.0     # thrust acts at the prop hub
+    sites = "\n      ".join(
+        f'<site name="m{n}" pos="{sx * a} {sy * a} {zs}" size="0.002"/>'
+        for n, (sx, sy, _) in MOTORS.items())
+    actuators = "\n    ".join(
+        f'<motor name="thrust{n}" site="m{n}" gear="0 0 1 0 0 0"/>' for n in MOTORS)
+    body = "\n      ".join(airframe.mjcf_body(p.gps_fitted, p.mag_fitted))
+    imu = " ".join("%g" % (v / 1000.0) for v in airframe.IMU_POS)
+    nose = airframe.A / 1000.0
     return f"""
 <mujoco model="pico-drone">
-  <option timestep="{PHYSICS_DT}" gravity="0 0 {-G}" integrator="implicitfast"/>
+  <compiler inertiafromgeom="true"/>
+  <option timestep="{PHYSICS_DT}" gravity="0 0 {-G}" integrator="Euler"/>
   <visual>
     <global offwidth="1280" offheight="720"/>
     <headlight ambient="0.35 0.35 0.35" diffuse="0.6 0.6 0.6"/>
@@ -73,27 +63,18 @@ def _mjcf(p):
     <material name="grid" texture="grid" texrepeat="12 12"/>
     <texture name="sky" type="skybox" builtin="gradient" rgb1="0.75 0.85 0.95" rgb2="1 1 1"
              width="256" height="256"/>
+    {airframe.mjcf_assets(p.gps_fitted)}
   </asset>
   <worldbody>
     <light pos="0 0 3" dir="0 0 -1" diffuse="0.6 0.6 0.6"/>
     <geom name="floor" type="plane" size="4 4 0.05" material="grid"/>
     <body name="drone" pos="0 0 {START_Z}">
       <freejoint/>
-      <inertial pos="0 0 0" mass="{p.mass}" diaginertia="{ix} {iy} {iz}"/>
-      <geom name="deck" type="box" size="0.03 0.0225 0.0015" rgba="0.95 0.95 0.92 1"
+      {body}
+      <geom name="nose" type="sphere" pos="{nose} 0 0" size="0.003" mass="0" rgba="0.9 0.15 0.15 1"
             contype="0" conaffinity="0"/>
-      <geom name="pico" type="box" pos="0 0.011 0.004" size="0.0255 0.0105 0.002"
-            rgba="0.1 0.45 0.2 1" contype="0" conaffinity="0"/>
-      <geom name="nose" type="box" pos="0.034 0 0.001" size="0.004 0.004 0.002"
-            rgba="0.9 0.2 0.2 1" contype="0" conaffinity="0"/>
-      <geom name="battery" type="box" pos="0 0 -0.0065" size="0.021 0.01 0.0045"
-            rgba="0.3 0.3 0.35 1"/>
-      {nl.join(arms)}
-      {nl.join(pods)}
-      {nl.join(props)}
-      {nl.join(legs)}
-      {nl.join(sites)}
-      <site name="imu" pos="0 0 0" size="0.002"/>
+      {sites}
+      <site name="imu" pos="{imu}" size="0.002"/>
     </body>
   </worldbody>
   <actuator>
@@ -122,6 +103,11 @@ class Drone:
         self.model = mujoco.MjModel.from_xml_string(_mjcf(params))
         self.data = mujoco.MjData(self.model)
         self.body = self.model.body("drone").id
+        # What MuJoCo worked out from the CAD parts: mass, CoM, principal
+        # inertia. Randomization perturbs around these.
+        self.cad_mass = float(self.model.body_mass[self.body])
+        self.cad_com = self.model.body_ipos[self.body].copy()
+        self.cad_inertia = self.model.body_inertia[self.body].copy()
         self.set_params(params)
 
     # --- configuration ----------------------------------------------------------
@@ -129,9 +115,15 @@ class Drone:
         """Apply a (possibly randomized) parameter set without recompiling."""
         self.p = p
         m = self.model
-        m.body_mass[self.body] = p.mass
-        m.body_inertia[self.body] = p.inertia()
-        m.body_ipos[self.body] = np.array(p.com_offset_mm) / 1000.0
+        # CAD parts + wires (a lump in the wiring bay) + however far the wires
+        # actually pull the CoM. Inertia scales with the added mass, then by
+        # inertia_scale for whatever the dummies get wrong.
+        w = p.extra_mass_g / 1000.0
+        total = self.cad_mass + w
+        com = (self.cad_mass * self.cad_com + w * np.array(WIRES_AT_MM) / 1000.0) / total
+        m.body_mass[self.body] = total
+        m.body_ipos[self.body] = com + np.array(p.com_offset_mm) / 1000.0
+        m.body_inertia[self.body] = self.cad_inertia * (total / self.cad_mass) * p.inertia_scale
         # Reaction torque per newton of thrust: CCW prop -> -z on the body.
         k = p.yaw_coef_mm / 1000.0
         for i, (_, _, spin) in enumerate(MOTORS.values()):
@@ -174,6 +166,10 @@ class Drone:
         sag = 1.0 - self.p.supply_sag * float(np.mean(all_throttles))
         return self.p.thrust_n(throttle) * sag
 
+    def _targets(self, cmd):
+        """Steady-state thrust (N) each motor heads for at these throttles."""
+        return np.array([self._steady(t, cmd) for t in cmd]) * self._scale
+
     def step(self, throttles, period_s, latency_s=None):
         """
         Hold the last motor command for `latency_s`, then apply `throttles`
@@ -189,10 +185,11 @@ class Drone:
         tau_dn = max(p.motor_tau_down_ms, 1e-3) / 1000.0
         a_up = 1.0 - math.exp(-PHYSICS_DT / tau_up)
         a_dn = 1.0 - math.exp(-PHYSICS_DT / tau_dn)
+        target = self._targets(self.cmd)
         for i in range(n):
             if i == n_lat:
                 self.cmd = new
-            target = np.array([self._steady(t, self.cmd) for t in self.cmd]) * self._scale
+                target = self._targets(new)
             alpha = np.where(target > self.thrust, a_up, a_dn)
             self.thrust += (target - self.thrust) * alpha
             self.data.ctrl[:] = self.thrust

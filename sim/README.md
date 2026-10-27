@@ -33,13 +33,16 @@ and the four motor outputs.
 
 | Thing | How | Why it matters |
 |---|---|---|
-| Frame | 84 mm motor pitch X quad, mass and inertia from `docs/power.md`'s weight budget | inertia sets how fast it tips |
-| CoM offset | `com_offset_mm` | wires and the GPS mast pull it off centre |
+| Airframe | the printed frame and GPS mast STLs from `hardware/frame/`, plus every part as the Onshape fit-check dummy at its real place and mass (`pico_drone_sim/airframe.py`, a port of `pico_drone_frame.fs`). MuJoCo computes mass, CoM and the full inertia from them: 64.4 g without wires (matches Onshape), CoM 2.0 mm forward and 2.7 mm above the deck with the GPS mast | inertia sets how fast it tips; the mast raises the CoM |
+| Wires | `extra_mass_g` (randomized 2–20 g) in the wiring bay, plus `com_offset_mm` (±4 mm sideways) for how far they pull the CoM | the CAD has no wires |
 | 720 coreless motors | thrust = curve(throttle) with a dead band, first-order spin-up/down lag, ±15 % per-motor spread, supply sag | the lag is what limits gains |
 | Prop drag torque | per-motor yaw torque, CCW props push the body CW | yaw control |
 | Weight relief | a constant upward force at the CoM sized so the drone hovers at `hover_throttle` | stands in for the helium balloon: the 720s can't lift ~80 g alone |
 | MPU6050 | noise, vibration noise growing with throttle, residual gyro bias, 44 Hz DLPF, ±2° mounting error | the policy only sees what the board sees |
 | Board loop | 80–130 Hz with jitter, 1–8 ms compute latency before the PWM write | matches the MicroPython loop |
+
+`gps_fitted` / `mag_fitted` in `drone_params.json` add or remove the mast
+parts (the compass is off, as on the real drone).
 
 Every number lives in `drone_params.json` with the range it is randomized
 over during training. Nothing has been weighed yet, so ranges are wide.

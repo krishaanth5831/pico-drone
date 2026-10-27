@@ -1,9 +1,10 @@
 {
-  "_about": "Nominal pico-drone parameters for the simulator, plus the range each one is randomized over during training. Nominal values are estimates (no scale yet): docs/power.md weight budget and thrust table, frame pitch 84 mm. sim/balance.py and the autotune result overwrite the measured ones; anything still a guess keeps a wide range.",
+  "_about": "Nominal pico-drone parameters for the simulator, plus the range each one is randomized over during training. Mass, CoM and inertia come from the CAD parts (sim/pico_drone_sim/airframe.py, a port of the Onshape fit-check model); extra_mass_g is the wires/tape the CAD doesn't have and com_offset_mm how far they move the CoM from the CAD one. Thrust and motor numbers are estimates (no scale yet). Measured values (autotune, a scale) replace the nominal ones; anything still a guess keeps a wide range.",
 
-  "mass_g": 80.0,
+  "gps_fitted": true,
+  "mag_fitted": false,
+  "extra_mass_g": 6.0,
   "com_offset_mm": [0.0, 0.0, 0.0],
-  "motor_half_pitch_mm": 42.0,
   "inertia_scale": 1.0,
 
   "thrust_full_g": 15.0,
@@ -32,10 +33,10 @@
   "relief_drag_z": 0.15,
 
   "randomize": {
-    "mass_g": [60.0, 100.0],
+    "extra_mass_g": [2.0, 20.0],
     "com_offset_mm_xy": 4.0,
     "com_offset_mm_z": [-6.0, 4.0],
-    "inertia_scale": [0.7, 1.4],
+    "inertia_scale": [0.85, 1.25],
     "thrust_full_g": [9.0, 18.0],
     "thrust_curve_exp": [1.4, 2.0],
     "throttle_deadband": [0.08, 0.25],
