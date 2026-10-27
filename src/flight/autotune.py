@@ -232,8 +232,10 @@ class Autotune:
     `at.done` turns True after the last axis; then `at.results(default_gains)`.
     """
 
-    def __init__(self, amplitude=0.06, axis_s=6.0, settle_s=1.5, yaw_gain=1.5, seed=1):
+    def __init__(self, amplitude=0.06, axis_s=6.0, settle_s=1.5, yaw_gain=1.5, seed=1, axes=AXES):
         self.amplitude = amplitude
+        # Which axes to excite, in order. PX4 can leave yaw out; so can this.
+        self.axes = tuple(axes)
         self.axis_s = axis_s
         self.settle_s = settle_s
         # Yaw has ~6x less authority per unit, so excite harder - but not too
@@ -259,10 +261,10 @@ class Autotune:
         t = t - self.t0
         slot = self.settle_s + self.axis_s
         i = int(t // slot)
-        if i >= len(AXES):
+        if i >= len(self.axes):
             self.done, self.axis = True, None
             return (0.0, 0.0, 0.0)
-        self.axis = AXES[i]
+        self.axis = self.axes[i]
         local = t - i * slot
         if local < self.settle_s:
             self._next_flip = t
@@ -274,7 +276,7 @@ class Autotune:
             self._next_flip = t + 0.05 + 0.2 * self._rand()
         amp = self.amplitude * (self.yaw_gain if self.axis == "yaw" else 1.0) * self._sign
         out = [0.0, 0.0, 0.0]
-        out[i] = amp
+        out[AXES.index(self.axis)] = amp
         return tuple(out)
 
     @property
@@ -293,7 +295,7 @@ class Autotune:
 
     @property
     def total_s(self):
-        return len(AXES) * (self.settle_s + self.axis_s)
+        return len(self.axes) * (self.settle_s + self.axis_s)
 
     def results(self, base, reference=None):
         """
@@ -308,6 +310,9 @@ class Autotune:
         reference = reference or REFERENCE
         out = {}
         for name in AXES:
+            if name not in self.axes:
+                out[name] = {"model": None, "gains": None, "scale": None, "why": "skipped"}
+                continue
             m = self.models[name].result()
             ref = reference[name]
             if m is None or ref[0] <= 0.0:
