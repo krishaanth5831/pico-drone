@@ -138,7 +138,7 @@ same protocol the Pico speaks over WiFi.
 ```bash
 cd sim
 uv run python sitl.py                          # terminal 1: the drone (MuJoCo window)
-python3 ../gcs/gcs.py                          # terminal 2: the ground station (its own window)
+/usr/bin/python3 ../gcs/gcs.py                 # terminal 2: the ground station (its own window)
 ```
 
 1. Click the drone window and hold **W** until it hovers at about 1 m.

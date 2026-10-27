@@ -2,13 +2,13 @@
 pico GCS - a small ground station in the spirit of QGroundControl, built
 around the PX4-style autotune (Vehicle Setup > PID Tuning > Autotune in QGC).
 
-    python3 gcs/gcs.py                          # the simulated drone (sim/sitl.py) on this PC
-    python3 gcs/gcs.py --vehicle 192.168.4.1    # the Pico on its own WiFi (firmware/autotune.py)
+    /usr/bin/python3 gcs/gcs.py                          # the simulated drone (sim/sitl.py)
+    /usr/bin/python3 gcs/gcs.py --vehicle 192.168.4.1    # the Pico on its WiFi (firmware/autotune.py)
 
 Standard library only (tkinter: `sudo apt install python3-tk` if it's
-missing). Use the system python3 rather than the sim's uv venv: the venv's
-bundled Tk has no font rendering beyond X11 bitmap fonts, so it works but
-looks rough. What it shows:
+missing). Use the system Python: miniforge's and the sim's uv venv's bundled
+Tk have no font rendering beyond X11 bitmap fonts, so they work but look
+rough. What it shows:
 
   left    the vehicle: artificial horizon, gyro rates (10 s), motor outputs,
           the rate gains + trim it is flying right now

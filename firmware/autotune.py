@@ -10,11 +10,12 @@ Open this in Thonny and press Run. Everything to edit is in the block below.
 
   1. WiFi comes up first. AP mode (default): the Pico makes its own network,
      AP_SSID below; join it from the laptop. The console prints the exact
-     ground-station command, e.g.  python3 gcs/gcs.py --vehicle 192.168.4.1
+     ground-station command, e.g.  /usr/bin/python3 gcs/gcs.py --vehicle 192.168.4.1
   2. At the prompt:
        ARM  -> motors spin, ramp to HOVER_THROTTLE, hover until DISARM / Stop
        DRY  -> whole loop + WiFi runs, motors stay asleep (SLP low). Tilt the
-               board by hand: the horizon in the ground station must follow.
+               board by hand: right side down must read roll +, nose down
+               pitch +, in the ground station. Otherwise STOP (IMU mounting).
        else -> abort
   3. Hovering, in the ground station: Autotune -> Start. ~25 s of wiggles,
      then a result: Accept (now, or on disarm) or Reject.
@@ -256,7 +257,7 @@ def run():
         gs = GroundStation(link, session, vehicle="pico")
         if WIFI_MODE == "AP":
             print("WiFi: join network %r (password %r) from the laptop" % (AP_SSID, AP_PASSWORD))
-        print("ground station:  python3 gcs/gcs.py --vehicle %s" % ip)
+        print("ground station:  /usr/bin/python3 gcs/gcs.py --vehicle %s" % ip)
 
         unstick_i2c()
         i2c = I2C(config.IMU_I2C_ID, sda=Pin(config.IMU_SDA_PIN), scl=Pin(config.IMU_SCL_PIN), freq=I2C_FREQ)
@@ -291,8 +292,8 @@ def run():
             live = True
         elif answer == "DRY":
             live = False
-            print("DRY run - SLP stays low, nothing can spin. Tilt the board: the ground "
-                  "station's horizon should follow.")
+            print("DRY run - SLP stays low, nothing can spin. Tilt the board: right side "
+                  "down must read roll +, nose down pitch +.")
         else:
             print("Aborted.")
             return
@@ -384,7 +385,7 @@ def run():
                     cant = ("hover throttle %.2f leaves no headroom for the wiggles (max %.2f) - "
                             "add balloon relief so it hovers lower" % (HOVER_THROTTLE, MAX_TUNE_THROTTLE))
                 for _sev, msg in session.texts:          # the console sees them too
-                    print("autotune:", msg)
+                    print(msg)
                 actions = gs.service(t, {
                     "armed": live, "airborne": airborne,
                     "att": [roll - level_roll, pitch - level_pitch, 0.0],
@@ -455,6 +456,8 @@ def run():
         # PX4's "apply on disarm": a result accepted for landing goes in now.
         if session is not None:
             session.landed()
+            for _sev, msg in session.texts:
+                print(msg)
             save = session.take_save()
             if save is not None:
                 to_save = save

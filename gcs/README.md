@@ -6,13 +6,14 @@ PX4-style autotune (QGC: *Vehicle Setup > PID Tuning > Autotune*).
 ![The autotune page after a run on the simulated drone](../docs/img/gcs_autotune.png)
 
 ```bash
-python3 gcs/gcs.py                          # the simulated drone: sim/sitl.py on this PC
-python3 gcs/gcs.py --vehicle 192.168.4.1    # the Pico on its own WiFi: firmware/autotune.py
+/usr/bin/python3 gcs/gcs.py                          # the simulated drone: sim/sitl.py on this PC
+/usr/bin/python3 gcs/gcs.py --vehicle 192.168.4.1    # the Pico on its own WiFi: firmware/autotune.py
 ```
 
 It needs only the standard library (tkinter). If tkinter is missing, run
-`sudo apt install python3-tk`. Use the system `python3`: the sim's uv venv
-also works, but its bundled Tk has no proper font rendering and looks rough.
+`sudo apt install python3-tk`. Use the system Python (`/usr/bin/python3`).
+Miniforge's Python and the sim's uv venv also run it, but their bundled Tk has
+no proper font rendering and looks rough.
 
 ## What's on it
 

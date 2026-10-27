@@ -207,8 +207,10 @@ height — needs a barometer at minimum (a BMP280 is a couple of dollars and a
 4-wire I2C add-on); this code leaves a clean seam for one but does not fake
 having it.
 
-**There is no control link and no physical kill switch.** The only way to stop
-a misbehaving motor right now is pulling the battery. Every safety mechanism
+**There is no RC control link and no physical kill switch.** The autotune's
+WiFi ground station can DISARM, but only in software and only while the link
+and the board's loop are working. The only sure way to stop a misbehaving
+motor right now is pulling the battery. Every safety mechanism
 below is a software approximation of what a real RC failsafe would do — treat
 them as backups, not as a substitute for standing next to the battery
 connector with your hand on it.
@@ -303,16 +305,25 @@ Above `MAX_TUNE_THROTTLE` (0.85) it refuses to start.
 2. Open `firmware/autotune.py` in Thonny, set `HOVER_THROTTLE` in EDIT HERE,
    and press Run. WiFi comes up first. Join the network it prints
    (`pico-drone` by default) from the laptop, then start the ground station
-   with the command it prints:
+   with the command it prints (the system Python: its Tk renders fonts
+   properly, miniforge's and the sim venv's don't):
    ```bash
-   python3 gcs/gcs.py --vehicle 192.168.4.1
+   /usr/bin/python3 gcs/gcs.py --vehicle 192.168.4.1
    ```
 3. **DRY first.** Type `DRY`. SLP stays low and nothing can spin. The ground
-   station's light turns green. Tilt the board by hand: the horizon must
-   follow, right side down when you roll it right and nose down when you
-   pitch it forward. Watch the console's `Hz (worst .. ms)`: it should hold
-   about 100 Hz with the worst loop well under 20 ms. **Start autotune** must
-   be refused with "DRY run". Stop with Thonny's Stop.
+   station's light turns green. Tilt the board by hand and watch the numbers
+   under the horizon:
+   - right side down: **roll reads +**
+   - nose down: **pitch reads +**
+
+   That is what the mixer assumes (`src/flight/mixer.py`, with the GY-521's
+   X arrow pointing to the nose). If either sign is the other way round,
+   **stop**: the IMU is mounted differently and the rate loop would push the
+   wrong way.
+
+   Watch the console's `Hz (worst .. ms)`: it should hold about 100 Hz, with
+   the worst loop well under 20 ms. **Start autotune** must be refused with
+   "DRY run". Stop with Thonny's Stop.
 4. Run again and type `ARM`. Let it hover for a minute **without** starting
    the autotune. WiFi transmit bursts plus motor current are exactly the kind
    of supply dip that has knocked the IMU off I2C before. If `i2c err`

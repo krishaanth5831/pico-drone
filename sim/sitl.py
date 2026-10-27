@@ -4,7 +4,7 @@ version of PX4's SITL (software in the loop).
 
     cd sim
     uv run python sitl.py                              # terminal 1: the drone (window)
-    uv run python ../gcs/gcs.py                        # terminal 2: the ground station
+    /usr/bin/python3 ../gcs/gcs.py                     # terminal 2: the ground station
     uv run python sitl.py --extreme "weak motors, heavy"   # a drone that needs retuning
     uv run python sitl.py --check                      # no windows: scripted end-to-end test
 

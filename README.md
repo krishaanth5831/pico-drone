@@ -6,9 +6,10 @@ written in MicroPython.
 Sensor drivers, control maths, and a component-by-component bench test suite —
 with a hardware disarm line that a software bug cannot override.
 
-> **Status: bench development.** This does not fly yet. There is no control link
-> on the airframe, so `main.py` deliberately stops at sensor bring-up and never
-> arms the motors. See [`docs/roadmap.md`](docs/roadmap.md).
+> **Status: bench development.** This does not fly yet. There is no RC control
+> link on the airframe (only the autotune's WiFi ground station, which can
+> disarm but not steer), so `main.py` deliberately stops at sensor bring-up and
+> never arms the motors. See [`docs/roadmap.md`](docs/roadmap.md).
 
 > **Before running anything: `config.py`, `drivers/` and `flight/` must be
 > copied onto the Pico's own filesystem first.** Opening a script in Thonny and
@@ -162,7 +163,8 @@ the drivers and control maths in `src/`. It self-levels and holds a heading; it
 does not hold altitude or position, since nothing on this airframe measures
 either. Read `firmware/README.md` in full before running it — it explains the
 safety model and the manual tuning procedure, both of which matter more than
-usual given there is still no control link or physical kill switch.
+usual given there is still no RC link or physical kill switch (the WiFi
+ground station's DISARM is software, not a kill switch).
 
 ## Development
 
