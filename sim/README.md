@@ -29,6 +29,48 @@ of mass 1 mm (a wire moved), **R** restart (alternates floor take-off and a
 tilted mid-air start). The terminal prints true roll/pitch, yaw rate, height
 and the four motor outputs.
 
+## Watch it learn (opens a window)
+
+```bash
+cd sim
+uv run python watch_training.py              # 2 minutes of PPO from scratch, live
+uv run python watch_training.py --minutes 5
+```
+
+Trains a throwaway policy in a background process and flies the current one,
+refreshed after every update, on a fresh randomized drone each episode. On
+screen: the drone's randomized parameters (top left), a learning curve
+(bottom left), the real centre of mass (red ball), the balloon's lift (blue
+arrow) and each motor's thrust (orange arrows). It starts out falling over
+and should be catching itself within a couple of minutes. It needs free
+cores, so pause a running `train_ppo.py` first, or both crawl.
+
+## Train the real policy
+
+```bash
+cd sim
+uv run python train_ppo.py                   # 6M steps, 2 x 32 network
+uv run tensorboard --logdir runs             # curves
+```
+
+The mean episode reward tops out around 600 (6 s at 100 Hz, level the whole
+time). Output goes to `runs/ppo_<time>/best.zip`.
+
+## Autotune in the sim (opens a window with --windowed)
+
+```bash
+cd sim
+uv run python autotune_sim.py --windowed     # watch the roll/pitch/yaw wiggles, then the new gains
+uv run python autotune_sim.py --check 12     # 12 random + 6 extreme drones vs lift.py's gains
+```
+
+This runs `src/flight/autotune.py`, the same file the board runs. It prints
+what it identified next to the sim's ground truth, the gain scale it picked
+per axis, and lift.py vs autotuned (with trim) under kicks. Last check:
+0 of 18 drones aborted, median K error 6 %, median trim error 0.001,
+autotuned better on 9 and worse on 0. `--reference` regenerates
+`autotune.REFERENCE` after `drone_params.json` changes.
+
 ## What is modelled
 
 | Thing | How | Why it matters |
