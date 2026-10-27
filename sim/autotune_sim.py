@@ -3,6 +3,9 @@ Run the board's autotune (src/flight/autotune.py) on simulated drones.
 
     cd sim
     uv run python autotune_sim.py --windowed       # watch one autotune flight, then the result
+    uv run python autotune_sim.py --windowed --com 3 -2      # wires pulled the CoM 3 mm fwd, 2 mm right
+    uv run python autotune_sim.py --windowed --extreme "slow motors"
+    uv run python autotune_sim.py --windowed --random        # a randomized drone (--seed picks which)
     uv run python autotune_sim.py                  # nominal drone: identify, scale, compare
     uv run python autotune_sim.py --check 12       # 12 randomized + 6 extreme drones
     uv run python autotune_sim.py --reference      # regenerate autotune.REFERENCE
@@ -13,7 +16,8 @@ next to the sim's ground truth (the sim knows the real torque per command and
 the CoM offset), the gain scale it chose, and a before/after comparison on the
 same drone with kicks: lift.py's gains vs autotuned gains + trim.
 
-Writes runs/autotune_gains.json, which `watch.py --gains autotune` flies.
+Writes runs/autotune_gains.json, which `watch.py --gains autotune` and
+`fly.py --gains autotune` fly (give fly.py the same --com to fly the same drone).
 """
 
 import argparse
@@ -27,7 +31,7 @@ import numpy as np
 
 from pico_drone_sim.controllers import LIFT_GAINS, PIDController, rollout
 from pico_drone_sim.env import HoverEnv
-from pico_drone_sim.params import describe
+from pico_drone_sim.params import describe, randomize
 
 # isort: split
 # (pico_drone_sim above puts ../src on sys.path, so `flight` imports after it)
@@ -231,6 +235,10 @@ def main():
     ap.add_argument("--check", type=int, default=0, help="run on N randomized + the extreme drones")
     ap.add_argument("--reference", action="store_true", help="print a new autotune.REFERENCE")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--com", type=float, nargs=2, metavar=("FWD_MM", "LEFT_MM"),
+                    help="centre of mass moved this far by wires/tape (+x nose, +y left)")
+    ap.add_argument("--extreme", choices=sorted(EXTREMES), help="one of the --check edge-case drones")
+    ap.add_argument("--random", action="store_true", help="a randomized drone (--seed picks which)")
     args = ap.parse_args()
 
     if args.reference:
@@ -241,7 +249,14 @@ def main():
         return
 
     env = HoverEnv(randomize_scale=0.0, seed=args.seed)
-    print("drone:", describe(env.nominal))
+    p = copy.deepcopy(env.nominal)
+    if args.random:
+        p = randomize(env.nominal, np.random.default_rng(args.seed), 1.0)
+    for k, v in EXTREMES.get(args.extreme, {}).items():
+        setattr(p, k, v)
+    if args.com is not None:
+        p.com_offset_mm = [args.com[0], args.com[1], p.com_offset_mm[2]]
+    print("drone:", describe(p))
     if args.windowed:
         import mujoco.viewer
 
@@ -250,15 +265,19 @@ def main():
             viewer.cam.elevation = -15
             print("flying the autotune: hover, then roll, pitch, yaw wiggles (~%.0f s)"
                   % Autotune().total_s)
-            at, aborted = fly_autotune(env, args.seed, viewer=viewer)
+            at, aborted = fly_autotune(env, args.seed, params=p, viewer=viewer)
             if aborted:
                 print("aborted: tilted past %.0f deg" % ABORT_TILT_DEG)
                 return
             res = at.results(BASE)
             report(env, res)
             gains, trim = tuned(res)
-            print("\nnow flying the NEW gains + trim with kicks - close the window to finish")
             p = env.p
+            c0, r0 = score(env, p, LIFT_GAINS)
+            c1, r1 = score(env, p, gains, trim)
+            print("\nwith kicks, 10 episodes: lift.py gains %d crashed, rms tilt %.1f deg | "
+                  "autotuned %d crashed, %.1f deg" % (c0, r0, c1, r1))
+            print("\nnow flying the NEW gains + trim with kicks - close the window to finish")
             env.kick_rate_hz, env.episode_s, env.trim = 0.5, 1e9, trim
             env.reset(options={"params": p, "ground": False, "tilt_deg": 15})
             ctl = PIDController(gains)
@@ -272,7 +291,7 @@ def main():
                 viewer.sync()
                 time.sleep(max(0.0, env.period - (time.perf_counter() - t0)))
     else:
-        at, aborted = fly_autotune(env, args.seed)
+        at, aborted = fly_autotune(env, args.seed, params=p)
         if aborted:
             print("aborted: tilted past %.0f deg" % ABORT_TILT_DEG)
             return

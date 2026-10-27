@@ -6,6 +6,9 @@ Fly the simulated pico-drone yourself, with the keyboard, in a room.
     uv run python fly.py --ctrl pid         # lift.py's PID instead (C switches live)
     uv run python fly.py --wind --random    # gusts on, a randomized drone
     uv run python fly.py --check            # no window: scripted flight, policy vs PID
+    uv run python fly.py --ctrl pid --gains autotune --com 3 -2
+                                            # PID with autotune_sim.py's gains + trim, on
+                                            # the drone it tuned (same --com)
 
 The levelling is done by the controller (the PPO policy by default), exactly
 as the board runs it: noisy IMU -> the board's complementary filter -> policy
@@ -18,7 +21,11 @@ What is simulated on top of watch.py, because the real room has it:
               to the top of the frame, each its own body: they have drag,
               swing, collide with each other and the ceiling, and tug the
               frame through the strings. B swaps back to the relief force
-              at the centre of mass the policy was trained with.
+              at the centre of mass the policy was trained with. T moves
+              the knot from the frame centre to right above the real CoM:
+              with wires pulling the CoM off-centre (--com), a centre knot
+              makes the balloons hang the frame tilted and the controller
+              spends its authority fighting that - tie it over the balance point.
   room        4 x 4 m, 2.6 m ceiling, a table, a shelf, a landing pad. The
               frame and the balloons hit the walls.
   wind        G: a draft (a door, a fan) with gusts. It pushes the balloons
@@ -46,6 +53,7 @@ Keys (click the window first):
     SPACE       kick it (a sudden knock)
     G           wind gusts on / off
     B           balloons on strings / relief lumped at the CoM (as trained)
+    T           strings tied at the frame centre / right above the real CoM
     V           fresh battery
     N           new random drone (domain randomization sample); M = nominal again
     R           reset on the pad
@@ -59,9 +67,12 @@ the last 10 s, and the top-left panel gives the RMS attitude error - that is
 """
 
 import argparse
+import copy
+import json
 import math
 import time
 from collections import deque
+from pathlib import Path
 
 import glfw
 import mujoco
@@ -96,9 +107,9 @@ STRING_L = (0.55, 0.72, 0.62, 0.80, 0.68)   # m, staggered so they bunch like a 
 BALLOON_RGB = ("0.9 0.15 0.2", "0.15 0.45 0.9", "0.95 0.75 0.1", "0.2 0.7 0.3", "0.65 0.25 0.8")
 
 # --- pilot ------------------------------------------------------------------------------
-MAX_TILT_DEG = 15.0      # full arrow = this much tilt target
-TILT_SLEW_DPS = 90.0     # targets move toward the sticks this fast (no step inputs)
-MAX_YAW_DPS = 90.0
+MAX_TILT_DEG = 12.0      # full arrow = this much tilt target
+TILT_SLEW_DPS = 45.0     # targets move toward the sticks this fast (no step inputs)
+MAX_YAW_DPS = 60.0
 YAW_KP = 0.0075          # policy mode: lift.py's yaw P term on top of the policy, which
                          # was only ever trained to hold yaw still
 LOITER_KP = 4.0          # loiter: deg of tilt per m off the hold point...
@@ -309,6 +320,7 @@ class Zero:
 
 
 CONTROLLERS = ("policy", "pid", "none")
+AUTOTUNE_GAINS = Path(__file__).resolve().parent / "runs" / "autotune_gains.json"
 CONTROLLER_NAMES = {"policy": "PPO policy (src/flight/policy_weights.py)",
                     "pid": "lift.py PID", "none": "none - nothing levels it"}
 
@@ -321,14 +333,26 @@ class Flight:
         self.nominal = P.load()
         self.rng = np.random.default_rng(args.seed)
         self.env = FlyEnv(self.nominal, args.seed, balloons=not args.no_balloons)
-        self.controllers = {"policy": PolicyController(policy_weights.LAYERS), "pid": PIDController(),
+        # --gains autotune: autotune_sim.py's result (gains + lift.py-style trim) for the PID.
+        self.pid_trim = (0.0, 0.0)
+        pid_gains = None
+        if args.gains == "autotune":
+            tuned = json.loads(AUTOTUNE_GAINS.read_text())
+            pid_gains, self.pid_trim = tuned["gains"], tuple(tuned["trim"])
+            print("PID gains + trim from", AUTOTUNE_GAINS, "(tuned on:", tuned["drone"] + ")")
+        self.controllers = {"policy": PolicyController(policy_weights.LAYERS), "pid": PIDController(pid_gains),
                             "none": Zero()}
         self.ctrl_name = args.ctrl
         self.hold_on = not args.manual
         self.loiter_on = args.loiter
+        self.tie_at_com = args.tie_at_com
         self.battery_on = not args.no_battery
         self.gusts_on = args.wind
         self.params, self.drone_label = self.nominal, "nominal"
+        if args.com is not None:
+            self.nominal = copy.deepcopy(self.nominal)
+            self.nominal.com_offset_mm = [args.com[0], args.com[1], self.nominal.com_offset_mm[2]]
+            self.params, self.drone_label = self.nominal, "CoM moved"
         if args.random:
             self.new_drone()
         self.paused = False
@@ -338,6 +362,7 @@ class Flight:
     def reset(self):
         env = self.env
         env.fly_reset(self.params)
+        self.place_knot()
         self.battery = Battery(self.params.hover_throttle, self.args.flight_min)
         self.hold = AltHold()
         self.manual = 0.0
@@ -350,6 +375,7 @@ class Flight:
         env.wind[:] = 0.0
         env.last_action = np.zeros(3)
         self.ctrl.reset()
+        env.trim = self.pid_trim if self.ctrl_name == "pid" else (0.0, 0.0)
         self.history = deque(maxlen=1000)
 
     @property
@@ -360,6 +386,7 @@ class Flight:
         self.ctrl_name = CONTROLLERS[(CONTROLLERS.index(self.ctrl_name) + 1) % len(CONTROLLERS)]
         self.ctrl.reset()
         self.env.last_action = np.zeros(3)
+        self.env.trim = self.pid_trim if self.ctrl_name == "pid" else (0.0, 0.0)
 
     def toggle_hold(self):
         z, _ = self.height()
@@ -370,6 +397,13 @@ class Flight:
             self.hold.z_sp = z if self.env.airborne else 0.0
             self.hold.i = self.env.stick_throttle - self.env.p.hover_throttle if self.env.airborne else 0.0
         self.hold_on = not self.hold_on
+
+    def place_knot(self):
+        """Where the strings are tied: frame centre, or straight above the CoM (T)."""
+        m = self.env.drone.model
+        top = m.site("top").id
+        com = m.body_ipos[self.env.drone.body]
+        m.site_pos[top] = [com[0], com[1], 0.02] if self.tie_at_com else [0.0, 0.0, 0.02]
 
     def new_wind(self):
         a = self.rng.uniform(0, 2 * math.pi)
@@ -550,7 +584,8 @@ def status_text(f):
                                                           f.battery.thrust_factor,
                                                           "  LAND NOW" if f.battery.volts < 3.5 else "")
          if f.battery_on else "off (always fresh)"),
-        ("weight relief", "%d balloons on strings, %.0f g" % (N_BALLOONS, p.relief_n / P.G * 1000)
+        ("weight relief", "%d balloons, %.0f g, tied %s" % (N_BALLOONS, p.relief_n / P.G * 1000,
+                                                            "over the CoM" if f.tie_at_com else "at frame centre")
          if env.balloons else "%.0f g lumped at the CoM (as trained)" % (p.relief_n / P.G * 1000)),
         ("wind", "%.2f m/s gusting" % float(np.linalg.norm(env.wind)) if f.gusts_on else "off"),
         ("ground effect", "x%.2f thrust" % env.ground_effect),
@@ -564,7 +599,7 @@ def status_text(f):
 HELP = (
     ("arrows", "tilt (up = forward)"), ("W / S", "climb / descend"), ("A / D", "yaw"),
     ("H", "altitude hold on/off"), ("L", "loiter on/off"), ("X", "cut motors"), ("C", "controller"), ("SPACE", "kick"),
-    ("G", "wind gusts"), ("B", "balloons / lumped"), ("V", "fresh battery"),
+    ("G", "wind gusts"), ("B", "balloons / lumped"), ("T", "knot: centre / over CoM"), ("V", "fresh battery"),
     ("N / M", "random / nominal drone"), ("R", "reset"), ("F", "camera"), ("P", "pause"),
     ("mouse", "drag orbit, scroll zoom"), ("ESC", "quit"),
 )
@@ -616,6 +651,9 @@ def run_window(f):
             f.toggle_wind()
         elif key == glfw.KEY_B:
             f.toggle_balloons()
+        elif key == glfw.KEY_T:
+            f.tie_at_com = not f.tie_at_com
+            f.place_knot()
         elif key == glfw.KEY_V:
             f.battery = Battery(f.params.hover_throttle, f.args.flight_min)
         elif key == glfw.KEY_N:
@@ -754,8 +792,13 @@ def main():
     ap.add_argument("--loiter", action="store_true", help="start with loiter (sim-only position hold) on")
     ap.add_argument("--random", action="store_true", help="start with a randomized drone")
     ap.add_argument("--no-balloons", action="store_true", help="relief at the CoM, as in training")
+    ap.add_argument("--tie-at-com", action="store_true", help="strings tied right above the real CoM")
     ap.add_argument("--no-battery", action="store_true", help="battery never drains")
     ap.add_argument("--flight-min", type=float, default=6.0, help="minutes of hover until the pack is at 20%%")
+    ap.add_argument("--gains", choices=("lift", "autotune"), default="lift",
+                    help="PID gains: lift.py's, or autotune_sim.py's result (with its trim)")
+    ap.add_argument("--com", type=float, nargs=2, metavar=("FWD_MM", "LEFT_MM"),
+                    help="centre of mass moved this far by wires/tape (+x nose, +y left)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--check", action="store_true", help="no window: scripted flight, policy vs PID")
     args = ap.parse_args()

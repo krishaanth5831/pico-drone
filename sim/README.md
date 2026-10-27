@@ -43,7 +43,8 @@ The controller does the levelling exactly as the board would. Your keys only
 move its targets: **arrows** tilt (up = forward), **W/S** climb/descend,
 **A/D** yaw. Added on top of the training sim: 5 helium balloons on strings
 as separate bodies (drag, swing, they bump the ceiling and tug the frame;
-**B** swaps back to the lumped relief the policy trained with), a 4 x 4 m
+**B** swaps back to the lumped relief the policy trained with, **T** ties the
+strings over the real CoM instead of the frame centre), a 4 x 4 m
 room with walls and furniture, wind gusts (**G**), a draining 1S battery
 (thrust falls with voltage squared; **V** = fresh pack) and ground effect.
 **H** altitude hold and **L** loiter are sim-only helpers. The real drone has
@@ -56,10 +57,10 @@ last 10 s, and the panel shows the RMS error.
 
 | controller | relief | disarmed | RMS attitude error | max tilt |
 |---|---|---|---|---|
-| policy | balloons | no | 4.5 deg | 13 deg |
-| lift.py PID | balloons | no | 3.9 deg | 16 deg |
-| policy | lumped | no | 6.1 deg | 25 deg |
-| lift.py PID | lumped | no | 5.1 deg | 20 deg |
+| policy | balloons | no | 3.5 deg | 11 deg |
+| lift.py PID | balloons | no | 2.9 deg | 14 deg |
+| policy | lumped | no | 4.7 deg | 19 deg |
+| lift.py PID | lumped | no | 3.8 deg | 16 deg |
 
 The policy flies the balloon rig it never saw in training. Here, too, it
 matches the PID but doesn't beat it. Without loiter, a 0.3 m/s draft carries
@@ -98,7 +99,15 @@ time). Output goes to `runs/ppo_<time>/best.zip`.
 cd sim
 uv run python autotune_sim.py --windowed     # watch the roll/pitch/yaw wiggles, then the new gains
 uv run python autotune_sim.py --check 12     # 12 random + 6 extreme drones vs lift.py's gains
+
+# Your case: wires pulled the CoM 4 mm forward and 3 mm right. Tune that drone,
+# then fly the result with the keyboard (same --com, so it is the same drone):
+uv run python autotune_sim.py --windowed --com 4 -3
+uv run python fly.py --ctrl pid --gains autotune --com 4 -3
 ```
+
+`--extreme "slow motors"` (or any `--check` edge case) and `--random --seed N`
+pick other drones to tune.
 
 This runs `src/flight/autotune.py`, the same file the board runs. It prints
 what it identified next to the sim's ground truth, the gain scale it picked
@@ -106,6 +115,18 @@ per axis, and lift.py vs autotuned (with trim) under kicks. Last check:
 0 of 18 drones aborted, median K error 6 %, median trim error 0.001,
 autotuned better on 9 and worse on 0. `--reference` regenerates
 `autotune.REFERENCE` after `drone_params.json` changes.
+
+With `--com 4 -3` it finds the trim to within 0.001 of the truth (roll
+-0.021, pitch -0.039). The sim's autotune flies the lumped relief, though, so
+that trim doesn't cover the balloon-string effect below.
+
+**Tie the balloon strings above the balance point, not at the frame centre.**
+In `fly.py --com 4 -3`, a knot at the centre lets the balloons hang the frame
+12-20 deg tilted. The PID then holds it about 5 deg off level, using a third of
+the motor range to do it. Press **T** (or pass `--tie-at-com`) to move the knot
+over the real CoM: level, with half the motor effort, and it hangs within about 6 deg even
+with no controller. On the real drone, balance the frame (battery and wires
+in) on a pencil tip and tie the strings there.
 
 ## What is modelled
 
