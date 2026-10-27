@@ -55,6 +55,13 @@ except ImportError as exc:
           "View -> Files, select config.py, drivers, flight -> 'Upload to /'.\n" % exc)
     raise SystemExit()
 
+# Saved autotune gains (firmware/autotune.py). A board uploaded before the
+# autotune existed has no flight/gains_file.py: then it's the numbers below.
+try:
+    from flight import gains_file  # noqa: E402
+except ImportError:
+    gains_file = None
+
 # The GPS is display only, so a board without drivers/gps.py still flies.
 try:
     from drivers.gps import GPS  # noqa: E402
@@ -143,6 +150,12 @@ I_ENABLE_THROTTLE = 0.55     # integrators held at zero below this - stops them
                              # winding up while the quad still sits on the ground
 TRIM_ROLL = 0.0              # constant roll correction, if it always drifts one way
 TRIM_PITCH = 0.0
+
+# True = fly the last gains + trim accepted in the autotune (/gains.json, written
+# by firmware/autotune.py) instead of the five rate/trim lines above. False =
+# exactly what is written above. The console says which ones are flying, so
+# an edit above that "does nothing" is visible: it's the saved file winning.
+USE_SAVED_GAINS = True
 
 # =============================================================================
 
@@ -364,10 +377,23 @@ def run():
         print("Calibrating gyro, keep the quad flat and still...")
         imu.calibrate_gyro()
 
+        gains = {"roll": ROLL_RATE, "pitch": PITCH_RATE, "yaw": YAW_RATE}
+        trim_roll, trim_pitch = TRIM_ROLL, TRIM_PITCH
+        if not USE_SAVED_GAINS:
+            source = "this file (USE_SAVED_GAINS is off)"
+        elif gains_file is None:
+            source = "this file (flight/gains_file.py not on the board - re-upload flight)"
+        else:
+            gains, (trim_roll, trim_pitch), source = gains_file.load(
+                "/gains.json", gains, (TRIM_ROLL, TRIM_PITCH))
+        print("rate gains: %s" % source)
+        for name in ("roll", "pitch", "yaw"):
+            print("  %-5s P %.4f  I %.4f  D %.5f" % ((name,) + tuple(gains[name])))
+        print("  trim  roll %+.3f  pitch %+.3f" % (trim_roll, trim_pitch))
         rate = {
-            "roll": PID(*ROLL_RATE, integral_limit=RATE_I_LIMIT),
-            "pitch": PID(*PITCH_RATE, integral_limit=RATE_I_LIMIT),
-            "yaw": PID(*YAW_RATE, integral_limit=RATE_I_LIMIT),
+            "roll": PID(*gains["roll"], integral_limit=RATE_I_LIMIT),
+            "pitch": PID(*gains["pitch"], integral_limit=RATE_I_LIMIT),
+            "yaw": PID(*gains["yaw"], integral_limit=RATE_I_LIMIT),
         }
         angle = {
             "roll": PID(ROLL_ANGLE_KP, 0.0, 0.0, output_limit=MAX_ANGLE_RATE_DPS),
@@ -496,8 +522,8 @@ def run():
 
                 roll_sp = angle["roll"].update(level_roll, roll, dt)
                 pitch_sp = angle["pitch"].update(level_pitch, pitch, dt)
-                roll_cmd = rate["roll"].update(roll_sp, gyro[0], dt) + TRIM_ROLL
-                pitch_cmd = rate["pitch"].update(pitch_sp, gyro[1], dt) + TRIM_PITCH
+                roll_cmd = rate["roll"].update(roll_sp, gyro[0], dt) + trim_roll
+                pitch_cmd = rate["pitch"].update(pitch_sp, gyro[1], dt) + trim_pitch
                 yaw_cmd = rate["yaw"].update(0.0, gyro[2], dt)
 
                 if not LEVELLING:

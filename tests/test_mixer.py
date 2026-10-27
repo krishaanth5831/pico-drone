@@ -24,14 +24,15 @@ def test_pitch_forward_lifts_rear():
     assert out[1] < 0.5 and out[3] < 0.5   # front pair
 
 
-def test_yaw_speeds_up_the_counter_rotating_pair():
-    # To yaw right you accelerate the motors spinning the opposite way. M1 and M2
-    # are the CCW pair, so a positive yaw command must raise exactly those.
+def test_positive_yaw_speeds_up_the_cw_pair():
+    # +yaw is counter-clockwise seen from above, the same sign as the MPU6050's
+    # gyro z. A CW prop's drag twists the body CCW, so +yaw must raise the CW
+    # pair (M3, M4). The opposite sign made the yaw rate loop positive feedback.
     out = mix(0.5, 0.0, 0.0, 0.2)
     ccw = [m for m, d in MOTOR_DIRECTIONS.items() if d == "CCW"]
     cw = [m for m, d in MOTOR_DIRECTIONS.items() if d == "CW"]
-    assert all(out[m] > 0.5 for m in ccw)
-    assert all(out[m] < 0.5 for m in cw)
+    assert all(out[m] > 0.5 for m in cw)
+    assert all(out[m] < 0.5 for m in ccw)
 
 
 def test_diagonal_pairs_rotate_together():

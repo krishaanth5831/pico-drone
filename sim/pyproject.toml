@@ -1,0 +1,28 @@
+[project]
+name = "pico-drone-sim"
+version = "0.1.0"
+description = "MuJoCo model of the pico-drone for PPO training, PID autotune checks and sim-to-real export"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "mujoco>=3.2",
+    "gymnasium>=1.0",
+    "stable-baselines3>=2.3",
+    "torch>=2.3",
+    "numpy",
+    "tensorboard",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.ruff]
+extend = "../pyproject.toml"   # same rules as the firmware
+
+[tool.ruff.lint.isort]
+# flight.* is the board's code in ../src, put on sys.path by pico_drone_sim/__init__.py
+known-first-party = ["pico_drone_sim", "flight"]

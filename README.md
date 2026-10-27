@@ -6,9 +6,10 @@ written in MicroPython.
 Sensor drivers, control maths, and a component-by-component bench test suite —
 with a hardware disarm line that a software bug cannot override.
 
-> **Status: bench development.** This does not fly yet. There is no control link
-> on the airframe, so `main.py` deliberately stops at sensor bring-up and never
-> arms the motors. See [`docs/roadmap.md`](docs/roadmap.md).
+> **Status: bench development.** This does not fly yet. There is no RC control
+> link on the airframe (only the autotune's WiFi ground station, which can
+> disarm but not steer), so `main.py` deliberately stops at sensor bring-up and
+> never arms the motors. See [`docs/roadmap.md`](docs/roadmap.md).
 
 > **Before running anything: `config.py`, `drivers/` and `flight/` must be
 > copied onto the Pico's own filesystem first.** Opening a script in Thonny and
@@ -42,10 +43,20 @@ src/
     mpu6050.py         GY-521 gyro + accelerometer
     hmc5883l.py        magnetometer, auto-detects the QMC5883L clone
     gps.py             NEO-6M NMEA parser
+    gcs_link.py        ground-station link: JSON over UDP (WiFi)
   flight/
     fusion.py          complementary filter -> roll and pitch
     pid.py             rate controller, anti-windup, no derivative kick
     mixer.py           X-quad motor mixing with desaturation
+    autotune.py        PX4-style system identification + gain scaling
+    autotune_session.py  start / abort / accept / verify around it
+    ground_station.py  the vehicle's side of the ground-station link
+    gains_file.py      /gains.json: saved autotune gains
+    step_response.py   predicted step response for the ground station
+
+firmware/              Thonny scripts: lift.py, autotune.py, flight_controller.py
+sim/                   MuJoCo drone: training, fly.py, sitl.py (sim/README.md)
+gcs/                   QGC-style ground station, autotune page (gcs/README.md)
 
 testing/               per-component bench procedures + scripts
 docs/                  pinout, power/thrust/weight, roadmap
@@ -152,7 +163,8 @@ the drivers and control maths in `src/`. It self-levels and holds a heading; it
 does not hold altitude or position, since nothing on this airframe measures
 either. Read `firmware/README.md` in full before running it — it explains the
 safety model and the manual tuning procedure, both of which matter more than
-usual given there is still no control link or physical kill switch.
+usual given there is still no RC link or physical kill switch (the WiFi
+ground station's DISARM is software, not a kill switch).
 
 ## Development
 
