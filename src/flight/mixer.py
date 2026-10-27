@@ -75,6 +75,27 @@ def mix(throttle, roll, pitch, yaw, idle=0.0):
     }
 
 
+
+def unmix(out):
+    """
+    The (throttle, roll, pitch, yaw) that four motor outputs actually deliver.
+
+    The inverse of mix() on what it returned, clipping included: the four
+    columns of the mix table (throttle all +1, roll/pitch/yaw +-1) are
+    orthogonal, so each term is just the column-weighted average of the
+    outputs. When the mixer clipped a motor at the idle floor or at 1.0, this
+    is smaller than what was asked for - it is what the airframe really got.
+    """
+    thr = roll = pitch = yaw = 0.0
+    for motor, (kr, kp, ky) in _MIX.items():
+        v = out[motor]
+        thr += v
+        roll += kr * v
+        pitch += kp * v
+        yaw += ky * v
+    return thr / 4.0, roll / 4.0, pitch / 4.0, yaw / 4.0
+
+
 MOTOR_DIRECTIONS = {1: "CCW", 2: "CCW", 3: "CW", 4: "CW"}
 MOTOR_POSITIONS = {
     1: "front-right",
