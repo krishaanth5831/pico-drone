@@ -18,18 +18,28 @@ share a rotation direction so their yaw torques cancel in the hover:
   M1 front-right  CCW      M3 front-left   CW
   M2 rear-left    CCW      M4 rear-right   CW
 
-Roll right  -> left motors up,  right motors down
-Pitch fwd   -> rear motors up,  front motors down
-Yaw right   -> CCW pair up,     CW pair down
+Every axis uses the gyro's sign, so a rate PID fed straight from the MPU6050
+pushes the right way (GY-521 chip up, X arrow to the nose -> +x nose, +y left,
++z up):
+
+  +roll   right side down  (gyro x > 0)  -> left motors up,  right motors down
+  +pitch  nose down        (gyro y > 0)  -> rear motors up,  front motors down
+  +yaw    nose LEFT, i.e. counter-clockwise seen from above  (gyro z > 0)
+                                         -> CW pair up,      CCW pair down
+
+Yaw comes from prop drag: a prop spinning CW pushes the body CCW. So to turn
+the nose left you speed up the CW pair. (Until 2026-10-27 the yaw column was
+the other way round - "+yaw = nose right" - which made every yaw rate loop in
+the repo positive feedback: the simulator span the drone up to ~1000 deg/s.)
 """
 
-# (roll, pitch, yaw) sign for each motor. Yaw sign is the OPPOSITE of the motor's
-# own rotation: to yaw right you speed up the motors spinning left.
+# (roll, pitch, yaw) sign for each motor. +yaw (counter-clockwise) speeds up the
+# CW-spinning pair, whose drag twists the body counter-clockwise.
 _MIX = {
-    1: (-1.0, -1.0, +1.0),  # front-right, CCW
-    2: (+1.0, +1.0, +1.0),  # rear-left,   CCW
-    3: (+1.0, -1.0, -1.0),  # front-left,  CW
-    4: (-1.0, +1.0, -1.0),  # rear-right,  CW
+    1: (-1.0, -1.0, -1.0),  # front-right, CCW
+    2: (+1.0, +1.0, -1.0),  # rear-left,   CCW
+    3: (+1.0, -1.0, +1.0),  # front-left,  CW
+    4: (-1.0, +1.0, +1.0),  # rear-right,  CW
 }
 
 

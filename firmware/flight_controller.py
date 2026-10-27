@@ -146,9 +146,12 @@ def control_step(imu, mag, fusion, rate_pid, angle_pid, heading_setpoint, dt):
     else:
         heading = mag.heading(fusion.pitch, fusion.roll)
         heading_error = wrap_deg_error(heading_setpoint, heading)
+        # Compass heading grows CLOCKWISE, the gyro's z (and the mixer's +yaw)
+        # grows COUNTER-clockwise, hence the minus: a positive heading error
+        # (need to turn clockwise) asks for a negative yaw rate.
         yaw_rate_sp = max(
             -tuning.MAX_YAW_RATE_DPS,
-            min(tuning.MAX_YAW_RATE_DPS, tuning.HEADING_KP * heading_error),
+            min(tuning.MAX_YAW_RATE_DPS, -tuning.HEADING_KP * heading_error),
         )
 
     roll_cmd = rate_pid["roll"].update(roll_rate_sp, gyro_x, dt)
