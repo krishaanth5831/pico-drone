@@ -1,0 +1,60 @@
+{
+  "_about": "Nominal pico-drone parameters for the simulator, plus the range each one is randomized over during training. Nominal values are estimates (no scale yet): docs/power.md weight budget and thrust table, frame pitch 84 mm. sim/balance.py and the autotune result overwrite the measured ones; anything still a guess keeps a wide range.",
+
+  "mass_g": 80.0,
+  "com_offset_mm": [0.0, 0.0, 0.0],
+  "motor_half_pitch_mm": 42.0,
+  "inertia_scale": 1.0,
+
+  "thrust_full_g": 15.0,
+  "thrust_curve_exp": 1.7,
+  "throttle_deadband": 0.15,
+  "motor_scale": [1.0, 1.0, 1.0, 1.0],
+  "motor_tau_up_ms": 35.0,
+  "motor_tau_down_ms": 55.0,
+  "yaw_coef_mm": 10.0,
+  "supply_sag": 0.08,
+
+  "hover_throttle": 0.62,
+  "idle": 0.40,
+  "control_hz": 100.0,
+  "latency_ms": 4.0,
+
+  "gyro_noise_dps": 0.2,
+  "gyro_bias_dps": 0.0,
+  "gyro_vibration_dps": 0.6,
+  "accel_noise_ms2": 0.1,
+  "accel_vibration_ms2": 1.5,
+  "imu_misalign_deg": [0.0, 0.0],
+
+  "drag_lin": 0.03,
+  "drag_rot": 2e-6,
+  "relief_drag_z": 0.15,
+
+  "randomize": {
+    "mass_g": [60.0, 100.0],
+    "com_offset_mm_xy": 4.0,
+    "com_offset_mm_z": [-6.0, 4.0],
+    "inertia_scale": [0.7, 1.4],
+    "thrust_full_g": [9.0, 18.0],
+    "thrust_curve_exp": [1.4, 2.0],
+    "throttle_deadband": [0.08, 0.25],
+    "motor_scale": 0.15,
+    "motor_tau_up_ms": [20.0, 60.0],
+    "motor_tau_down_ms_factor": [1.0, 1.8],
+    "yaw_coef_mm": [5.0, 18.0],
+    "supply_sag": [0.0, 0.15],
+    "hover_throttle": [0.52, 0.75],
+    "control_hz": [80.0, 130.0],
+    "latency_ms": [1.0, 8.0],
+    "gyro_noise_dps": [0.05, 0.4],
+    "gyro_bias_dps": 0.4,
+    "gyro_vibration_dps": [0.0, 1.5],
+    "accel_noise_ms2": [0.05, 0.3],
+    "accel_vibration_ms2": [0.0, 3.0],
+    "imu_misalign_deg": 2.0,
+    "drag_lin": [0.01, 0.06],
+    "drag_rot": [0.0, 6e-6],
+    "relief_drag_z": [0.05, 0.4]
+  }
+}

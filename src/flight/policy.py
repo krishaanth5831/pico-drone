@@ -46,10 +46,18 @@ OBS_RATE_DPS = 300.0
 OBS_INTEGRAL = 10.0
 INTEGRAL_LIMIT = 20.0   # deg*s, clamp on obs 5-6 before scaling
 
-# Policy output is tanh-squashed to -1..1 per axis, then scaled to this many
+def _clip1(v):
+    return -1.0 if v < -1.0 else (1.0 if v > 1.0 else v)
+
+
+# Policy output is clipped to -1..1 per axis, then scaled to this many
 # units of mixer correction. 0.35 is a little over what the rate PID asks for
 # at a 100 deg/s error with lift.py's gains, so it is the same authority.
 ACT_SCALE = 0.35
+
+# Mixer floor the policy was trained with. rl_lift.py must use the same value,
+# or the policy's corrections land on a different part of the motor curve.
+TRAIN_IDLE = 0.40
 
 
 def build_obs(roll_err, pitch_err, gyro, i_roll, i_pitch, throttle, last_action):
@@ -73,8 +81,9 @@ class Policy:
     """
     layers: list of (weights, biases). weights[j] is the row of input weights
     for output j, so a layer maps len(weights[0]) inputs to len(weights)
-    outputs. Every layer but the last is followed by tanh; the last is followed
-    by tanh too (squashes to -1..1), then multiplied by ACT_SCALE.
+    outputs. Every layer but the last is followed by tanh. The last is linear,
+    clipped to -1..1 and multiplied by ACT_SCALE - exactly what the simulator
+    does with the trained network's (deterministic) output.
     """
 
     def __init__(self, layers):
@@ -93,14 +102,15 @@ class Policy:
             w, b = self.layers[k]
             out = self._bufs[k]
             n_in = len(x)
+            hidden = k < len(self.layers) - 1
             for j in range(len(b)):
                 row = w[j]
                 s = b[j]
                 for i in range(n_in):
                     s += row[i] * x[i]
-                out[j] = math.tanh(s)
+                out[j] = math.tanh(s) if hidden else s
             x = out
-        return [x[0] * ACT_SCALE, x[1] * ACT_SCALE, x[2] * ACT_SCALE]
+        return [_clip1(x[0]) * ACT_SCALE, _clip1(x[1]) * ACT_SCALE, _clip1(x[2]) * ACT_SCALE]
 
     @property
     def macs(self):

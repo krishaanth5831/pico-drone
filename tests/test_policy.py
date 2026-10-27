@@ -17,7 +17,8 @@ def test_forward_pass_matches_hand_maths():
     p = _identity_net()
     x = [0.3, -0.2]
     h = [math.tanh(0.3), math.tanh(-0.2)]
-    expected = [math.tanh(h[0]), math.tanh(h[1]), math.tanh(h[0] + h[1] + 0.5)]
+    # Last layer is linear, then clipped to -1..1.
+    expected = [h[0], h[1], min(1.0, h[0] + h[1] + 0.5)]
     out = p.act(x)
     for got, want in zip(out, expected, strict=True):
         assert got == pytest.approx(want * ACT_SCALE, abs=1e-9)
