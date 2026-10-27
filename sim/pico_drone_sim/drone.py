@@ -38,7 +38,10 @@ START_Z = -airframe.Z_FLOOR / 1000.0 + 0.0005   # body origin height resting on 
 WIRES_AT_MM = (0.0, 0.0, -6.0)  # wiring bay under the deck, between the header pins
 
 
-def _mjcf(p):
+def _mjcf(p, assets="", world="", extra=""):
+    """MJCF for the drone. assets/world/extra: optional scene XML (fly.py's room,
+    balloon and string) added to <asset>, <worldbody> after the drone, and the
+    end of the model. The drone stays the first free joint either way."""
     a = airframe.A / 1000.0
     zs = (airframe.M_RISE + 3.0) / 1000.0     # thrust acts at the prop hub
     sites = "\n      ".join(
@@ -64,6 +67,7 @@ def _mjcf(p):
     <texture name="sky" type="skybox" builtin="gradient" rgb1="0.75 0.85 0.95" rgb2="1 1 1"
              width="256" height="256"/>
     {airframe.mjcf_assets(p.gps_fitted)}
+    {assets}
   </asset>
   <worldbody>
     <light pos="0 0 3" dir="0 0 -1" diffuse="0.6 0.6 0.6"/>
@@ -75,7 +79,9 @@ def _mjcf(p):
             contype="0" conaffinity="0"/>
       {sites}
       <site name="imu" pos="{imu}" size="0.002"/>
+      <site name="top" pos="0 0 0.02" size="0.002"/>
     </body>
+    {world}
   </worldbody>
   <actuator>
     {actuators}
@@ -84,6 +90,7 @@ def _mjcf(p):
     <gyro name="gyro" site="imu"/>
     <accelerometer name="accel" site="imu"/>
   </sensor>
+  {extra}
 </mujoco>
 """
 
@@ -99,8 +106,13 @@ def _rot_y(a):
 
 
 class Drone:
-    def __init__(self, params):
-        self.model = mujoco.MjModel.from_xml_string(_mjcf(params))
+    def __init__(self, params, assets="", world="", extra=""):
+        self.model = mujoco.MjModel.from_xml_string(_mjcf(params, assets, world, extra))
+        # fly.py: False when a balloon body on a string carries the relief
+        # instead of a force at the CoM; force_hook(data) adds scene forces
+        # (balloon, wind) every physics step.
+        self.relief_on_body = True
+        self.force_hook = None
         self.data = mujoco.MjData(self.model)
         self.body = self.model.body("drone").id
         # What MuJoCo worked out from the CAD parts: mass, CoM, principal
@@ -212,12 +224,17 @@ class Drone:
         w_world = R @ d.qvel[3:6]
         f = np.zeros(6)
         f[0:2] = -p.drag_lin * v[0:2]
-        f[2] = p.relief_n - p.relief_drag_z * v[2] - p.drag_lin * v[2]
+        f[2] = -p.drag_lin * v[2]
+        if self.relief_on_body:
+            # Balloon lift and its vertical drag, lumped at the CoM (training).
+            f[2] += p.relief_n - p.relief_drag_z * v[2]
         z = d.qpos[2]
         if z > 2.5:
             f[2] -= 2.0 * (z - 2.5) + 0.5 * v[2]
         f[3:6] = -p.drag_rot * w_world
         d.xfrc_applied[self.body] = f
+        if self.force_hook is not None:
+            self.force_hook(d)
 
     # --- what the board sees ------------------------------------------------------
     def read_imu(self, rng):

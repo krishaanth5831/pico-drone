@@ -45,6 +45,9 @@ class HoverEnv(gym.Env):
         self.action_space = gym.spaces.Box(-1.0, 1.0, (ACT_SIZE,), np.float32)
         self.rng = np.random.default_rng(seed)
         self.trim = (0.0, 0.0)   # roll/pitch trim added to commands, like lift.py's TRIM_*
+        # Attitude setpoint relative to level (deg), for flying it with sticks
+        # (fly.py). Training leaves it at zero: "hold level".
+        self.target = (0.0, 0.0)
 
     # ------------------------------------------------------------------------------
     def reset(self, seed=None, options=None):
@@ -120,8 +123,8 @@ class HoverEnv(gym.Env):
         return self.t >= self.ramp_s
 
     def _obs(self):
-        roll_err = self.level[0] - self.est[0]
-        pitch_err = self.level[1] - self.est[1]
+        roll_err = self.level[0] + self.target[0] - self.est[0]
+        pitch_err = self.level[1] + self.target[1] - self.est[1]
         return np.array(build_obs(roll_err, pitch_err, self.gyro, self.integral[0], self.integral[1],
                                   self.throttle_at(self.t), self.last_action), dtype=np.float32)
 
@@ -155,7 +158,7 @@ class HoverEnv(gym.Env):
         self.est = (self.fusion.roll_deg, self.fusion.pitch_deg)
         if self.integrating:
             for i in range(2):
-                v = self.integral[i] + (self.level[i] - self.est[i]) * period
+                v = self.integral[i] + (self.level[i] + self.target[i] - self.est[i]) * period
                 self.integral[i] = max(-INTEGRAL_LIMIT, min(INTEGRAL_LIMIT, v))
 
         roll, pitch, _ = self.drone.attitude_deg()

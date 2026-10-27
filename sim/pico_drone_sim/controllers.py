@@ -49,13 +49,13 @@ class PIDController:
         if not env.integrating:
             for pid in self.rate.values():
                 pid._integral = 0.0
-        roll_sp = self.angle["roll"].update(env.level[0], env.est[0], dt)
-        pitch_sp = self.angle["pitch"].update(env.level[1], env.est[1], dt)
+        roll_sp = self.angle["roll"].update(env.level[0] + env.target[0], env.est[0], dt)
+        pitch_sp = self.angle["pitch"].update(env.level[1] + env.target[1], env.est[1], dt)
         g = env.gyro
         return np.array([
             self.rate["roll"].update(roll_sp, g[0], dt),
             self.rate["pitch"].update(pitch_sp, g[1], dt),
-            self.rate["yaw"].update(0.0, g[2], dt),
+            self.rate["yaw"].update(getattr(env, "yaw_rate_sp", 0.0), g[2], dt),
         ])
 
 
