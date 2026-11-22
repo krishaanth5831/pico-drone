@@ -65,9 +65,8 @@ the source of truth, and `docs/pinout.md` mirrors it.
 puts the whole airframe on one page, and each `testing/0X_*/README.md` covers
 one part in detail.
 
-The KiCad schematic and wiring PDFs in `hardware/` are older. They still show
-the compass and the earlier battery wiring, so trust `docs/pinout.md` where
-they differ.
+The KiCad schematic and wiring PDFs in `hardware/` are older and still show
+the compass, so trust `docs/pinout.md` where they differ.
 
 **Grounding rule:** once the bench supply is plugged in, the breadboard rails
 are motor ground. Sensor grounds go straight to Pico GND pins (GY-521 to pin 38,
@@ -123,7 +122,7 @@ Each test assumes the previous ones pass. Open the script in Thonny (interpreter
 | [02](testing/02_drv8833/README.md) | DRV8833 drivers, no motor attached | no |
 | [03](testing/03_coreless_motor/README.md) | Motor mapping and direction | **yes** |
 | [04](testing/04_gy521_imu/README.md) | GY-521 IMU | no |
-| [05](testing/05_hmc5883l_compass/README.md) | HMC5883L compass (removed from the build; kept for later) | no |
+| [05](testing/05_hmc5883l_compass/README.md) | HMC5883L compass. **Skip it**: the compass is removed from the build | no |
 | [06](testing/06_gy_gps6mv2/README.md) | GPS | no |
 | [07](testing/07_lipo_power/README.md) | Power system, brownout hunt | **yes** |
 | [08](testing/08_full_stack_dry_run/README.md) | Everything together, motors detached | no |
@@ -139,10 +138,10 @@ them.
 | Script | What it does |
 |---|---|
 | `lift.py` | Lift test: staggered spin-up, ramp, hold until Stop, optional self-levelling. Settings are at the top (EDIT HERE), so you don't need to re-upload |
-| `flight_controller.py` | Attitude hold (self-levels, holds heading). `tuning.LIVE_MOTORS = False` by default, so nothing spins |
+| `flight_controller.py` | Attitude hold: self-levels roll and pitch. Without the compass it holds the yaw rate only, so the heading drifts. `tuning.LIVE_MOTORS = False` by default, so nothing spins |
 | `autotune.py` | PX4-style autotune flight over WiFi with `gcs/gcs.py`. Starts a WiFi access point and asks for `DRY` or `ARM`. **Never run on hardware** |
 | `bench_policy.py` | Times neural-network sizes on the Pico. It never arms the motors |
-| `imu_motor_check.py` | Spins each motor on its own and counts failed IMU reads, to find a bad power or ground path |
+| `imu_motor_check.py` | Spins each motor on its own as soon as you press Run (props off), and counts failed IMU reads, to find a bad power or ground path |
 
 ### 5. Standalone sensor stream (optional)
 
@@ -258,8 +257,8 @@ say. This is a hardware disarm, not a software convention.
 - `MAX_DUTY` is capped at 0.70, and `tests/test_config.py` fails if it is raised.
 - Nothing in this repo arms the motors at power-on. The flight scripts
   (`lift.py`, `flight_controller.py`, `autotune.py`) only spin up after you type
-  `ARM` at the board's prompt. The bench tests that spin motors (03, 07) only do
-  so when you run them. The ground station has no arm button.
+  `ARM` at the board's prompt. The bench tests that spin motors (03, 07) and
+  `imu_motor_check.py` spin them as soon as you press Run, with no prompt. The ground station has no arm button.
 - **Every bench procedure assumes props are off.**
 
 The onboard LED pulses (long on, short off) while any script runs. If it stops
@@ -324,8 +323,9 @@ flags caused this once). Run `lift.py` with `LEVELLING = False` to take the PID
 out of the picture. Feed the HW-131 from a USB charger of at least 2 A, not its
 barrel jack.
 
-**A motor spins the wrong way.** Swap its two leads at the driver's OUT1/OUT2.
-IN2/IN4 are tied to ground, so this cannot be fixed in code.
+**A motor spins the wrong way.** Swap its two leads at the driver's outputs
+(`AOUT1`/`AOUT2` or `BOUT1`/`BOUT2`). `AIN2`/`BIN2` are tied to ground, so this
+cannot be fixed in code.
 
 **The ground station window looks rough or won't start.** Run it with
 `/usr/bin/python3` and install `python3-tk`.
