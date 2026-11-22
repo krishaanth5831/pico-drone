@@ -246,10 +246,11 @@ the code — worth remembering if you extend this file.
 
 1. Complete `testing/01` through `testing/07` first — this assumes every
    component already works individually.
-2. Run `testing/05_hmc5883l_compass/` **with the airframe fully assembled**
-   and copy the printed `offset`/`scale` into `tuning.py`'s `MAG_OFFSET` /
-   `MAG_SCALE`. Skipping this leaves heading-hold steering off whatever
-   distortion happens to be nearby.
+2. *Only if the compass is fitted* (it is currently removed from the build,
+   see above): run `testing/05_hmc5883l_compass/` **with the airframe fully
+   assembled** and copy the printed `offset`/`scale` into `tuning.py`'s
+   `MAG_OFFSET` / `MAG_SCALE`. Skipping this leaves heading-hold steering off
+   whatever distortion happens to be nearby.
 3. Upload the library, which now includes `tuning.py`:
    ```bash
    ./tools/upload.sh
@@ -363,7 +364,10 @@ interactions; MicroPython has no autodiff and the stock firmware has no
 `numpy`-equivalent (`ulab` isn't bundled by default); and every failed
 training rollout on a real spinning-prop airframe is a potential crash.
 Training in simulation and deploying a small pretrained policy for inference
-only ("sim-to-real") is possible in principle, but needs an accurate physics
-model and system identification of this specific airframe first — a
-substantial project on its own, and PID will be flying reliably long before
-that pipeline would even be validated.
+only ("sim-to-real") is the route [`sim/`](../sim/README.md) now takes: PPO
+trains in MuJoCo, and `sim/export_policy.py` writes the network to
+`src/flight/policy_weights.py` for the board's pure-Python runner
+(`src/flight/policy.py`). In the sim it matches the PID but does not beat it.
+The script that flies it on the board (`rl_lift.py`) is not written yet, and
+`bench_policy.py` (how big a network the Pico can run in the loop) has not
+been run on hardware.
