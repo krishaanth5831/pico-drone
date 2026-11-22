@@ -12,6 +12,14 @@ What exists, and what is still needed before this flies.
 - [x] LED heartbeat failsafe on every bench script
 - [x] Attitude-hold flight controller (`firmware/`) — self-levels and holds
       heading, manually tuned; no altitude/position hold (no sensor for it)
+- [x] MuJoCo simulator running the board's own control code, with keyboard
+      flight, PPO training and policy export ([`sim/`](../sim/README.md))
+- [x] PX4-style autotune with a QGC-style ground station over WiFi
+      ([`gcs/`](../gcs/README.md), `firmware/autotune.py`) — checked in the sim
+      and under CPython only, **not yet run on hardware**
+
+Nothing above has flown. The deploy order for the next hardware session is in
+[`firmware/README.md`](../firmware/README.md#autotune-flight-px4-style-over-wifi).
 
 ## Next — in order
 
@@ -28,7 +36,9 @@ whatever the main loop is doing, is cheap and should happen before any
 autotune routine or untethered test.
 
 ### 3. Control link
-**Nothing currently commands the aircraft.** Options:
+**Nothing currently commands the aircraft.** The autotune's WiFi ground
+station can start an autotune and DISARM, but it cannot steer or arm. Options
+for a real control link:
 
 | Option | Latency | Range | Extra parts |
 |---|---|---|---|
