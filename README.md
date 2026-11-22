@@ -1,188 +1,343 @@
 # pico-drone
 
-A coreless quadcopter flight controller built on a **Raspberry Pi Pico 2 W**,
-written in MicroPython.
+A flight controller for a small coreless quadcopter, built on a **Raspberry Pi
+Pico 2 W** and written in MicroPython. The repo also has a MuJoCo simulator of
+the same drone. The simulator runs the board's own control code, so you can
+fly the drone with a keyboard, train a reinforcement-learning (PPO) levelling
+policy, and try a PX4/QGroundControl-style autotune before anything spins on
+the bench.
 
-Sensor drivers, control maths, and a component-by-component bench test suite —
-with a hardware disarm line that a software bug cannot override.
+> **Status: not flight-tested.** The drone has never flown.
+>
+> - **Bench-run, props off:** the drivers and the component tests in `testing/`,
+>   and `firmware/lift.py` on the bench power supply.
+> - **Never run on a board:** the autotune flight script (`firmware/autotune.py`),
+>   the trained policy, and the ground station over WiFi. They are tested only
+>   under CPython with a mocked hardware layer, and in the simulator.
+>
+> There is no RC link and no physical kill switch. The WiFi ground station can
+> DISARM, but only in software. The roadmap is in [`docs/roadmap.md`](docs/roadmap.md).
 
-> **Status: bench development.** This does not fly yet. There is no RC control
-> link on the airframe (only the autotune's WiFi ground station, which can
-> disarm but not steer), so `main.py` deliberately stops at sensor bring-up and
-> never arms the motors. See [`docs/roadmap.md`](docs/roadmap.md).
+## What's in here
 
-> **Before running anything: `config.py`, `drivers/` and `flight/` must be
-> copied onto the Pico's own filesystem first.** Opening a script in Thonny and
-> pressing Run does not upload anything — without this step every script fails
-> with `ImportError: no module named 'config'`. Run `./tools/upload.sh`, or see
-> [step 2 below](#2-put-the-library-on-the-board) for the Thonny method.
+- **Drivers** for the DRV8833 motor drivers, the GY-521 (MPU6050) IMU, the
+  HMC5883L/QMC5883L compass and the NEO-6M GPS. Pins come from one file, `src/config.py`.
+- **A hardware disarm.** One GPIO holds both motor drivers asleep, so a software
+  bug cannot spin a motor (see [Safety model](#safety-model)).
+- **Control maths:** a complementary filter, a rate/angle PID and an X-quad
+  mixer with desaturation, all in `src/flight/`.
+- **Bench tests**, one folder per component, run in order from Thonny
+  ([`testing/`](testing/README.md)).
+- **Firmware scripts** that run on the board: a lift test, an attitude-hold
+  controller and an autotune flight ([`firmware/`](firmware/README.md)).
+- **A MuJoCo simulator** built from the CAD parts. It has keyboard flight,
+  PPO training, an autotune check and a SITL vehicle ([`sim/`](sim/README.md)).
+- **A small ground station** in the spirit of QGroundControl, with an
+  autotune page ([`gcs/`](gcs/README.md)).
+- **A 3D-printed frame**: STLs plus the Onshape FeatureScript that generates
+  them ([`hardware/frame/`](hardware/frame/README.md)).
 
-## Hardware
+## Bill of materials
 
-| Part | Role |
-|---|---|
-| Raspberry Pi Pico 2 W | Flight controller (RP2350, dual-core 150 MHz) |
-| 2× DRV8833 | Dual H-bridge motor drivers, two motors each |
-| 4× coreless motors | Propulsion (8520 recommended — see [`docs/power.md`](docs/power.md)) |
-| GY-521 (MPU6050) | 3-axis gyro + accelerometer |
-| HMC5883L | 3-axis magnetometer, yaw reference |
-| GY-GPS6MV2 (NEO-6M) | GPS position |
-| 1S LiPo | Power |
+The parts below come from the docs in this repo. Weights and thrust figures
+are in [`docs/power.md`](docs/power.md).
 
-Full wiring: [`docs/pinout.md`](docs/pinout.md).
+| Part | Qty | Role / note |
+|---|---|---|
+| Raspberry Pi Pico 2 W | 1 | Flight controller (RP2350) with WiFi for the ground station |
+| DRV8833 breakout | 2 | Dual H-bridge, two motors each. `MAX_DUTY` is capped at 0.70 because two chips overheat at full throttle |
+| Coreless motors + 55 mm props | 4 | The bench build uses **720** motors, but they cannot lift the drone alone (about 61 g usable thrust). [`docs/power.md`](docs/power.md#thrust-to-weight) recommends **8520** motors. The sim and the autotune assume 720s with helium balloons carrying part of the weight |
+| GY-521 (MPU6050) | 1 | Gyro and accelerometer on I2C0, the only device on the bus |
+| GY-GPS6MV2 (NEO-6M) | 1 | GPS on UART0. Optional: the docs advise building v1 without it to save weight |
+| HMC5883L compass | 0 | **Removed from the build.** The driver and test are kept in case it comes back |
+| 1S LiPo, ~600 mAh | 1 | Airframe power (planned; the bench uses a supply) |
+| SS14 Schottky diode | 1 | Battery to Pico VSYS, so USB cannot backfeed the LiPo |
+| 470 µF capacitor | 2 | One at each driver's VM/GND pins |
+| HW-131 breadboard supply | 1 | Bench motor power, fed from a USB charger of at least 2 A |
+| 3D-printed frame | 1 | [`hardware/frame/`](hardware/frame/README.md): 8.7 g PLA, no supports |
 
-## Layout
+## Wiring
 
+**Use [`docs/pinout.md`](docs/pinout.md).** It has every pin, by GPIO and
+physical pin number, plus the bench and battery power rails. `src/config.py` is
+the source of truth, and `docs/pinout.md` mirrors it.
+[`firmware/README.md`](firmware/README.md#wiring--every-component-in-one-place)
+puts the whole airframe on one page, and each `testing/0X_*/README.md` covers
+one part in detail.
+
+The KiCad schematic and wiring PDFs in `hardware/` are older. They still show
+the compass and the earlier battery wiring, so trust `docs/pinout.md` where
+they differ.
+
+**Grounding rule:** once the bench supply is plugged in, the breadboard rails
+are motor ground. Sensor grounds go straight to Pico GND pins (GY-521 to pin 38,
+GPS to pin 3). Exactly one wire joins Pico GND to the supply's GND rail. See
+[Troubleshooting](#troubleshooting).
+
+## Getting started on the board
+
+You need [Thonny](https://thonny.org) (the firmware and test scripts are run
+from it) and, for uploading from a terminal, `mpremote`:
+
+```bash
+pip install mpremote        # or: pipx install mpremote
 ```
-src/
-  config.py            single source of truth for every pin and constant
-  main.py              entry point - sensor bring-up, motors stay disarmed
-  drivers/
-    motors.py          DRV8833 bank with hardware arm/disarm
-    heartbeat.py       onboard-LED liveness pulse, soft-timer driven
-    mpu6050.py         GY-521 gyro + accelerometer
-    hmc5883l.py        magnetometer, auto-detects the QMC5883L clone
-    gps.py             NEO-6M NMEA parser
-    gcs_link.py        ground-station link: JSON over UDP (WiFi)
-  flight/
-    fusion.py          complementary filter -> roll and pitch
-    pid.py             rate controller, anti-windup, no derivative kick
-    mixer.py           X-quad motor mixing with desaturation
-    autotune.py        PX4-style system identification + gain scaling
-    autotune_session.py  start / abort / accept / verify around it
-    ground_station.py  the vehicle's side of the ground-station link
-    gains_file.py      /gains.json: saved autotune gains
-    step_response.py   predicted step response for the ground station
-
-firmware/              Thonny scripts: lift.py, autotune.py, flight_controller.py
-sim/                   MuJoCo drone: training, fly.py, sitl.py (sim/README.md)
-gcs/                   QGC-style ground station, autotune page (gcs/README.md)
-
-testing/               per-component bench procedures + scripts
-docs/                  pinout, power/thrust/weight, roadmap
-hardware/              KiCad schematic + wiring diagram
-  frame/               3D-printed airframe: STLs + Onshape FeatureScript source
-tests/                 CPython tests against a mocked hardware layer
-tools/                 repo convention checks run in CI
-```
-
-## Getting started
 
 ### 1. Flash MicroPython
 
-Grab the Pico 2 W UF2 from
-[micropython.org](https://micropython.org/download/RPI_PICO2_W/), hold
-**BOOTSEL** while plugging in, and copy the file to the `RP2350` drive that
-appears. Full walkthrough in [`testing/01_pico_2w/`](testing/01_pico_2w/README.md).
+Download the Pico 2 W UF2 from
+[micropython.org](https://micropython.org/download/RPI_PICO2_W/). Hold
+**BOOTSEL** while plugging the board in, then copy the file to the `RP2350`
+drive that appears. The full walkthrough, with a self-contained LED and serial
+check, is in [`testing/01_pico_2w/`](testing/01_pico_2w/README.md).
 
 ### 2. Put the library on the board
 
-The bench scripts import `config`, `drivers` and `flight`, and those imports
-resolve against the **Pico's** filesystem — not your computer's:
+Every script imports `config`, `drivers` and `flight`. Those imports resolve
+against the **Pico's** filesystem, not your computer's, so upload them first:
 
 ```bash
-pip install mpremote
-./tools/upload.sh          # --list to check, --clean to wipe first
+./tools/upload.sh           # copies config.py, drivers/, flight/ and firmware/tuning.py, then lists the board
+./tools/upload.sh --list    # only show what is on the board (warns if main.py is there)
+./tools/upload.sh --clean   # wipe the board's root first, then upload
 ```
 
-Or in Thonny: `View → Files`, select `config.py`, `drivers` and `flight`,
-right-click → **Upload to /**. Re-upload after any change under `src/`.
+Or in Thonny: **View → Files**, select `config.py`, `drivers` and `flight` in
+the computer pane, right-click → **Upload to /**.
 
-`main.py` is deliberately excluded. MicroPython auto-runs it on every boot *and
-every soft-reboot* — which is what Thonny's Run button always does first — so a
-`main.py` on the board hijacks every test run before your script executes. If
-you see the shell print `MPY: soft reboot` repeatedly with none of your test's
-own output, this is why: run `./tools/upload.sh` again, which removes it.
+Re-upload after any change under `src/`, because the board keeps its own copy.
+Close Thonny first, or use Thonny's upload instead, since `mpremote` cannot open
+the port while Thonny has it.
 
-### 3. Work through the bench tests
+`upload.sh` never uploads `main.py`, and it removes one it finds. See
+[Troubleshooting](#troubleshooting) for why.
 
-Do these **in order** — each assumes the previous one passes.
+### 3. Work through the bench tests, in order
+
+Each test assumes the previous ones pass. Open the script in Thonny (interpreter:
+**MicroPython (Raspberry Pi Pico)**) and press Run. **Props off for all of them.**
 
 | # | Component | Motors spin? |
 |---|---|---|
 | [01](testing/01_pico_2w/README.md) | Pico 2 W bring-up | no |
-| [02](testing/02_drv8833/README.md) | DRV8833 driver, no motor attached | no |
+| [02](testing/02_drv8833/README.md) | DRV8833 drivers, no motor attached | no |
 | [03](testing/03_coreless_motor/README.md) | Motor mapping and direction | **yes** |
-| [04](testing/04_gy521_imu/README.md) | IMU | no |
-| [05](testing/05_hmc5883l_compass/README.md) | Compass | no |
+| [04](testing/04_gy521_imu/README.md) | GY-521 IMU | no |
+| [05](testing/05_hmc5883l_compass/README.md) | HMC5883L compass (removed from the build; kept for later) | no |
 | [06](testing/06_gy_gps6mv2/README.md) | GPS | no |
 | [07](testing/07_lipo_power/README.md) | Power system, brownout hunt | **yes** |
+| [08](testing/08_full_stack_dry_run/README.md) | Everything together, motors detached | no |
 
-Index and safety notes: [`testing/README.md`](testing/README.md).
+The index and safety notes are in [`testing/README.md`](testing/README.md).
 
-### 4. Run it
+### 4. Firmware scripts
 
-**Do this separately from the bench tests above, and remove it again afterwards.**
-`main.py` auto-runs on every boot and soft-reboot, so leaving it on the board
-hijacks every test run in step 3 - if you go back to bench testing after this,
-delete it first (`./tools/upload.sh` does this for you automatically).
+These live in [`firmware/`](firmware/README.md). Open them in Thonny and press
+Run; they are not uploaded. Read `firmware/README.md` before running any of
+them.
+
+| Script | What it does |
+|---|---|
+| `lift.py` | Lift test: staggered spin-up, ramp, hold until Stop, optional self-levelling. Settings are at the top (EDIT HERE), so you don't need to re-upload |
+| `flight_controller.py` | Attitude hold (self-levels, holds heading). `tuning.LIVE_MOTORS = False` by default, so nothing spins |
+| `autotune.py` | PX4-style autotune flight over WiFi with `gcs/gcs.py`. Starts a WiFi access point and asks for `DRY` or `ARM`. **Never run on hardware** |
+| `bench_policy.py` | Times neural-network sizes on the Pico. It never arms the motors |
+| `imu_motor_check.py` | Spins each motor on its own and counts failed IMU reads, to find a bad power or ground path |
+
+### 5. Standalone sensor stream (optional)
+
+`src/main.py` brings up the sensors and streams attitude and GPS status to the
+REPL, with the motors held hardware-disarmed. MicroPython runs `main.py` on every
+boot, so copy it only when you want this:
 
 ```bash
-mpremote fs cp src/main.py :
+mpremote fs cp src/main.py :     # then reset the board
+mpremote fs rm :main.py          # remove it before going back to the bench tests (upload.sh also does this)
 ```
 
-Then reset the board. You get live attitude, heading and GPS status streamed to
-the REPL, with the motors held hardware-disarmed throughout.
+## Simulator quick start
+
+The simulator lives in `sim/`, a separate [uv](https://docs.astral.sh/uv/)
+project (Python 3.11–3.12, MuJoCo, Stable-Baselines3, CPU-only torch). The
+firmware tests don't need it.
+
+```bash
+cd sim
+uv sync                                  # once: creates sim/.venv
+uv run python watch.py                   # opens a MuJoCo window: lift.py's PID on the nominal drone
+uv run python fly.py                     # opens a window: fly it with the keyboard in a room
+```
+
+In `watch.py`, click the window first. Then **SPACE** kicks the drone, the
+**arrows** shift its centre of mass, and **R** restarts. In `fly.py`, the
+**arrows** tilt, **W/S** climb and descend, **A/D** yaw, and **C** switches
+between the policy, the PID and no controller. All keys are listed in
+[`sim/README.md`](sim/README.md).
+
+### Training (PPO)
+
+```bash
+cd sim
+uv run python watch_training.py                      # watch PPO learn live in a window (2 min throwaway run)
+uv run python train_ppo.py                           # the real run: 6M steps, 2 x 32 network, output in sim/runs/ppo_<time>/
+uv run tensorboard --logdir runs                     # learning curves
+uv run python export_policy.py runs/ppo_<time>/best.zip   # overwrites src/flight/policy_weights.py (tracked)
+uv run python watch.py --ctrl policy --random        # watch the exported policy fly random drones
+```
+
+Training is CPU-heavy, so stop other heavy jobs first. A script that flies the
+policy on the board (`firmware/rl_lift.py`) is not written yet.
+
+### Autotune
+
+```bash
+cd sim
+uv run python autotune_sim.py --windowed             # watch the board's autotune run on the simulated drone
+uv run python autotune_sim.py --check 12             # 12 random + the extreme drones, no window
+
+# The PX4 + QGC flow, in two terminals:
+uv run python sitl.py                                # terminal 1: the simulated vehicle (MuJoCo window)
+/usr/bin/python3 ../gcs/gcs.py                       # terminal 2: the ground station (Tk window)
+uv run python sitl.py --check                        # no window: the whole flow over real UDP
+```
+
+The ground station needs tkinter (`sudo apt install python3-tk`). Use the
+system Python: other Pythons' bundled Tk renders fonts badly. The step-by-step
+flow, the results so far, and what is modelled are in
+[`sim/README.md`](sim/README.md) and [`gcs/README.md`](gcs/README.md). The
+procedure for the real drone is in
+[`firmware/README.md`](firmware/README.md#autotune-flight-px4-style-over-wifi).
+
+## Project layout
+
+```
+src/                     code that runs on the board (also imports under CPython for tests)
+  config.py              every pin and constant, in one place
+  main.py                optional standalone sensor stream, motors stay disarmed
+  drivers/               motors.py (hardware arm/disarm), heartbeat.py, mpu6050.py,
+                         hmc5883l.py, gps.py, gcs_link.py (JSON over UDP)
+  flight/                fusion.py, pid.py, mixer.py, angles.py,
+                         policy.py + policy_weights.py (the trained network, pure Python),
+                         autotune.py, autotune_session.py, ground_station.py,
+                         gains_file.py (/gains.json), step_response.py
+firmware/                Thonny scripts: lift.py, flight_controller.py + tuning.py,
+                         autotune.py, bench_policy.py, imu_motor_check.py
+testing/01..08_*/        one folder per component: README + bench script
+sim/                     MuJoCo model, keyboard flight, PPO, autotune check, SITL (uv project)
+gcs/                     gcs.py: QGC-style ground station (tkinter, standard library only)
+hardware/                KiCad schematic + wiring PDFs (older, see Wiring)
+  frame/                 3D-printed airframe STLs + Onshape FeatureScript source
+docs/                    pinout, power/thrust/weight, roadmap, images
+tests/                   CPython tests, with tests/mocks/machine.py faking MicroPython's hardware
+tools/upload.sh          copies the library to the board with mpremote
+```
+
+## Documentation map
+
+| Doc | What it covers |
+|---|---|
+| [`docs/pinout.md`](docs/pinout.md) | Every pin, power rails, reserved GPIOs, I2C addresses |
+| [`docs/power.md`](docs/power.md) | Bench supply, grounding rule, battery topology, driver losses, weight and thrust |
+| [`docs/roadmap.md`](docs/roadmap.md) | What is still needed before it flies |
+| [`testing/README.md`](testing/README.md) | Bench-test index, upload step, LED heartbeat |
+| [`firmware/README.md`](firmware/README.md) | Full wiring, safety model, manual tuning, autotune flight procedure |
+| [`sim/README.md`](sim/README.md) | Simulator setup, every script and key, results, what is modelled |
+| [`gcs/README.md`](gcs/README.md) | Ground station screens, how the autotune works, the UDP link |
+| [`hardware/frame/README.md`](hardware/frame/README.md) | Printing, fitting the boards, tolerances, re-exporting |
 
 ## Safety model
 
-**`GP15` (physical pin 20) drives `SLP` on both DRV8833s.** Held low, the driver
-outputs go high-impedance and the motors are dead no matter what the PWM
-registers contain. This is a hardware disarm, not a software convention.
+**`GP15` (physical pin 20) drives `SLP` on both DRV8833s.** While it is low, the
+driver outputs are off and the motors cannot spin, whatever the PWM registers
+say. This is a hardware disarm, not a software convention.
 
-Enforced throughout:
+- `MotorBank` pulls `SLP` low **before** it creates any PWM channel.
+- Using `MotorBank` as a context manager disarms it on every exit, including
+  exceptions. New motor code must do the same, with `with MotorBank()` or a
+  `finally` block.
+- `MAX_DUTY` is capped at 0.70, and `tests/test_config.py` fails if it is raised.
+- Nothing in this repo arms the motors at power-on. The flight scripts
+  (`lift.py`, `flight_controller.py`, `autotune.py`) only spin up after you type
+  `ARM` at the board's prompt. The bench tests that spin motors (03, 07) only do
+  so when you run them. The ground station has no arm button.
+- **Every bench procedure assumes props are off.**
 
-- `MotorBank` drives `SLP` low **before** any PWM channel is constructed, so no
-  stale duty can reach a motor during startup.
-- Using it as a context manager disarms on every exit path, exceptions included.
-- Keep that pattern in any new motor-driving code: a `finally` block or
-  `with MotorBank()`, no exceptions.
-- `MAX_DUTY` is capped at 0.70 — two DRV8833s thermally shut down at sustained
-  full throttle — and `tests/test_config.py` fails if it is raised.
-- Nothing in this repo arms motors at power-on.
+The onboard LED pulses (long on, short off) while any script runs. If it stops
+and restarts, the board reset, which on this airframe usually means a brownout.
 
-**Every bench procedure assumes props are off.**
+## Development and tests
 
-### LED heartbeat
-
-Every script pulses the onboard LED for as long as it runs — a long on, short off
-that reads as a glow. Pulsing means the board is powered and its scheduler is
-running; **stopping and restarting means it reset**, which on this airframe means
-a brownout. It runs on a soft timer, so it survives blocking calls, and
-Keep that pattern in anything new: start it, stop it, no orphaned timers.
-
-It does not prove the main loop is progressing — a soft timer keeps firing even
-if the code above it hangs. It catches reset and power loss, which is the failure
-this hardware actually has.
-
-## Firmware
-
-[`firmware/`](firmware/README.md) is the integrated flight controller — sensor
-fusion, cascaded PID, motor mixing, and the arm/disarm safety logic, built on
-the drivers and control maths in `src/`. It self-levels and holds a heading; it
-does not hold altitude or position, since nothing on this airframe measures
-either. Read `firmware/README.md` in full before running it — it explains the
-safety model and the manual tuning procedure, both of which matter more than
-usual given there is still no RC link or physical kill switch (the WiFi
-ground station's DISARM is software, not a kill switch).
-
-## Development
+The tests run on a normal computer with no board attached.
+`tests/mocks/machine.py` fakes MicroPython's `machine` module. `Pin` records
+levels, `PWM` records duty, and `I2C` serves bytes from a register dict.
 
 ```bash
 python3 -m venv .venv
 ./.venv/bin/pip install pytest ruff
 
-./.venv/bin/python -m pytest        # 80 tests, no hardware needed
+./.venv/bin/python -m pytest        # firmware, autotune, policy and link tests
 ./.venv/bin/ruff check .
 ```
 
-`tests/mocks/machine.py` fakes MicroPython's hardware layer — `Pin` records its
-levels, `PWM` its duty, `I2C` serves bytes from a register dict — so the same
-code the board runs can be exercised on a computer with no board attached.
+On a machine with ROS installed, prefix pytest with
+`env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`. Otherwise ROS's
+`launch_testing` plugin auto-loads and crashes.
 
-> On a machine with ROS installed, prefix pytest with
-> `env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` — ROS's `launch_testing`
-> plugin auto-loads and crashes.
+`sim/sitl.py --check` and `sim/autotune_sim.py --check 12` are the simulator's
+end-to-end checks. No CI is attached.
+
+## Troubleshooting
+
+**Thonny prints `MPY: soft reboot` over and over, and none of your script's output.**
+There is a `main.py` on the board. MicroPython runs it on every boot *and every
+soft reboot*, and Thonny's Run always soft-reboots first, so `main.py` takes
+over every run. Run `./tools/upload.sh` (it removes it) or delete it in
+Thonny's Files view.
+
+**`ImportError: no module named 'config'`.** The library is not on the board.
+Pressing Run in Thonny does not upload anything. See
+[step 2](#2-put-the-library-on-the-board).
+
+**A script exits with no message.** MicroPython in Thonny drops the text of an
+uncaught `SystemExit("...")`. The scripts here print the message first; do the
+same in new code.
+
+**`mpremote: failed to access ... (it may be in use)`.** Thonny has the serial
+port open. Close Thonny (or disconnect it), or upload from Thonny's
+**View → Files → Upload to /** instead.
+
+**Your edit didn't take effect.** Thonny can save its open, older copy of a file
+over a change made on disk. After editing a file outside Thonny, close its tab
+*without saving* and reopen it. Then check the file on disk before trusting a
+run.
+
+**The IMU drops off I2C the moment the motors spin** (`IMU stopped answering`,
+or `i2c err` climbing). A sensor ground is on a breadboard rail, which is motor
+ground. Move GY-521 GND to Pico pin 38 and GPS GND to pin 3, and keep exactly one
+wire from Pico GND to the supply's GND rail. There is a multimeter check in
+[`docs/power.md`](docs/power.md#grounding-rule--breadboard-rails-are-motor-ground).
+
+**Motors stall or slow down on the bench supply.** First check the printed
+`m1..m4` values. If the code commands equal throttle, the cause is power, not
+the PID: supply sag, a split rail, or extra load on a motor (oversized tape
+flags caused this once). Run `lift.py` with `LEVELLING = False` to take the PID
+out of the picture. Feed the HW-131 from a USB charger of at least 2 A, not its
+barrel jack.
+
+**A motor spins the wrong way.** Swap its two leads at the driver's OUT1/OUT2.
+IN2/IN4 are tied to ground, so this cannot be fixed in code.
+
+**The ground station window looks rough or won't start.** Run it with
+`/usr/bin/python3` and install `python3-tk`.
+
+## Contributing
+
+Issues and pull requests are welcome. Day-to-day work goes on `dev`, and `main`
+is protected, so open pull requests against `dev`. Keep the hardware rules in
+[`CLAUDE.md`](CLAUDE.md): every script that can drive motors pulls GP15 low at
+start and in a `finally` block, `MAX_DUTY` stays at or below 0.70, and code in
+`src/` must import under CPython with `tests/mocks/` on the path. Run the tests
+and ruff before sending a change.
 
 ## License
 
